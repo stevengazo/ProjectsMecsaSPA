@@ -5,6 +5,7 @@
         public int ProjectId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        public string TaskNumber { get; set; }
         public DateTime CreationDate { get; set; }
         public int TypeId { get; set; }
         public int CustomerId { get; set; }
@@ -13,11 +14,13 @@
         public string OC { get; set; }
         public DateTime OCDate { get; set; }
         public bool IsDeleted { get; set; }
-        public string Seller { get; set; }
+        public bool IsCompleted { get; set; }
+        public int SellerId { get; set; }
         public int StateId { get; set; }
 
         #region Relaciones
-        public Type Type { get; set; }
+        public Seller Seller { get; set; }
+        public TypeModel Type { get; set; }
         public Customer Customer { get; set; }
         public State State { get; set; }
         public ICollection<FileModel> Files { get; set; }

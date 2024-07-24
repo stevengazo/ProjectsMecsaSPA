@@ -1,6 +1,6 @@
 ﻿namespace ProjectsMecsaSPA.Model
 {
-    public class Type
+    public class TypeModel
     {
         public int TypeId { get; set; }
         public string Name { get; set; }
