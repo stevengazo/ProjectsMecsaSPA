@@ -28,6 +28,24 @@ builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 
+using( var scope = app.Services.CreateScope())
+{
+	try
+	{
+        var db = scope.ServiceProvider.GetRequiredService<ProjectsDBContext>();
+        if (!db.Database.CanConnect())
+        {
+            db.Database.Migrate();
+        }
+    }
+	catch (Exception e)
+	{
+        Console.WriteLine($"Error in the Database Connection. {e.Message}");
+        Console.WriteLine($"Error in the Database Connection. {e.InnerException}");
+        throw;
+	}
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
