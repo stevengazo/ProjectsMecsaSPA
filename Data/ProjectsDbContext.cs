@@ -65,14 +65,14 @@ namespace ProjectsMecsaSPA.Data
                 },
                 new()
                 {
-                    StateId=4,
+                    StateId=6,
                     StateName="Informe",
                     SendNotification=false,
                     IsDeleted=false
                 },
                 new()
                 {
-                    StateId=4,
+                    StateId=5,
                     StateName="Revisión",
                     SendNotification=false,
                     IsDeleted=false
