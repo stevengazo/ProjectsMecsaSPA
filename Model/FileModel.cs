@@ -1,7 +1,10 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class FileModel
     {
+        [Key]
         public int FileId { get; set; }
         public string FileName { get; set; }
         public long Size { get; set; }

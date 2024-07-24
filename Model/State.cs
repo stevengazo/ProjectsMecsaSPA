@@ -1,7 +1,10 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class State
     {
+        [Key]
         public int StateId { get; set; }
         public string StateName { get; set; }
         public bool SendNotification { get; set; }

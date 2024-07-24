@@ -1,7 +1,10 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class MemberType
     {
+        [Key]
         public int MemberTypeId { get; set; }
         public string Name { get; set; }
 

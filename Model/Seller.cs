@@ -1,7 +1,10 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class Seller
     {
+        [Key]
         public int SellerId { get; set; }
         public string SellerName { get; set; }
         public string Email { get; set; }

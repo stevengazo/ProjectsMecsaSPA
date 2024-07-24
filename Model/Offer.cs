@@ -1,7 +1,11 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class Offer
     {
+        [Key]
         public int OfferId { get; set; }
         public DateTime Creation { get; set; }
         public string Customer { get; set; }
@@ -12,6 +16,7 @@
         public bool RequireSPAT { get; set; }
         public bool RequireSurgeProtector { get; set; }
         public bool RequireOther { get; set; }
+        [Column(TypeName = "decimal(15, 3)")]
         public decimal Amount { get; set; }
         public string CalculateBy { get; set; }
         public string Author { get; set; }

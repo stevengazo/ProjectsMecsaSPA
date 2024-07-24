@@ -1,7 +1,10 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class Commentary
     {
+        [Key]
         public int CommentaryID { get; set; }
         public string CommentaryText { get; set; }
         public DateTime CreationDate { get; set; }

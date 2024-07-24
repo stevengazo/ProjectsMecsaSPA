@@ -1,7 +1,11 @@
-﻿namespace ProjectsMecsaSPA.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ProjectsMecsaSPA.Model
 {
     public class Project
     {
+        [Key]
         public int ProjectId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
@@ -10,6 +14,7 @@
         public int TypeId { get; set; }
         public int CustomerId { get; set; }
         public string Ubication { get; set; }
+        [Column(TypeName = "decimal(15, 3)")]
         public decimal Amount { get; set; }
         public string OC { get; set; }
         public DateTime OCDate { get; set; }

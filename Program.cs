@@ -10,16 +10,19 @@ using ProjectsMecsaSPA.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
+var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
+
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(UsersConnection));
+builder.Services.AddDbContext<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
+
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddBlazorBootstrap();
 

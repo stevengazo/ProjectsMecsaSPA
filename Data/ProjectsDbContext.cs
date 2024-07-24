@@ -21,5 +21,64 @@ namespace ProjectsMecsaSPA.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            List<TypeModel> typeModels = new List<TypeModel>() { 
+                new TypeModel()
+                {
+                    TypeId=1,
+                    Name="No Establecido",
+                    IsDeleted=false,
+                }
+            };
+            modelBuilder.Entity<TypeModel>().HasData(typeModels);
+            List<State> states = new List<State>()
+            {
+                new()
+                {
+                    StateId=1,
+                    StateName="Pendiente",
+                    SendNotification=false,
+                    IsDeleted=false
+                },
+                new()
+                {
+                    StateId=2,
+                    StateName="Coordinado",
+                    SendNotification=false,
+                    IsDeleted=false
+                },
+                new()
+                {
+                    StateId=3,
+                    StateName="Requisición",
+                    SendNotification=false,
+                    IsDeleted=false
+                },
+                new()
+                {
+                    StateId=4,
+                    StateName="En ejecucion",
+                    SendNotification=false,
+                    IsDeleted=false
+                },
+                new()
+                {
+                    StateId=4,
+                    StateName="Informe",
+                    SendNotification=false,
+                    IsDeleted=false
+                },
+                new()
+                {
+                    StateId=4,
+                    StateName="Revisión",
+                    SendNotification=false,
+                    IsDeleted=false
+                }
+            };
+            modelBuilder.Entity<State>().HasData(states);
+        }
     }
 }
