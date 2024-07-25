@@ -250,6 +250,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 });
 
             migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "CustomerId", "DNI", "Name", "Type" },
+                values: new object[] { 1, 1, "Default", "Publico" });
+
+            migrationBuilder.InsertData(
+                table: "Seller",
+                columns: new[] { "SellerId", "Email", "SellerName" },
+                values: new object[] { 1, "", "Sample" });
+
+            migrationBuilder.InsertData(
                 table: "States",
                 columns: new[] { "StateId", "IsDeleted", "SendNotification", "StateName" },
                 values: new object[,]

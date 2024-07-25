@@ -12,7 +12,7 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240724210608_ProjectsMigration")]
+    [Migration("20240724233506_ProjectsMigration")]
     partial class ProjectsMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,6 +75,15 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasKey("CustomerId");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            CustomerId = 1,
+                            DNI = 1,
+                            Name = "Default",
+                            Type = "Publico"
+                        });
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.FileModel", b =>
@@ -325,6 +334,14 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasKey("SellerId");
 
                     b.ToTable("Seller");
+
+                    b.HasData(
+                        new
+                        {
+                            SellerId = 1,
+                            Email = "",
+                            SellerName = "Sample"
+                        });
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.State", b =>

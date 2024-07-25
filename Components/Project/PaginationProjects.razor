@@ -1,0 +1,89 @@
+﻿
+@inject ProjectsDBContext db
+
+@using Microsoft.EntityFrameworkCore
+@using System.Linq
+
+<h3>Pagination Projects</h3>
+
+<!-- Contenedor para la tabla de proyectos -->
+<div>
+    @if (projects != null && projects.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Creation Date</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in projects)
+                {
+                    <tr>
+                        <td>@project.Title</td>
+                        <td>@project.Description</td>
+                        <td>@project.CreationDate.ToShortDateString()</td>
+                        <td>@project.Amount.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No projects found.</p>
+    }
+</div>
+
+<!-- Componente de paginación -->
+<Pagination ActivePageNumber="currentPage"
+            TotalPages="totalPages"
+            DisplayPages="5"
+            FirstLinkIcon="IconName.ChevronDoubleLeft"
+            PreviousLinkIcon="IconName.ChevronLeft"
+            NextLinkIcon="IconName.ChevronRight"
+            LastLinkIcon="IconName.ChevronDoubleRight"
+            OnPageChanged="OnPageChanged" />
+
+@code {
+    private List<Project> projects;  // Lista para almacenar proyectos
+    private int currentPage = 1;      // Página actual
+    private int totalPages;           // Número total de páginas
+
+    // Cargar los proyectos con la paginación
+    protected override async Task OnInitializedAsync()
+    {
+        // Establece la cantidad de elementos por página
+        int pageSize = 10;
+
+        // Obtiene el total de proyectos en la base de datos
+        var totalProjects = await db.Projects.CountAsync(p => !p.IsDeleted);
+
+        // Calcula el número total de páginas
+        totalPages = (int)Math.Ceiling(totalProjects / (double)pageSize);
+
+        // Carga los proyectos para la página actual
+        await LoadProjectsAsync(currentPage, pageSize);
+    }
+
+    // Maneja el cambio de página
+    private async Task OnPageChanged(int pageNumber)
+    {
+        currentPage = pageNumber;
+        await LoadProjectsAsync(currentPage, 10);  // Cambia el tamaño de la página si es necesario
+    }
+
+    // Carga los proyectos de la página especificada
+    private async Task LoadProjectsAsync(int pageNumber, int pageSize)
+    {
+        projects = await db.Projects
+                            .Where(p => !p.IsDeleted)
+                            .OrderBy(p => p.CreationDate) // Ordena los proyectos por fecha de creación
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+    }
+}
