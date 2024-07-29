@@ -7,41 +7,30 @@
 <h3>Projects</h3>
 
 <!-- Contenedor para la tabla de proyectos con evento de scroll -->
-<div @ref="scrollContainer" @onscroll="OnScroll" style="height: 500px; overflow-y: auto;">
-    @if (projects != null && projects.Any())
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Creation Date</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var project in projects)
-                {
-                    <RowTableComponent ProjectObj="project" />
-                }
-            </tbody>
-        </table>
-
-        @if (isLoading)
-        {
-            <div>Loading...</div>
-        }
-    }
-    else
-    {
-        <p>No projects found.</p>
-    }
+<div @ref="scrollContainer" @onscroll="OnScroll" class="" style="height: 600px; overflow-y:auto;">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Creation Date</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in projects)
+            {
+                <RowTableComponent ProjectObj="project" />
+            }
+        </tbody>
+    </table>
 </div>
 
 @code {
     private List<Project> projects = new List<Project>();  // Lista para almacenar proyectos
     private int currentPage = 1;      // Página actual
     private bool isLoading = false;   // Indicador de carga
+    private Timer scrollTimer;         // Timer para debounce
 
     private ElementReference scrollContainer;
 
@@ -54,28 +43,44 @@
     // Maneja el evento de scroll
     private async Task OnScroll()
     {
-        var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
-        var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
-        var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
-
-        if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
+        if (scrollTimer != null)
         {
-            currentPage++;
-            await LoadProjectsAsync();
+            scrollTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
+
+        scrollTimer = new Timer(async _ =>
+        {
+            var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
+            var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
+            var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
+
+            if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
+            {
+                currentPage++;
+                await LoadProjectsAsync();
+            }
+        }, null, 300, Timeout.Infinite);
+    }
+
+    // Método para recargar la lista de proyectos
+    public async Task RefreshProjectsAsync()
+    {
+        currentPage = 1; // Reinicia la página a 1
+        projects.Clear(); // Limpia la lista actual de proyectos
+        await LoadProjectsAsync(); // Vuelve a cargar los proyectos
     }
 
     // Carga los proyectos de la página especificada
     private async Task LoadProjectsAsync()
     {
         isLoading = true;
-        int pageSize = 50;
+        int pageSize = 40;
 
         var newProjects = await db.Projects
                                    .Include(i => i.State)
                                    .Include(i => i.Customer)
                                    .Where(p => !p.IsDeleted)
-                                   .OrderBy(p => p.CreationDate) // Ordena los proyectos por fecha de creación
+                                   .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por fecha de creación
                                    .Skip((currentPage - 1) * pageSize)
                                    .Take(pageSize)
                                    .ToListAsync();
@@ -88,6 +93,6 @@
         isLoading = false;
 
         // Forzar una actualización de la interfaz para asegurarse de que el contenedor de desplazamiento se actualice
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 }
