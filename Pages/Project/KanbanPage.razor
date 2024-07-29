@@ -1,0 +1,91 @@
+﻿@page "/kanban"
+@inject ProjectsDBContext db
+
+<div class="row">
+    @foreach (var state in States)
+    {
+        <div class="col">
+            <h3>@state.StateName</h3>
+            <SortableList TItem="Project"
+                          Name="@($"projectList_{state.StateId}")"
+                          Data="@GetProjectsByState(state.StateId)"
+                          Context="project"
+                          OnUpdate="args => OnProjectListUpdate(args, state.StateId)"
+                          OnRemove="args => OnProjectListRemove(args, state.StateId)">
+                <ItemTemplate>
+                    @project.Title
+                </ItemTemplate>
+            </SortableList>
+        </div>
+    }
+</div>
+
+@code {
+    public List<State> States { get; set; } = new();
+    public Dictionary<int, List<Project>> ProjectLists { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        // Cargar estados
+        States = db.States.ToList();
+
+        // Inicializar el diccionario ProjectLists con listas vacías para cada estado
+        foreach (var state in States)
+        {
+            ProjectLists[state.StateId] = new List<Project>();
+        }
+
+        // Cargar proyectos
+        var projects = db.Projects.ToList();
+
+        // Agrupar proyectos por estado
+        foreach (var project in projects)
+        {
+            if (ProjectLists.ContainsKey(project.StateId))
+            {
+                ProjectLists[project.StateId].Add(project);
+            }
+        }
+    }
+
+    private List<Project> GetProjectsByState(int stateId)
+    {
+        return ProjectLists.ContainsKey(stateId) ? ProjectLists[stateId] : new List<Project>();
+    }
+
+    private void OnProjectListUpdate(SortableListEventArgs args, int stateId)
+    {
+        if (ProjectLists.ContainsKey(stateId))
+        {
+            var projectList = ProjectLists[stateId];
+            var itemToMove = projectList[args.OldIndex];
+             
+            projectList.RemoveAt(args.OldIndex);
+
+            if (args.NewIndex < projectList.Count)
+                projectList.Insert(args.NewIndex, itemToMove);
+            else
+                projectList.Add(itemToMove);
+        }
+    }
+
+    private void OnProjectListRemove(SortableListEventArgs args, int stateId)
+    {
+        if (ProjectLists.ContainsKey(stateId))
+        {
+            var projectList = ProjectLists[stateId];
+            var item = projectList[args.OldIndex];
+
+            // Aquí asumimos que args contiene el nuevo StateId. Debes ajustar esta lógica si es necesario.
+            var newStateId = args.NewIndex; // Asumimos que args tiene esta propiedad
+            if (ProjectLists.ContainsKey(newStateId))
+            {
+                ProjectLists[newStateId].Insert(args.NewIndex, item);
+                // Actualizar el estado del proyecto
+                item.StateId = newStateId;
+            }
+
+            projectList.RemoveAt(args.OldIndex);
+        }
+    }
+}

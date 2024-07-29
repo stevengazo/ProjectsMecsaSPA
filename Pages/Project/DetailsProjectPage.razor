@@ -1,0 +1,113 @@
+﻿@inject ProjectsDBContext db
+
+@page "/projects/{id}"
+@using Microsoft.EntityFrameworkCore
+
+
+<h3>Detalles del Proyecto</h3>
+
+
+<table class="table table-hover border ">
+    <tbody>
+        <tr>
+            <th>
+                @nameof(project.ProjectId)
+            </th>
+            <td>
+                @project.ProjectId
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.Title)
+            </th>
+            <td>
+                @project.Title
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.Description)
+            </th>
+            <td>
+                @project.Description
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.CreationDate)
+            </th>
+            <td>
+                @project.CreationDate.ToLongDateString()
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.Customer)
+            </th>
+            <td>
+                @project.Customer.Name
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.State)
+            </th>
+            <td>
+                @project.State.StateName
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.Type)
+            </th>
+            <td>
+                @project.Type.Name
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.OC)
+            </th>
+            <td>
+                @project.OC
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(project.OCDate)
+            </th>
+            <td>
+                @project.OCDate.ToLongDateString()
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public Project project = new();
+
+    public int _id;
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        var d = int.TryParse(id, out _id);
+        if (d)
+        {
+            project = db.Projects
+            .Include(e => e.State)
+            .Include(e => e.Type)
+            .Include(e => e.Customer)
+            .Include(e => e.Commentaries)
+            .Include(e => e.Seller)
+            .FirstOrDefault(i => i.ProjectId == _id);
+
+        }
+    }
+}
