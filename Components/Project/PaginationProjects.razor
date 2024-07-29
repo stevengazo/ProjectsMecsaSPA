@@ -1,13 +1,13 @@
-﻿
+﻿@inject IJSRuntime JSRuntime
 @inject ProjectsDBContext db
 
 @using Microsoft.EntityFrameworkCore
 @using System.Linq
 
-<h3>Pagination Projects</h3>
+<h3>Projects</h3>
 
-<!-- Contenedor para la tabla de proyectos -->
-<div>
+<!-- Contenedor para la tabla de proyectos con evento de scroll -->
+<div @ref="scrollContainer" @onscroll="OnScroll" style="height: 500px; overflow-y: auto;">
     @if (projects != null && projects.Any())
     {
         <table class="table table-striped">
@@ -22,15 +22,15 @@
             <tbody>
                 @foreach (var project in projects)
                 {
-                    <tr>
-                        <td>@project.Title</td>
-                        <td>@project.Description</td>
-                        <td>@project.CreationDate.ToShortDateString()</td>
-                        <td>@project.Amount.ToString("C")</td>
-                    </tr>
+                    <RowTableComponent ProjectObj="project" />
                 }
             </tbody>
         </table>
+
+        @if (isLoading)
+        {
+            <div>Loading...</div>
+        }
     }
     else
     {
@@ -38,52 +38,56 @@
     }
 </div>
 
-<!-- Componente de paginación -->
-<Pagination ActivePageNumber="currentPage"
-            TotalPages="totalPages"
-            DisplayPages="5"
-            FirstLinkIcon="IconName.ChevronDoubleLeft"
-            PreviousLinkIcon="IconName.ChevronLeft"
-            NextLinkIcon="IconName.ChevronRight"
-            LastLinkIcon="IconName.ChevronDoubleRight"
-            OnPageChanged="OnPageChanged" />
-
 @code {
-    private List<Project> projects;  // Lista para almacenar proyectos
+    private List<Project> projects = new List<Project>();  // Lista para almacenar proyectos
     private int currentPage = 1;      // Página actual
-    private int totalPages;           // Número total de páginas
+    private bool isLoading = false;   // Indicador de carga
 
-    // Cargar los proyectos con la paginación
+    private ElementReference scrollContainer;
+
+    // Cargar los proyectos iniciales
     protected override async Task OnInitializedAsync()
     {
-        // Establece la cantidad de elementos por página
-        int pageSize = 10;
-
-        // Obtiene el total de proyectos en la base de datos
-        var totalProjects = await db.Projects.CountAsync(p => !p.IsDeleted);
-
-        // Calcula el número total de páginas
-        totalPages = (int)Math.Ceiling(totalProjects / (double)pageSize);
-
-        // Carga los proyectos para la página actual
-        await LoadProjectsAsync(currentPage, pageSize);
+        await LoadProjectsAsync();
     }
 
-    // Maneja el cambio de página
-    private async Task OnPageChanged(int pageNumber)
+    // Maneja el evento de scroll
+    private async Task OnScroll()
     {
-        currentPage = pageNumber;
-        await LoadProjectsAsync(currentPage, 10);  // Cambia el tamaño de la página si es necesario
+        var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
+        var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
+        var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
+
+        if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
+        {
+            currentPage++;
+            await LoadProjectsAsync();
+        }
     }
 
     // Carga los proyectos de la página especificada
-    private async Task LoadProjectsAsync(int pageNumber, int pageSize)
+    private async Task LoadProjectsAsync()
     {
-        projects = await db.Projects
-                            .Where(p => !p.IsDeleted)
-                            .OrderBy(p => p.CreationDate) // Ordena los proyectos por fecha de creación
-                            .Skip((pageNumber - 1) * pageSize)
-                            .Take(pageSize)
-                            .ToListAsync();
+        isLoading = true;
+        int pageSize = 50;
+
+        var newProjects = await db.Projects
+                                   .Include(i => i.State)
+                                   .Include(i => i.Customer)
+                                   .Where(p => !p.IsDeleted)
+                                   .OrderBy(p => p.CreationDate) // Ordena los proyectos por fecha de creación
+                                   .Skip((currentPage - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
+
+        if (newProjects.Any())
+        {
+            projects.AddRange(newProjects);
+        }
+
+        isLoading = false;
+
+        // Forzar una actualización de la interfaz para asegurarse de que el contenedor de desplazamiento se actualice
+        StateHasChanged();
     }
 }

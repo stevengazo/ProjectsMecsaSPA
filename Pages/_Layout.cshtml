@@ -44,6 +44,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script>
 
+    <script>
+        window.getScrollPosition = function (element) {
+            return element.scrollTop;
+        };
+
+        window.getClientHeight = function (element) {
+            return element.clientHeight;
+        };
+
+        window.getScrollHeight = function (element) {
+            return element.scrollHeight;
+        };
+    </script>
+
+
 
 </body>
 </html>
