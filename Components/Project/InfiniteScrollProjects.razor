@@ -11,10 +11,14 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Creation Date</th>
-                <th>Amount</th>
+                <th>N</th>
+                <th>Titulo</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>OC</th>
+                <th>Tipo</th>
+                <th>Creacion</th>
+                <th>Monto</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +43,8 @@
     {
         await LoadProjectsAsync();
     }
+
+  
 
     // Maneja el evento de scroll
     private async Task OnScroll()
@@ -79,6 +85,8 @@
         var newProjects = await db.Projects
                                    .Include(i => i.State)
                                    .Include(i => i.Customer)
+                                   .Include(i => i.State)
+                                   .Include(i => i.Type)
                                    .Where(p => !p.IsDeleted)
                                    .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por fecha de creación
                                    .Skip((currentPage - 1) * pageSize)

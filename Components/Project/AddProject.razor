@@ -125,6 +125,9 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
     private Project project = new Project();
     private List<TypeModel> types = new List<TypeModel>();
     private List<Customer> customers = new List<Customer>();
@@ -138,6 +141,9 @@
         customers = db.Customers.ToList();
         sellers = db.Seller.ToList();
         states =  db.States.ToList();
+
+        project.CreationDate = DateTime.Now;
+        project.OCDate = DateTime.Now;
     }
 
     private async Task HandleValidSubmit()
@@ -147,7 +153,14 @@
         {
             db.Projects.Add(project);
             await db.SaveChangesAsync();
-            // Redirigir o mostrar un mensaje de éxito si es necesario
+
+            project = new();
+            project.CreationDate = DateTime.Now;
+            project.OCDate = DateTime.Now;
+        }
+        if (OnAdded.HasDelegate)
+        {
+            await OnAdded.InvokeAsync();
         }
     }
 }

@@ -1,15 +1,14 @@
 ﻿
-
-
 @page "/projects"
 
-<h3>IndexProjectPage</h3>
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<h3>Proyectos</h3>
 
 <Button Color="ButtonColor.Primary" @onclick="ShowEmployeeComponent">AddProject</Button>
 
 <Offcanvas @ref="offcanvas" />
-<PaginationProjects />
-
+<InfiniteScrollProjects @ref="infiniteScrollProjects" />
 
 
 
@@ -19,16 +18,41 @@
 
 @code {
     private Offcanvas offcanvas = default!;
+    private InfiniteScrollProjects infiniteScrollProjects = default!;
     private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+
 
     private async Task ShowEmployeeComponent()
     {
-        //        var parameters = new Dictionary<string, object>();
-        //      parameters.Add("EmployeeId", 322);
-        //    parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, ShowDTMessage));
-        await offcanvas.ShowAsync<AddProject>("Agregar Proyecto") ;
+        // Crear un diccionario para pasar parámetros al componente AddProject
+        var parameters = new Dictionary<string, object>
+        {
+            // Usar EventCallback.Factory.Create para crear un EventCallback para el método HandleProjectAdded
+            { nameof(AddProject.OnAdded), EventCallback.Factory.Create(this, HandleProjectAdded) }
+        };
+
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<AddProject>("Agregar Proyecto", parameters);
     }
 
-    
+    private async Task HandleProjectAdded()
+    {
+        // Solicitar al componente InfiniteScrollProjects que vuelva a cargar los datos
+        if (infiniteScrollProjects != null)
+        {
+
+            await infiniteScrollProjects.RefreshProjectsAsync();
+            await offcanvas.HideAsync();
+            messages.Add(new()
+                {
+                    Message = "Proyecto Agregado",
+                    Type = ToastType.Success
+                });
+                   }
+    }
 
 }
