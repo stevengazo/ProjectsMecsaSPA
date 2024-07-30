@@ -6,139 +6,108 @@
 
 <h3>Detalles del Proyecto</h3>
 
-<div class="row">
-    <div class="col">
-        <table class="table table-hover border ">
-            <tbody>
-                <tr>
-                    <th>
-                        @nameof(project.ProjectId)
-                    </th>
-                    <td>
-                        @project.ProjectId
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.Title)
-                    </th>
-                    <td>
-                        @project.Title
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.Description)
-                    </th>
-                    <td>
-                        @project.Description
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.CreationDate)
-                    </th>
-                    <td>
-                        @project.CreationDate.ToLongDateString()
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.Customer)
-                    </th>
-                    <td>
-                        @project.Customer.Name
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.State)
-                    </th>
-                    <td>
-                        @project.State.StateName
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.Type)
-                    </th>
-                    <td>
-                        @project.Type.Name
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.OC)
-                    </th>
-                    <td>
-                        @project.OC
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        @nameof(project.OCDate)
-                    </th>
-                    <td>
-                        @project.OCDate.ToLongDateString()
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="container">
     <div class="row">
-        <div>
-            <h5>
-                Comentarios
-            </h5>
-            <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-            <div class="d-flex flex-column overflow">
-                @foreach (var i in project.Commentaries)
-                {
-                    <div class="mx-2 my-1 p-2 border rounded">
-                        <label>@i.CreationDate.ToLongDateString() @i.Author</label>
-                        <p>
-                            @i.CommentaryText
-                        </p>
-                    </div>
-                }
+        <!-- Detalles del Proyecto -->
+        <div class="col-md-6 shadow p-1 border rounded ">
+            <table class="table table-hover border">
+                <tbody>
+                    <tr>
+                        <th>@nameof(project.ProjectId)</th>
+                        <td>@project.ProjectId</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.Title)</th>
+                        <td>@project.Title</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.Description)</th>
+                        <td>@project.Description</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.CreationDate)</th>
+                        <td>@project.CreationDate.ToLongDateString()</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.Customer)</th>
+                        <td>@project.Customer.Name</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.State)</th>
+                        <td>@project.State.StateName</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.Type)</th>
+                        <td>@project.Type.Name</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.OC)</th>
+                        <td>@project.OC</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.OCDate)</th>
+                        <td>@project.OCDate.ToLongDateString()</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-sm btn-outline-info" > Editar Proyecto</button>
+        </div>
+        <!-- Comentarios -->
+        <div class="col-md-6 shadow p-1 border rounded ">
+            <div class="overflow-auto" style="height: 400px;">
+                <h5>Comentarios</h5>
+                <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                <div class="d-flex flex-column overflow">
+                    @foreach (var i in project.Commentaries)
+                    {
+                        <div class="mx-2 my-1 p-2 border rounded">
+                            <label>@i.CreationDate.ToLongDateString() @i.Author</label>
+                            <p>@i.CommentaryText</p>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
-        <div>
-            facturas
+    </div>
+    <div class="row mt-3 shadow p-1 border rounded ">
+        <!-- Componentes de Archivos -->
+        <div class="col-md-12">
+            <UploadFileComponent id="project.ProjectId" />
+            <FileManagementComponent id="project.ProjectId" />
         </div>
     </div>
 </div>
 
 
 
-@code {
-    [Parameter]
-    public string id { get; set; }
+    @code {
+        [Parameter]
+        public string id { get; set; }
 
-    public Project project = new();
+        public Project project = new();
 
-    public int _id;
+        public int _id;
 
-    protected override async Task OnInitializedAsync()
-    {
-        base.OnInitializedAsync();
-        var d = int.TryParse(id, out _id);
-        if (d)
+        protected override async Task OnInitializedAsync()
         {
-            project = db.Projects
-            .Include(e => e.State)
-            .Include(e => e.Type)
-            .Include(e => e.Customer)
-            .Include(e => e.Commentaries)
-            .Include(e => e.Seller)
-            .FirstOrDefault(i => i.ProjectId == _id);
+            base.OnInitializedAsync();
+            var d = int.TryParse(id, out _id);
+            if (d)
+            {
+                project = db.Projects
+                .Include(e => e.State)
+                .Include(e => e.Type)
+                .Include(e => e.Customer)
+                .Include(e => e.Commentaries)
+                .Include(e => e.Seller)
+                .FirstOrDefault(i => i.ProjectId == _id);
 
+            }
         }
-    }
 
-    public async Task UpdateCommentaries()
-    {
-        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
-    }
+        public async Task UpdateCommentaries()
+        {
+            project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
+        }
 
-}
+    }
