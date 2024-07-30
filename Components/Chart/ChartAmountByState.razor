@@ -1,19 +1,23 @@
-﻿@inject ProjectsDBContext db
+﻿
+@inject ProjectsDBContext db
 
-<h6>Proyectos por vendedor</h6>
-<BarChart @ref="barChart" Width="500" Height="300" />
+<h6>
+    Monto Por Etapa
+</h6>
+<BarChart @ref="barChart" />
 
 @code {
     private BarChart barChart = default!;
     private BarChartOptions barChartOptions = default!;
     private ChartData chartData = default!;
 
-
     private List<string> GetLabelsStates()
     {
+        // Obtener nombres de estados
         return db.States.Select(w => w.StateName).ToList();
     }
-    private List<double?> GetCountByState(List<string> states)
+
+    private List<double?> GetAmountsByState(List<string> states)
     {
         // Obtener todos los proyectos y convertir a una lista en memoria
         var projects = db.Projects.ToList();
@@ -21,12 +25,12 @@
         // Obtener todos los estados y convertir a una lista en memoria
         var stateList = db.States.ToList();
 
-        // Crear un diccionario que mapea StateId a la cantidad de proyectos
-        var projectCountsByState = projects
+        // Crear un diccionario que mapea StateId a la suma de amounts
+        var projectAmountsByState = projects
             .GroupBy(p => p.StateId) // Agrupar proyectos por StateId
             .ToDictionary(
                 g => g.Key, // La clave es StateId
-                g => (double?)g.Count() // El valor es la cantidad de proyectos como double?
+                g => (double?)g.Sum(p => p.Amount) // La suma de amounts como double?
             );
 
         // Crear un diccionario que mapea el nombre del estado a StateId
@@ -37,15 +41,15 @@
                 s => s.StateId // El valor es el StateId
             );
 
-        // Crear la lista de conteos de proyectos basada en los StateIds
+        // Crear la lista de amounts basada en los StateIds
         var values = states
             .Select(state =>
             {
                 // Obtener el StateId para el nombre del estado
                 if (stateIds.TryGetValue(state, out var stateId))
                 {
-                    // Obtener el conteo de proyectos para el StateId
-                    return projectCountsByState.TryGetValue(stateId, out var count) ? count : (double?)null;
+                    // Obtener el amount total para el StateId
+                    return projectAmountsByState.TryGetValue(stateId, out var amount) ? amount : (double?)null;
                 }
                 return (double?)null; // Si no se encuentra el StateId, devolver null
             })
@@ -54,7 +58,6 @@
         return values;
     }
 
-
     protected override void OnInitialized()
     {
         var labels = GetLabelsStates();
@@ -62,7 +65,7 @@
 
         var dataset1 = new BarChartDataset()
             {
-                Data = GetCountByState(labels),
+                Data = GetAmountsByState(labels), // Usar el método actualizado
                 BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderWidth = new List<double> { 0 },
@@ -71,15 +74,28 @@
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
-        barChartOptions = new BarChartOptions();
-        barChartOptions.Responsive = true;
-        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
-        barChartOptions.IndexAxis = "y";
+        barChartOptions = new BarChartOptions
+            {
+                Responsive = true,
+                Interaction = new Interaction { Mode = InteractionMode.Y },
+                IndexAxis = "y",
+                Scales = new Scales
+                {
+                    X = new ChartAxes
+                    {
+                        Title = new ChartAxesTitle { Text = "Amount", Display = true }
+                    },
+                    Y = new ChartAxes
+                    {
+                        Title = new ChartAxesTitle { Text = "Etapa", Display = true }
+                    }
+                }
+            };
+        barChartOptions.Scales.X.Stacked = true;
+        barChartOptions.Scales.Y.Stacked = true;
+        barChartOptions.Plugins.Title!.Text = "";
+        barChartOptions.Plugins.Title.Display = true;
 
-        barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Visitors", Display = true };
-        barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Browser", Display = true };
-
-        barChartOptions.Plugins.Legend.Display = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -91,4 +107,3 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 }
-
