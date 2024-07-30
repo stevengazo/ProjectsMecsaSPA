@@ -86,7 +86,7 @@
 
     @foreach (var i in project.Commentaries)
     {
-        <div class="mx-2 my-1 px-1">
+        <div class="mx-2 my-1 p-2 border rounded">
             <label>@i.CreationDate.ToLongDateString() @i.Author</label>
             <p>
                 @i.CommentaryText

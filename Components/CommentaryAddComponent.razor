@@ -1,11 +1,10 @@
 ﻿@inject ProjectsDBContext db
 
-<EditForm Model="commentary">
-
-    <div>
+<EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
+    <div >
         <InputTextArea @bind-Value="commentary.CommentaryText" class="form-control" />
     </div>
-    <button class="btn btn-sm btn-outline-success" @onclick="Add">Agregar</button>
+    <button class="btn w-100 btn-sm btn-outline-success" @onclick="Add">Agregar</button>
 </EditForm>
 @code {
     [Parameter]

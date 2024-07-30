@@ -105,6 +105,8 @@
         ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
         ProjectTemp.StateId = TargetState.StateId;
 
+        ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
+
         db.Projects.Update(ProjectTemp);
         await db.SaveChangesAsync();
 
