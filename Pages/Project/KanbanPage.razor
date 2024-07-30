@@ -8,9 +8,10 @@
 <div class="row overflow-scroll">
     @foreach (var Obj in ProjectLists)
     {
-        <div class="col">
+        <div class="col h-100">
             <h3>@Obj.Key.StateName</h3>
-            <SortableList style="overflow-x:auto;"
+            <SortableList  
+                          class="h-100"
                           TItem="Project"
                           Name="@($"{Obj.Key.StateName}")"
                           Data="@Obj.Value"
@@ -54,7 +55,7 @@
     protected override void OnInitialized()
     {
         // Cargar estados
-        States = db.States.ToList();
+        States = db.States.Where(i=>!i.IsDeleted).ToList();
 
         // Inicializar el diccionario ProjectLists con listas vacías para cada estado
         foreach (var state in States)
@@ -71,6 +72,7 @@
         .Include(e => e.Commentaries)
         .Include(e => e.Customer)
         .Include(e => e.State)
+        .OrderByDescending(e => e.ProjectId)
         .Where(i => i.StateId == stateId).ToList();
     }
 

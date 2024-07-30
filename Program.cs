@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using ProjectsMecsaSPA.Areas.Identity;
 using ProjectsMecsaSPA.Data;
@@ -28,22 +25,22 @@ builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 
-using( var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
-	try
-	{
+    try
+    {
         var db = scope.ServiceProvider.GetRequiredService<ProjectsDBContext>();
         if (!db.Database.CanConnect())
         {
             db.Database.Migrate();
         }
     }
-	catch (Exception e)
-	{
+    catch (Exception e)
+    {
         Console.WriteLine($"Error in the Database Connection. {e.Message}");
         Console.WriteLine($"Error in the Database Connection. {e.InnerException}");
         throw;
-	}
+    }
 }
 
 // Configure the HTTP request pipeline.

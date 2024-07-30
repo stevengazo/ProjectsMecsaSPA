@@ -38,6 +38,14 @@
         </tr>
         <tr>
             <td>
+                @nameof(project.Seller)
+            </td>
+            <td>
+                @project.Seller?.SellerName
+            </td>
+        </tr>
+        <tr>
+            <td>
                 @nameof(project.State)
             </td>
             <td>
@@ -93,7 +101,6 @@
             </p>
         </div>
     }
-
 </div>
 
 @code {

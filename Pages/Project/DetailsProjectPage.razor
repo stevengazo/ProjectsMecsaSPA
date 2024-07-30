@@ -5,84 +5,105 @@
 
 
 <h3>Detalles del Proyecto</h3>
-
-
-<table class="table table-hover border ">
-    <tbody>
-        <tr>
-            <th>
-                @nameof(project.ProjectId)
-            </th>
-            <td>
-                @project.ProjectId
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.Title)
-            </th>
-            <td>
-                @project.Title
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.Description)
-            </th>
-            <td>
-                @project.Description
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.CreationDate)
-            </th>
-            <td>
-                @project.CreationDate.ToLongDateString()
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.Customer)
-            </th>
-            <td>
-                @project.Customer.Name
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.State)
-            </th>
-            <td>
-                @project.State.StateName
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.Type)
-            </th>
-            <td>
-                @project.Type.Name
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.OC)
-            </th>
-            <td>
-                @project.OC
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(project.OCDate)
-            </th>
-            <td>
-                @project.OCDate.ToLongDateString()
-            </td>
-        </tr>
-    </tbody>
-</table>
+<div class="row">
+    <div class="col">
+        <table class="table table-hover border ">
+            <tbody>
+                <tr>
+                    <th>
+                        @nameof(project.ProjectId)
+                    </th>
+                    <td>
+                        @project.ProjectId
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.Title)
+                    </th>
+                    <td>
+                        @project.Title
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.Description)
+                    </th>
+                    <td>
+                        @project.Description
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.CreationDate)
+                    </th>
+                    <td>
+                        @project.CreationDate.ToLongDateString()
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.Customer)
+                    </th>
+                    <td>
+                        @project.Customer.Name
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.State)
+                    </th>
+                    <td>
+                        @project.State.StateName
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.Type)
+                    </th>
+                    <td>
+                        @project.Type.Name
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.OC)
+                    </th>
+                    <td>
+                        @project.OC
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        @nameof(project.OCDate)
+                    </th>
+                    <td>
+                        @project.OCDate.ToLongDateString()
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<div class="col">
+        <div>
+            <h5>
+                Comentarios
+            </h5>
+            <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+            <div class="d-flex flex-column">
+                @foreach (var i in project.Commentaries)
+                {
+                    <div class="mx-2 my-1 p-2 border rounded">
+                        <label>@i.CreationDate.ToLongDateString() @i.Author</label>
+                        <p>
+                            @i.CommentaryText
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+</div>
+</div>
 
 
 
@@ -110,4 +131,10 @@
 
         }
     }
+
+    public async Task UpdateCommentaries()
+    {
+        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
+    }
+
 }

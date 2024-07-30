@@ -25,14 +25,15 @@ namespace ProjectsMecsaSPA.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            Seller seller = new() { 
-            SellerId=1,
-            SellerName="Sample",
-            Email=""
-            
+            Seller seller = new()
+            {
+                SellerId = 1,
+                SellerName = "Sample",
+                Email = ""
+
             };
             modelBuilder.Entity<Seller>().HasData(seller);
-            List<TypeModel> typeModels = new List<TypeModel>() { 
+            List<TypeModel> typeModels = new List<TypeModel>() {
                 new TypeModel()
                 {
                     TypeId=1,
@@ -42,15 +43,16 @@ namespace ProjectsMecsaSPA.Data
             };
             modelBuilder.Entity<TypeModel>().HasData(typeModels);
 
-            Customer customer = new Customer() { 
-            CustomerId=1,
-            Name="Default",
-            Type="Publico",
-            DNI=1
-         };
+            Customer customer = new Customer()
+            {
+                CustomerId = 1,
+                Name = "Default",
+                Type = "Publico",
+                DNI = 1
+            };
 
             modelBuilder.Entity<Customer>().HasData(customer);
-            
+
             List<State> states = new List<State>()
             {
                 new()
