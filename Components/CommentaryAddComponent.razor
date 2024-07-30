@@ -1,0 +1,38 @@
+﻿@inject ProjectsDBContext db
+
+<EditForm Model="commentary">
+
+    <div>
+        <InputTextArea @bind-Value="commentary.CommentaryText" class="form-control" />
+    </div>
+    <button class="btn btn-sm btn-outline-success" @onclick="Add">Agregar</button>
+</EditForm>
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+
+    private Commentary commentary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        commentary = new();
+
+        commentary.ProjectId = ProjectId;
+        base.OnInitializedAsync();   
+    }
+
+    private async Task Add()
+    {
+        commentary.Author = "";// A;adir autor
+        commentary.CreationDate = DateTime.Now;
+        commentary.ProjectId = ProjectId;
+        db.Comments.Add(commentary);
+        await db.SaveChangesAsync();
+        OnAdded.InvokeAsync();
+        commentary = new();
+        
+    }
+}

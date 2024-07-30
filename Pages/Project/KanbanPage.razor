@@ -1,7 +1,11 @@
 ﻿@page "/kanban"
+@using Microsoft.EntityFrameworkCore
 @inject ProjectsDBContext db
 
-<div class="row">
+
+<Offcanvas @ref="offcanvas" />
+
+<div class="row overflow-scroll">
     @foreach (var Obj in ProjectLists)
     {
         <div class="col">
@@ -14,19 +18,23 @@
                           OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
                           OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
                 <ItemTemplate>
-                    <table>
+                    <table @onclick="() => HandleProjectView(project)">
                         <tbody>
                             <tr>
-                               ID: @project.ProjectId
+                                <td>ID:</td>
+                                <td>@project.ProjectId</td>
                             </tr>
                             <tr>
-                                @project.Title
+                                <td>Title:</td>
+                                <td>@project.Title</td>
                             </tr>
                             <tr>
-                                @project.Type?.Name
+                                <td>Type:</td>
+                                <td>@project.Type?.Name</td>
                             </tr>
                             <tr>
-                                @project.Customer?.Name
+                                <td>Customer:</td>
+                                <td>@project.Customer?.Name</td>
                             </tr>
                         </tbody>
                     </table>
@@ -38,6 +46,7 @@
 
 
 @code {
+    private Offcanvas offcanvas = default!;
     public List<State> States { get; set; } = new();
     public Dictionary<State, List<Project>> ProjectLists { get; set; } = new();
 
@@ -56,7 +65,13 @@
 
     private List<Project> GetProjectsByState(int stateId)
     {
-        return db.Projects.Where(i => i.StateId == stateId).ToList();
+        return 
+        db.Projects
+        .Include( e=> e.Type)
+        .Include(e => e.Commentaries)
+        .Include(e => e.Customer)
+        .Include(e => e.State)
+        .Where(i => i.StateId == stateId).ToList();
     }
 
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
@@ -113,6 +128,20 @@
             return null;
         }
 
+    }
+
+
+    private async Task HandleProjectView(Project e)
+    {
+        // Crear un diccionario para pasar parámetros al componente AddProject
+        var parameters = new Dictionary<string, object>();
+        parameters.Add("project", e);
+
+
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<ProjectCanvaViewComponent>("Información del Proyecto", parameters);
     }
 
 }

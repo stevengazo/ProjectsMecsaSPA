@@ -1,0 +1,108 @@
+﻿@inject ProjectsDBContext db
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Categoria
+            </th>
+            <th>
+                Datos
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @nameof(project.ProjectId)
+            </td>
+            <td>
+                @project.ProjectId
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.Title)
+            </td>
+            <td>
+                @project.Title
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.Customer)
+            </td>
+            <td>
+                @project.Customer?.Name
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.State)
+            </td>
+            <td>
+                @project.State?.StateName
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.Type)
+            </td>
+            <td>
+                @project.Type?.Name
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.TaskNumber)
+            </td>
+            <td>
+                @project.TaskNumber
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.CreationDate)
+            </td>
+            <td>
+                @project.CreationDate.ToLongDateString()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @nameof(project.OC)
+            </td>
+            <td>
+                @project.OC
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h5>
+    Comentarios
+</h5>
+<CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+<div class="d-flex flex-column">
+
+    @foreach (var i in project.Commentaries)
+    {
+        <div class="mx-2 my-1 px-1">
+            <label>@i.CreationDate.ToLongDateString() @i.Author</label>
+            <p>
+                @i.CommentaryText
+            </p>
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public Project project { get; set; }
+
+    public async Task UpdateCommentaries()
+    {
+        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
+    }
+
+}
