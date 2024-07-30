@@ -6,14 +6,30 @@
     {
         <div class="col">
             <h3>@Obj.Key.StateName</h3>
-            <SortableList TItem="Project"
+            <SortableList style="overflow-x:auto;"
+                          TItem="Project"
                           Name="@($"{Obj.Key.StateName}")"
                           Data="@Obj.Value"
                           Context="project"
-                          OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId)"
+                          OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
                           OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
                 <ItemTemplate>
-                    @project.Title
+                    <table>
+                        <tbody>
+                            <tr>
+                               ID: @project.ProjectId
+                            </tr>
+                            <tr>
+                                @project.Title
+                            </tr>
+                            <tr>
+                                @project.Type?.Name
+                            </tr>
+                            <tr>
+                                @project.Customer?.Name
+                            </tr>
+                        </tbody>
+                    </table>
                 </ItemTemplate>
             </SortableList>
         </div>
@@ -34,7 +50,7 @@
         // Inicializar el diccionario ProjectLists con listas vacías para cada estado
         foreach (var state in States)
         {
-            ProjectLists[state] = GetProjectsByState(state.StateId); 
+            ProjectLists[state] = GetProjectsByState(state.StateId);
         }
     }
 
@@ -43,17 +59,60 @@
         return db.Projects.Where(i => i.StateId == stateId).ToList();
     }
 
-    private void OnProjectListUpdate(SortableListEventArgs args, int stateId)
+    private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
     {
+        var TargetState = GetState(NameState);
+        var ProjectTemp = GetProject(TargetState, args.OldIndex);
+
+        ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
+        var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
+        if (args.NewIndex < size)
+        {
+            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
+        }
+        else
+        {
+            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
+        }
 
     }
 
-    private void OnProjectListRemove(SortableListEventArgs args, int stateId)
+    private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)
     {
-        var TargetState = States.FirstOrDefault(i => i.StateName == args.ToListName);
-        var OriginState = States.FirstOrDefault(i => i.StateName == args.FromListName);
-        var Item = ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value[args.OldIndex];
-        ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(Item);
+        var TargetState = GetState(args.ToListName);
+        var OriginState = GetState(args.FromListName);
+
+        var ProjectTemp = GetProject(OriginState, args.OldIndex);
+
+        /// Delete  Project
+        ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
+        /// Insert Project
+        ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
+        ProjectTemp.StateId = TargetState.StateId;
+
+        db.Projects.Update(ProjectTemp);
+        await db.SaveChangesAsync();
+
 
     }
+
+    private State GetState(string Name)
+    {
+        return States.FirstOrDefault(i => i.StateName == Name);
+    }
+
+    private Project GetProject(State searchState, int index)
+    {
+        try
+        {
+            return ProjectLists.Where(i => i.Key == searchState).FirstOrDefault().Value[index];
+        }
+        catch (Exception e)
+        {
+
+            return null;
+        }
+
+    }
+
 }
