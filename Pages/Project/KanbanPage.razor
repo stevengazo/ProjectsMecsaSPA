@@ -21,8 +21,11 @@
                 <ItemTemplate>
                     <div @onclick="() => HandleProjectView(project)">
                         <h6><b>@project.Title</b></h6>
-                        <label>@project.Type?.Name</label>
-                        <label>@project.Customer?.Name</label>
+                        <div class="d-flex flex-column">
+                            <label><i>@project.Type?.Name</i></label>
+                            <label><i>@project.Customer?.Name</i></label>
+                        </div>
+                        
                      </div>
                 </ItemTemplate>
             </SortableList>
@@ -57,8 +60,9 @@
         .Include(e => e.Commentaries)
         .Include(e => e.Customer)
         .Include(e => e.State)
+        .Include(e => e.Seller)
         .OrderByDescending(e => e.ProjectId)
-        .Where(i => i.StateId == stateId).ToList();
+        .Where(i => i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
     }
 
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)

@@ -92,7 +92,6 @@
 </h5>
 <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
 <div class="d-flex flex-column">
-
     @foreach (var i in project.Commentaries)
     {
         <div class="mx-2 my-1 p-2 border rounded">
@@ -110,7 +109,8 @@
 
     public async Task UpdateCommentaries()
     {
-        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
+        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).OrderByDescending(e=>e.CommentaryID).ToList();
+        
     }
 
 }

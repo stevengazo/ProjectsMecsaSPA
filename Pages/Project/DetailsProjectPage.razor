@@ -25,13 +25,26 @@
                         <td>@project.Description</td>
                     </tr>
                     <tr>
-                        <th>@nameof(project.CreationDate)</th>
-                        <td>@project.CreationDate.ToLongDateString()</td>
+                        <th>@nameof(project.TaskNumber)</th>
+                        <td>@project.TaskNumber</td>
                     </tr>
                     <tr>
                         <th>@nameof(project.Customer)</th>
                         <td>@project.Customer.Name</td>
                     </tr>
+                    <tr>
+                        <th>@nameof(project.Ubication)</th>
+                        <td>@project.Ubication</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.Amount)</th>
+                        <td>@project.Amount</td>
+                    </tr>
+                    <tr>
+                        <th>@nameof(project.CreationDate)</th>
+                        <td>@project.CreationDate.ToLongDateString()</td>
+                    </tr>
+
                     <tr>
                         <th>@nameof(project.State)</th>
                         <td>@project.State.StateName</td>
@@ -54,7 +67,7 @@
         </div>
         <!-- Comentarios -->
         <div class="col-md-6 shadow p-1 border rounded ">
-            <div class="overflow-auto" style="height: 400px;">
+            <div class="overflow-auto" style="height: 450px;">
                 <h5>Comentarios</h5>
                 <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
                 <div class="d-flex flex-column overflow">
@@ -80,27 +93,28 @@
 
 
 
-    @code {
-        [Parameter]
-        public string id { get; set; }
+@code {
+    [Parameter]
+    public string id { get; set; }
 
-        public Project project = new();
+    public Project project = new();
 
-        public int _id;
+    public int _id;
 
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        var d = int.TryParse(id, out _id);
+        if (d)
         {
-            base.OnInitializedAsync();
-            var d = int.TryParse(id, out _id);
-            if (d)
-            {
-                project = db.Projects
-                .Include(e => e.State)
-                .Include(e => e.Type)
-                .Include(e => e.Customer)
-                .Include(e => e.Commentaries)
-                .Include(e => e.Seller)
-                .FirstOrDefault(i => i.ProjectId == _id);
+            project = db.Projects
+            .Include(e => e.State)
+            .Include(e => e.Type)
+            .Include(e => e.Customer)
+            .Include(e => e.Commentaries)
+            .Include(e => e.Seller)
+            .FirstOrDefault(i => i.ProjectId == _id);
+            project.Commentaries = project.Commentaries.OrderByDescending(i => i.CommentaryID).ToList();
 
             }
         }
