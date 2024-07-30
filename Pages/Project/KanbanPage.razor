@@ -19,26 +19,11 @@
                           OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
                           OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
                 <ItemTemplate>
-                    <table @onclick="() => HandleProjectView(project)">
-                        <tbody>
-                            <tr>
-                                <td>ID:</td>
-                                <td>@project.ProjectId</td>
-                            </tr>
-                            <tr>
-                                <td>Title:</td>
-                                <td>@project.Title</td>
-                            </tr>
-                            <tr>
-                                <td>Type:</td>
-                                <td>@project.Type?.Name</td>
-                            </tr>
-                            <tr>
-                                <td>Customer:</td>
-                                <td>@project.Customer?.Name</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div @onclick="() => HandleProjectView(project)">
+                        <h6><b>@project.Title</b></h6>
+                        <label>@project.Type?.Name</label>
+                        <label>@project.Customer?.Name</label>
+                     </div>
                 </ItemTemplate>
             </SortableList>
         </div>
