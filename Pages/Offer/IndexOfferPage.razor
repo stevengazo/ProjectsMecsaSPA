@@ -1,0 +1,85 @@
+﻿@page "/offers"
+@inject ProjectsDBContext db
+
+<h3>Ofertas Existentes</h3>
+
+@if (offers != null && offers.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>N</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Autor</th>
+                <th>Descripción</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var offer in offers)
+            {
+                <tr>
+                    <td>@offer.OfferId</td>
+                    <td>@offer.Creation.ToShortDateString()</td>
+                    <td>@offer.Customer</td>
+                    <td>@offer.Author</td>
+                    <td>@offer.Description</td>
+                    <td>$@offer.Amount</td>
+                    <td >
+                        <a class="btn btn-outline-info">
+                            Ver Oferta
+                        </a>
+                        <a class="btn btn-outline-success">
+                            Modificar
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No hay ofertas disponibles.</p>
+}
+
+<Pagination ActivePageNumber="@currentPageNumber"
+            TotalPages="@totalPages"
+            PageChanged="OnPageChangedAsync" />
+
+<text>Current Page Number: @currentPageNumber</text>
+
+@code {
+    private List<Offer> offers = new List<Offer>();
+    private int currentPageNumber = 1;
+    private int totalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOffersAsync(currentPageNumber);
+    }
+
+    private async Task LoadOffersAsync(int pageNumber)
+    {
+        // Definir cuántas ofertas mostrar por página
+        int pageSize = 100;
+
+        // Obtener el total de ofertas para calcular el número total de páginas
+        int totalOffers =  db.Offers.Count();
+        totalPages = (int)Math.Ceiling(totalOffers / (double)pageSize);
+
+        // Obtener las ofertas para la página actual
+        offers = db.Offers
+            .OrderByDescending(o => o.OfferId)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private async Task OnPageChangedAsync(int newPageNumber)
+    {
+        currentPageNumber = newPageNumber;
+        await LoadOffersAsync(currentPageNumber);
+    }
+}
