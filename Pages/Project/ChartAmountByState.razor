@@ -87,8 +87,12 @@
                         Title = new ChartAxesTitle { Text = "States", Display = true }
                     }
                 }
-              
             };
+        barChartOptions.Scales.X.Stacked = true;
+        barChartOptions.Scales.Y.Stacked = true;
+        barChartOptions.Plugins.Title!.Text = "Operating system";
+        barChartOptions.Plugins.Title.Display = true;
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
