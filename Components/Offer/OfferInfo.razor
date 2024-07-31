@@ -100,6 +100,18 @@
                         <ValidationMessage For="@(() => offer.Author)" />
                     </td>
                 </tr>
+                <div class="row mb-2">
+                    <label>Etapa</label>
+                    <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
+                        <option value="Enviado">Enviado</option>
+                        <option value="Negociación">Negociación</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Vendido">Vendido</option>
+                        <option value="Cobro">Cobro</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => offer.State)" />
+                </div>
+
                 <!-- Aquí puedes agregar más campos si es necesario -->
             </tbody>
         </table>
@@ -167,6 +179,10 @@ else
             <tr>
                 <th>@nameof(offer.Author)</th>
                 <td>@offer.Author</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.State)</th>
+                <td>@offer.State</td>
             </tr>
         </tbody>
     </table>

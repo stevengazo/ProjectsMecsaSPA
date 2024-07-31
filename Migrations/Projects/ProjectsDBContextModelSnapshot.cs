@@ -234,6 +234,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<bool>("RequiredLightningStrike")
                         .HasColumnType("bit");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

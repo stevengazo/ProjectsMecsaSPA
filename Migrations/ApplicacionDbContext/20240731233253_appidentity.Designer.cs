@@ -12,7 +12,7 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240731231401_appidentity")]
+    [Migration("20240731233253_appidentity")]
     partial class appidentity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,11 +183,19 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)

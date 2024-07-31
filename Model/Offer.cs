@@ -20,6 +20,7 @@ namespace ProjectsMecsaSPA.Model
         public string Description { get; set; }
 
         public string Type { get; set; }
+        public string State { get; set; }
 
         public bool RequiredDDCE { get; set; }
         public bool RequiredLightningStrike { get; set; }

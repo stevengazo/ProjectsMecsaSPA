@@ -25,9 +25,11 @@
                 <th>N</th>
                 <th>Fecha</th>
                 <th>Cliente</th>
+                <th>Estado</th>
                 <th>Autor</th>
                 <th>Descripción</th>
                 <th>Monto</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +39,7 @@
                     <td>@offer.OfferId</td>
                     <td>@offer.Creation.ToShortDateString()</td>
                     <td>@offer.Customer</td>
+                    <td>@offer.State</td>
                     <td>@offer.Author</td>
                     <td>@offer.Description</td>
                     <td>$@offer.Amount</td>
