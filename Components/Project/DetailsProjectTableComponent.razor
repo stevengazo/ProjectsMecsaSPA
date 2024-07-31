@@ -39,14 +39,16 @@
                 <tr>
                     <th>@nameof(project.Customer)</th>
                     <td>
-                        <InputSelect @bind-Value="project.CustomerId" class="form-control form-control-sm">
-                            <option value="">Seleccionar cliente</option>
-                            @foreach (var item in customers)
-                            {
-                                <option value="@item.Key">@item.Value</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => project.CustomerId)" />
+
+                 
+                        <AutoComplete @bind-Value="customerName"
+                                      TItem="Customer"
+                                      class="text-danger"
+                                      DataProvider="CustomersDataProvider"
+                                      PropertyName="Name"
+                                      Placeholder="Search a customer..."
+                                      OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+                                     
                     </td>
                 </tr>
                 <tr>
@@ -110,61 +112,59 @@
 }
 else
 {
-        <table class="table table-hover border">
-            <tbody>
-                <tr>
-                    <th>@nameof(project.ProjectId)</th>
-                    <td>@project.ProjectId</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Title)</th>
-                    <td>@project.Title</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Description)</th>
-                    <td>@project.Description</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.TaskNumber)</th>
-                    <td>@project.TaskNumber</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Customer)</th>
-                    <td>@project.Customer?.Name </td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Ubication)</th>
-                    <td>@project.Ubication</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Amount)</th>
-                    <td>@project.Amount</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.CreationDate)</th>
-                    <td>@project.CreationDate.ToLongDateString()</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.State)</th>
-                    <td>@project.State?.StateName</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.Type)</th>
-                    <td>@project.Type?.Name</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.OC)</th>
-                    <td>@project.OC</td>
-                </tr>
-                <tr>
-                    <th>@nameof(project.OCDate)</th>
-                    <td>@project.OCDate.ToLongDateString()</td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
-   
-  
+    <table class="table table-hover border">
+        <tbody>
+            <tr>
+                <th>@nameof(project.ProjectId)</th>
+                <td>@project.ProjectId</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Title)</th>
+                <td>@project.Title</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Description)</th>
+                <td>@project.Description</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.TaskNumber)</th>
+                <td>@project.TaskNumber</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Customer)</th>
+                <td>@project.Customer?.Name </td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Ubication)</th>
+                <td>@project.Ubication</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Amount)</th>
+                <td>@project.Amount</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.CreationDate)</th>
+                <td>@project.CreationDate.ToLongDateString()</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.State)</th>
+                <td>@project.State?.StateName</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.Type)</th>
+                <td>@project.Type?.Name</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.OC)</th>
+                <td>@project.OC</td>
+            </tr>
+            <tr>
+                <th>@nameof(project.OCDate)</th>
+                <td>@project.OCDate.ToLongDateString()</td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
 }
 
 @code {
@@ -172,8 +172,13 @@ else
     public Project project { get; set; }
     private bool IsEditing = false;
 
+    private string? customerName;
+
     private Dictionary<int, string> customers = new();
+    private Dictionary<int, string> filteredCustomers = new();
     private Dictionary<int, string> States = new();
+
+    private string searchCustomer = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -183,11 +188,30 @@ else
     private async Task LoadDataAsync()
     {
         customers = await db.Customers.ToDictionaryAsync(e => e.CustomerId, r => r.Name);
+        filteredCustomers = customers; // Inicialmente, todos los clientes están disponibles
         States = await db.States
             .Where(i => !i.IsDeleted)
             .OrderByDescending(e => e.StateName)
             .ToDictionaryAsync(e => e.StateId, r => r.StateName);
     }
+
+    private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
+    {
+        var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
+        return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
+    }
+
+    private void OnAutoCompleteChanged(Customer customer)
+    {
+        if(customer != null)
+        {
+            customerName = customer.Name;
+            project.Customer = customer;
+            project.CustomerId = customer.CustomerId;
+        }
+    }
+
+ 
 
     private void StartEdit()
     {
@@ -205,7 +229,6 @@ else
         {
             if (project != null)
             {
-
                 // Desvincula relaciones si es necesario
                 project.Seller = db.Seller.FirstOrDefault(e => e.SellerId == project.SellerId);
                 project.State = db.States.FirstOrDefault(e => e.StateId == project.StateId);
@@ -214,6 +237,12 @@ else
                 db.Projects.Update(project);
                 await db.SaveChangesAsync();
 
+                // Recargar el objeto desde la base de datos
+                project = await db.Projects
+                    .Include(p => p.Customer)
+                    .Include(p => p.State)
+                    .Include(p => p.Type)
+                    .FirstOrDefaultAsync(p => p.ProjectId == project.ProjectId);
 
                 IsEditing = false;
             }
