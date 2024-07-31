@@ -1,0 +1,219 @@
+﻿@page "/offer-edit"
+@inject ProjectsDBContext db
+
+@using System.ComponentModel.DataAnnotations
+
+@if (IsEditing)
+{
+    <EditForm Model="offer" OnValidSubmit="Update">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <table class="table table-hover border">
+            <tbody>
+                <tr>
+                    <th>@nameof(offer.OfferId)</th>
+                    <td>@offer.OfferId</td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Creation)</th>
+                    <td>
+                        <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Creation)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Customer)</th>
+                    <td>
+                        <InputText @bind-Value="offer.Customer" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Customer)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Description)</th>
+                    <td>
+                        <InputText @bind-Value="offer.Description" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Description)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Type)</th>
+                    <td>
+                        <InputText @bind-Value="offer.Type" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Type)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequiredDDCE)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequiredDDCE" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequiredLightningStrike)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequireTower)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequireTower" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequireSPAT)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequireSPAT" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequireSurgeProtector)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.RequireOther)</th>
+                    <td>
+                        <InputCheckbox @bind-Value="offer.RequireOther" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Amount)</th>
+                    <td>
+                        <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Amount)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.CalculateBy)</th>
+                    <td>
+                        <InputText @bind-Value="offer.CalculateBy" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.CalculateBy)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>@nameof(offer.Author)</th>
+                    <td>
+                        <InputText @bind-Value="offer.Author" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => offer.Author)" />
+                    </td>
+                </tr>
+                <!-- Aquí puedes agregar más campos si es necesario -->
+            </tbody>
+        </table>
+
+        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
+        <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
+    </EditForm>
+}
+else
+{
+    <table class="table table-hover border">
+        <tbody>
+            <tr>
+                <th>@nameof(offer.OfferId)</th>
+                <td>@offer.OfferId</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Creation)</th>
+                <td>@offer.Creation.ToShortDateString()</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Customer)</th>
+                <td>@offer.Customer</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Description)</th>
+                <td>@offer.Description</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Type)</th>
+                <td>@offer.Type</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequiredDDCE)</th>
+                <td>@offer.RequiredDDCE</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequiredLightningStrike)</th>
+                <td>@offer.RequiredLightningStrike</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequireTower)</th>
+                <td>@offer.RequireTower</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequireSPAT)</th>
+                <td>@offer.RequireSPAT</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequireSurgeProtector)</th>
+                <td>@offer.RequireSurgeProtector</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.RequireOther)</th>
+                <td>@offer.RequireOther</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Amount)</th>
+                <td>@offer.Amount</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.CalculateBy)</th>
+                <td>@offer.CalculateBy</td>
+            </tr>
+            <tr>
+                <th>@nameof(offer.Author)</th>
+                <td>@offer.Author</td>
+            </tr>
+        </tbody>
+    </table>
+    
+        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Oferta</button>
+    
+}
+
+@code {
+    [Parameter]
+    public Offer offer { get; set; }
+    private bool IsEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Aquí puedes cargar datos iniciales si es necesario
+    }
+
+    private void StartEdit()
+    {
+        IsEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        IsEditing = false;
+    }
+
+    private async Task Update()
+    {
+        try
+        {
+            if (offer != null)
+            {
+                db.Offers.Update(offer);
+                await db.SaveChangesAsync();
+
+                // Recargar el objeto desde la base de datos si es necesario
+                offer = await db.Offers.FindAsync(offer.OfferId);
+
+                IsEditing = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Manejar el error de actualización aquí
+            Console.WriteLine($"Error al actualizar la oferta: {ex.Message}");
+        }
+    }
+}

@@ -1,4 +1,4 @@
-﻿@inject ProjectsDBContext db
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
     <div >
@@ -12,11 +12,13 @@
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
+    ProjectsDBContext db;
 
     private Commentary commentary;
 
     protected override async Task OnInitializedAsync()
     {
+        db = DbContextFactory.CreateDbContext();
         commentary = new();
 
         commentary.ProjectId = ProjectId;

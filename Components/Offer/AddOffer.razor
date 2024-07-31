@@ -1,6 +1,7 @@
 ﻿@page "/add-offer"
 @using System.ComponentModel.DataAnnotations
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject NavigationManager NAV;
 
 <EditForm Model="offer" OnValidSubmit="Add" class="p-2">
     <DataAnnotationsValidator />
@@ -118,11 +119,9 @@
         using var context = DbContextFactory.CreateDbContext();
         context.Offers.Add(offer);
         await context.SaveChangesAsync();
-        offer = new();
-        offer = new Offer
-            {
-                Creation = DateTime.Now // Reinicia el modelo después de agregar la oferta con la fecha actual
-            };
-            OnAdded.InvokeAsync();
+        NAV.NavigateTo($"/offers/{offer.OfferId}");
+        
+   
+   
     }
 }
