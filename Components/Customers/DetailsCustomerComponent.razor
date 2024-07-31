@@ -1,38 +1,41 @@
 ﻿
-<table class="table">
-    <tr>
-        <th>
-            @nameof(customer.CustomerId)
-        </th>
-        <td>
-            @customer.CustomerId
-        </td>
-    </tr>
-    <tr>
-        <th>
-            @nameof(customer.Name)
-        </th>
-        <td>
-            @customer.Name
-        </td>
-    </tr>
+<div class="border rounded m-1 shadow" >
+    <table class="table table-sm">
         <tr>
-        <th>
-            @nameof(customer.Type)
-        </th>
-        <td>
-            @customer.Type
-        </td>
-    </tr>
-    <tr>
-        <th>
-            @nameof(customer.DNI)
-        </th>
-        <td>
-            @customer.DNI
-        </td>
-    </tr>
-</table>
+            <th>
+                @nameof(customer.CustomerId)
+            </th>
+            <td>
+                @customer.CustomerId
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(customer.Name)
+            </th>
+            <td>
+                @customer.Name
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(customer.Type)
+            </th>
+            <td>
+                @customer.Type
+            </td>
+        </tr>
+        <tr>
+            <th>
+                @nameof(customer.DNI)
+            </th>
+            <td>
+                @customer.DNI
+            </td>
+        </tr>
+    </table>
+</div>
+
 @code {
     [Parameter]
     public Customer customer { get; set; }

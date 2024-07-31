@@ -1,0 +1,82 @@
+﻿@page "/add-offer"
+@using System.ComponentModel.DataAnnotations
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<EditForm Model="offer" OnValidSubmit="Add">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row mb-2">
+        <label>Fecha Registro</label>
+        <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm"></InputDate>
+        <ValidationMessage For="@(() => offer.Creation)" />
+    </div>
+    <div class="row mb-2">
+        <label>Cliente</label>
+        <InputText @bind-Value="offer.Customer" class="form-control form-control-sm"></InputText>
+        <ValidationMessage For="@(() => offer.Customer)" />
+    </div>
+    <div class="row mb-2">
+        <label>Descripción</label>
+        <InputTextArea @bind-Value="offer.Description" class="form-control form-control-sm"></InputTextArea>
+        <ValidationMessage For="@(() => offer.Description)" />
+    </div>
+    <div class="row mb-2">
+        <label>Monto</label>
+        <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm"></InputNumber>
+        <ValidationMessage For="@(() => offer.Amount)" />
+    </div>
+    <div class="row mb-2">
+        <label>Cotizado Por</label>
+        <InputText @bind-Value="offer.CalculateBy" class="form-control form-control-sm"></InputText>
+        <ValidationMessage For="@(() => offer.CalculateBy)" />
+    </div>
+    <div class="row mb-2">
+        <label>Autor</label>
+        <InputText @bind-Value="offer.Author" class="form-control form-control-sm"></InputText>
+        <ValidationMessage For="@(() => offer.Author)" />
+    </div>
+    <div class="row mb-2">
+        <label>Requiere DDCE</label>
+        <InputCheckbox @bind-Value="offer.RequiredDDCE" class="form-check-input"></InputCheckbox>
+    </div>
+    <div class="justify-content-around mb-2 d-flex flex-row">
+        <label>Requiere Lightning Strike</label>
+        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" class="form-check-input"></InputCheckbox>
+    </div>
+    <div class="justify-content-around mb-2 d-flex flex-row">
+        <label>Requiere Torre</label>
+        <InputCheckbox @bind-Value="offer.RequireTower" class="form-check-input"></InputCheckbox>
+    </div>
+    <div class="justify-content-around mb-2 d-flex flex-row">
+        <label>Requiere SPAT</label>
+        <InputCheckbox @bind-Value="offer.RequireSPAT" class="form-check-input"></InputCheckbox>
+    </div>
+    <div class="justify-content-around mb-2 d-flex flex-row">
+        <label>Requiere Surge Protector</label>
+        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" class="form-check-input"></InputCheckbox>
+    </div>
+    <div class="justify-content-around mb-2 d-flex flex-row">
+        <label>Requiere Otro</label>
+        <InputCheckbox @bind-Value="offer.RequireOther" class="form-check-input"></InputCheckbox>
+    </div>
+    <button type="submit" class="btn btn-outline-success">Agregar</button>
+</EditForm>
+
+@code {
+    private Offer offer = new Offer
+        {
+            Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
+        };
+
+    private async Task Add()
+    {
+        using var context = DbContextFactory.CreateDbContext();
+        context.Offers.Add(offer);
+        await context.SaveChangesAsync();
+        offer = new Offer
+            {
+                Creation = DateTime.Now // Reinicia el modelo después de agregar la oferta con la fecha actual
+            };
+    }
+}

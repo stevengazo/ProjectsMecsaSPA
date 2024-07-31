@@ -17,13 +17,18 @@
 
 <Tabs EnableFadeEffect="true">
     <Tab Title="Todos" Active="true">
-        <Content>
-            <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+        <Content >
+            <div class="p-1">
+                <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+            </div>
+            
         </Content>
     </Tab>
     <Tab Title="Búsqueda">
-        <Content>
-            <SearchProjectsComponent />
+        <Content >
+            <div class="p-1">
+                <SearchProjectsComponent />
+            </div>
         </Content>
     </Tab>
 </Tabs>

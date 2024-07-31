@@ -2,7 +2,7 @@
 
 <ConfirmDialog @ref="dialog" />
 
-<tr>
+<tr class="@stylerow">
     <td>@ProjectObj.ProjectId</td>
     <td>@ProjectObj.Title</td>
     <td>@ProjectObj.Customer.Name</td>
@@ -35,10 +35,22 @@
     [Parameter]
     public Project ProjectObj { get; set; }
 
+    string stylerow = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if ( ProjectObj.IsDeleted)
+        {
+            stylerow = "text-danger text-decoration-line-through";
+        }
+        base.OnInitializedAsync();   
+    }
+
     private void Update()
     {
         db.Projects.Update(ProjectObj);
         db.SaveChanges();
+        StateHasChanged();
     }
 
     private void Disable()

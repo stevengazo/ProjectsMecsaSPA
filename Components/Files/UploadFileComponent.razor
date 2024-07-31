@@ -8,7 +8,9 @@
     <!-- Sección de carga de archivos -->
     <div class="d-flex flex-row justify-content-between ">
         <div class="d-flex flex-row gap-2 align-middle justify-content-center">
-            <span class=" bg-info h-100 h-100 p-2 rounded rounded-1 oi oi-data-transfer-upload text-white" aria-hidden="true"></span>
+            <div class=" bg-info h-100 h-100 p-2 rounded rounded-1 " >
+                <Icon Name="IconName.Upload" class="text-white"></Icon>
+            </div>
             <!-- Encabezado del componente -->
             <h4 class="text-start h-100 align-content-center">Cargar Nuevo Archivo</h4>
         </div>
@@ -35,8 +37,6 @@
     
 </div>
 <label class="text-info p-1 text-end">@uploadMessage</label>
-
-
 
 @code {
     [Parameter]

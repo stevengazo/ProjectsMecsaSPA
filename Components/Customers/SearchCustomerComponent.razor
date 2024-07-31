@@ -32,6 +32,7 @@
                 <th>Nombre</th>
                 <th>Tipo</th>
                 <th>DNI</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -41,6 +42,9 @@
                     <td>@customer.Name</td>
                     <td>@customer.Type</td>
                     <td>@customer.DNI</td>
+                    <a href="/customers/@customer.CustomerId" class="btn btn-sm btn-outline-info">
+                        Ver
+                    </a>
                 </tr>
             }
         </tbody>
