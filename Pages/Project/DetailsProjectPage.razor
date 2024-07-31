@@ -5,6 +5,15 @@
 
 
 <h3>Detalles del Proyecto</h3>
+@if (project.IsDeleted)
+{
+    <h3 class="text-danger">
+        Este proyecto fue marcado como inactivo
+    </h3>
+    <p class="text-danger">
+        Este proyecto no aparecerá en la zona Kanban de planificación. Además no podrá ingresar nueva información
+    </p>
+}
 
 <div class="container">
     <div class="row">
@@ -16,7 +25,10 @@
         <div class="col-md-6 shadow p-1 border rounded ">
             <div class="overflow-auto" style="height: 450px;">
                 <h5>Comentarios</h5>
-                <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                @if (!project.IsDeleted)
+                {
+                    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                }
                 <div class="d-flex flex-column overflow">
                     @foreach (var i in project.Commentaries)
                     {
@@ -32,7 +44,11 @@
     <div class="row mt-3 shadow p-1 border rounded ">
         <!-- Componentes de Archivos -->
         <div class="col-md-12">
-            <UploadFileComponent id="project.ProjectId" />
+            @if (!project.IsDeleted)
+            {
+                <UploadFileComponent id="project.ProjectId" />
+            }
+            
             <FileManagementComponent id="project.ProjectId" />
         </div>
     </div>

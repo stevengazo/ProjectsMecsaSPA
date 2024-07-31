@@ -1,4 +1,8 @@
-﻿<tr>
+﻿@inject ProjectsDBContext db
+
+<ConfirmDialog @ref="dialog" />
+
+<tr>
     <td>@ProjectObj.ProjectId</td>
     <td>@ProjectObj.Title</td>
     <td>@ProjectObj.Customer.Name</td>
@@ -11,16 +15,60 @@
         <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
         Ver
         </a>
-        <a href="#" class="btn btn-sm btn-outline-success">
-            Modificar
-        </a>
-        
+        @if (ProjectObj.IsDeleted)
+        {
+            <button  class="btn btn-sm btn-outline-success mx-1">
+                Activar Proyecto
+            </button>
+        }
+        else
+        {
+            <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
+                Desactivar 
+            </button>
+        }
     </td>
-
 </tr>
 
 
 @code {
     [Parameter]
     public Project ProjectObj { get; set; }
+
+    private void Update()
+    {
+        db.Projects.Update(ProjectObj);
+        db.SaveChanges();
+    }
+
+    private void Disable()
+    {
+        ProjectObj.IsDeleted = true;
+        Update();
+    }
+    private void Enable()
+    {
+        ProjectObj.IsDeleted = false;
+        Update();
+    }
+
+
+    private ConfirmDialog dialog = default!;
+
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Borrado de Proyecto",
+            message1: "El proyecto no será borrado de la base de datos. Solamente se marcará como \"Eliminado\". No podrá agregar mas información o modificarlo.",
+            message2: "Desea proceder?");
+
+        if (confirmation)
+        {
+            Disable();
+        }
+        else
+        {
+            Enable();
+        }
+    }
 }

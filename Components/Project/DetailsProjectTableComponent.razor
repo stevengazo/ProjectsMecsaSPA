@@ -87,7 +87,14 @@
                 </tr>
                 <tr>
                     <th>@nameof(project.Type)</th>
-                    <td>@project.Type.Name</td>
+                    <InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
+                        <option value="">Seleccionar un tipo</option>
+                        @foreach (var item in types)
+                        {
+                            <option value="@item.Key">@item.Value</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => project.TypeId)" />
                 </tr>
                 <tr>
                     <th>@nameof(project.OC)</th>
@@ -106,6 +113,7 @@
             </tbody>
         </table>
 
+        
         <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
         <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
     </EditForm>
@@ -164,7 +172,9 @@ else
             </tr>
         </tbody>
     </table>
-    <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+    @if(!project.IsDeleted){
+        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+    }
 }
 
 @code {
@@ -175,6 +185,7 @@ else
     private string? customerName;
 
     private Dictionary<int, string> customers = new();
+    private Dictionary<int, string> types = new();
     private Dictionary<int, string> filteredCustomers = new();
     private Dictionary<int, string> States = new();
 
@@ -188,6 +199,7 @@ else
     private async Task LoadDataAsync()
     {
         customers = await db.Customers.ToDictionaryAsync(e => e.CustomerId, r => r.Name);
+        types = await db.Types.ToDictionaryAsync(e => e.TypeId, r => r.Name);
         filteredCustomers = customers; // Inicialmente, todos los clientes están disponibles
         States = await db.States
             .Where(i => !i.IsDeleted)
@@ -211,11 +223,12 @@ else
         }
     }
 
- 
+
 
     private void StartEdit()
     {
         IsEditing = true;
+        customerName = project.Customer.Name;
     }
 
     private void CancelEdit()
