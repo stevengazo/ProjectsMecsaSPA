@@ -7,7 +7,7 @@ namespace ProjectsMecsaSPA.Model
         [Key]
         public int StateId { get; set; }
         public string StateName { get; set; }
-        public bool SendNotification { get; set; }
+        public int OrderPriority { get; set; }
         public bool IsDeleted { get; set; }
 
         #region Relaciones

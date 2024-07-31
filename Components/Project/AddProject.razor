@@ -89,6 +89,23 @@
     </div>
 
     <div class="form-group">
+        <label for="TypeOfChange">Tipo Cambio</label>
+        <InputNumber id="TypeOfChange" class="form-control" @bind-Value="project.TypeOfChange" />
+        <ValidationMessage For="@(() => project.TypeOfChange)" />
+    </div>
+
+    <div class="form-group">
+        <label for="IsCompleted">Moneda</label>
+        <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
+            <option value="Dolar">Dolar</option>
+            <option value="Colon">Colon</option>
+            <option value="Euro">Euro</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => project.CurrencyType)" />
+    </div>
+
+
+    <div class="form-group">
         <label for="OC">OC</label>
         <InputText id="OC" class="form-control" @bind-Value="project.OC" />
         <ValidationMessage For="@(() => project.OC)" />
@@ -107,20 +124,19 @@
         <ValidationMessage For="@(() => project.Ubication)" />
     </div>
 
-
     <div class="form-group">
-        <label for="IsDeleted">Is Deleted</label>
-        <InputCheckbox id="IsDeleted" class="form-check-input" @bind-Value="project.IsDeleted" />
-        <ValidationMessage For="@(() => project.IsDeleted)" />
+        <label for="Province">Provincia</label>
+        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+            <option value="San Josse">San Jose</option>
+            <option value="Heredia">Heredia</option>
+            <option value="Alajuela">Alajuela</option>
+            <option value="Cartago">Cartago</option>
+            <option value="Puntarenas">Puntarenas</option>
+            <option value="Guanacaste">Guanacaste</option>
+            <option value="Limon">Limon</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => project.CurrencyType)" />
     </div>
-
-
-    <div class="form-group">
-        <label for="IsCompleted">Is Completed</label>
-        <InputCheckbox id="IsCompleted" class="form-check-input" @bind-Value="project.IsCompleted" />
-        <ValidationMessage For="@(() => project.IsCompleted)" />
-    </div>
-
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Create Project</button>
     </div>
@@ -142,6 +158,7 @@
         types = db.Types.ToList();
         customers = db.Customers.ToList();
         sellers = db.Seller.ToList();
+        project.CurrencyType = "Dolar";
         states =  db.States.ToList();
 
         project.CreationDate = DateTime.Now;

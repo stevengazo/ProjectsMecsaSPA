@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class ProjectsMigration : Migration
+    public partial class projectsmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,40 +15,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 {
                     CustomerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     DNI = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.CustomerId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Members",
-                columns: table => new
-                {
-                    MemberId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Members", x => x.MemberId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MemberTypes",
-                columns: table => new
-                {
-                    MemberTypeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MemberTypes", x => x.MemberTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,8 +31,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     OfferId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Creation = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Customer = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Customer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     RequiredDDCE = table.Column<bool>(type: "bit", nullable: false),
                     RequiredLightningStrike = table.Column<bool>(type: "bit", nullable: false),
                     RequireTower = table.Column<bool>(type: "bit", nullable: false),
@@ -66,8 +40,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     RequireSurgeProtector = table.Column<bool>(type: "bit", nullable: false),
                     RequireOther = table.Column<bool>(type: "bit", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    CalculateBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CalculateBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     AuthorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -96,7 +70,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     StateId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     StateName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SendNotification = table.Column<bool>(type: "bit", nullable: false),
+                    OrderPriority = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -124,20 +98,23 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 {
                     ProjectId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TaskNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    TaskNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TypeId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    Ubication = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ubication = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    OC = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     OCDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     IsCompleted = table.Column<bool>(type: "bit", nullable: false),
                     SellerId = table.Column<int>(type: "int", nullable: false),
-                    StateId = table.Column<int>(type: "int", nullable: false)
+                    StateId = table.Column<int>(type: "int", nullable: false),
+                    CurrencyType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    TypeOfChange = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -165,6 +142,34 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         column: x => x.TypeId,
                         principalTable: "Types",
                         principalColumn: "TypeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bill",
+                columns: table => new
+                {
+                    BillId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BillNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastEditor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastEditionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BillDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bill", x => x.BillId);
+                    table.ForeignKey(
+                        name: "FK_Bill_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "ProjectId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -214,40 +219,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "MembersMemberships",
-                columns: table => new
-                {
-                    ProjectMemberId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MemberId = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<int>(type: "int", nullable: false),
-                    MemberTypeId = table.Column<int>(type: "int", nullable: false),
-                    Notify = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MembersMemberships", x => x.ProjectMemberId);
-                    table.ForeignKey(
-                        name: "FK_MembersMemberships_Members_MemberId",
-                        column: x => x.MemberId,
-                        principalTable: "Members",
-                        principalColumn: "MemberId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MembersMemberships_MemberTypes_MemberTypeId",
-                        column: x => x.MemberTypeId,
-                        principalTable: "MemberTypes",
-                        principalColumn: "MemberTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MembersMemberships_Projects_ProjectId",
-                        column: x => x.ProjectId,
-                        principalTable: "Projects",
-                        principalColumn: "ProjectId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "CustomerId", "DNI", "Name", "Type" },
@@ -260,21 +231,41 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
             migrationBuilder.InsertData(
                 table: "States",
-                columns: new[] { "StateId", "IsDeleted", "SendNotification", "StateName" },
+                columns: new[] { "StateId", "IsDeleted", "OrderPriority", "StateName" },
                 values: new object[,]
                 {
-                    { 1, false, false, "Pendiente" },
-                    { 2, false, false, "Coordinado" },
-                    { 3, false, false, "Requisición" },
-                    { 4, false, false, "En ejecucion" },
-                    { 5, false, false, "Revisión" },
-                    { 6, false, false, "Informe" }
+                    { 1, false, 1, "Pendiente" },
+                    { 2, false, 2, "Coordinado" },
+                    { 3, false, 3, "En ejecución" },
+                    { 4, false, 4, "Pendiente Informe" },
+                    { 5, false, 5, "Informe en proceso" },
+                    { 6, false, 6, "Ofertando" },
+                    { 7, false, 7, "Finalizado" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Types",
                 columns: new[] { "TypeId", "IsDeleted", "Name" },
-                values: new object[] { 1, false, "No Establecido" });
+                values: new object[,]
+                {
+                    { 1, false, "No Establecido" },
+                    { 2, false, "Mantenimiento DDCE" },
+                    { 3, false, "Mantenimiento Ionizante" },
+                    { 4, false, "Mantenimiento Torre" },
+                    { 5, false, "Instalación DDCE" },
+                    { 6, false, "Instalación Ionizante" },
+                    { 7, false, "Instalación Torre" },
+                    { 8, false, "Instalación SPAT" },
+                    { 9, false, "Instalación Supresores" },
+                    { 10, false, "Certificación SPAT" },
+                    { 11, false, "Eléctricos" },
+                    { 12, false, "Otros" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bill_ProjectId",
+                table: "Bill",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_ProjectId",
@@ -284,21 +275,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
             migrationBuilder.CreateIndex(
                 name: "IX_Files_ProjectId",
                 table: "Files",
-                column: "ProjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MembersMemberships_MemberId",
-                table: "MembersMemberships",
-                column: "MemberId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MembersMemberships_MemberTypeId",
-                table: "MembersMemberships",
-                column: "MemberTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MembersMemberships_ProjectId",
-                table: "MembersMemberships",
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
@@ -325,22 +301,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Bill");
+
+            migrationBuilder.DropTable(
                 name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Files");
 
             migrationBuilder.DropTable(
-                name: "MembersMemberships");
-
-            migrationBuilder.DropTable(
                 name: "Offers");
-
-            migrationBuilder.DropTable(
-                name: "Members");
-
-            migrationBuilder.DropTable(
-                name: "MemberTypes");
 
             migrationBuilder.DropTable(
                 name: "Projects");

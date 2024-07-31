@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectsMecsaSPA.Model
@@ -51,6 +53,15 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "El estado es obligatorio.")]
         public int StateId { get; set; }
 
+        [StringLength(10, ErrorMessage = "El tipo de moneda no puede exceder los 3 caracteres.")]
+        public string CurrencyType { get; set; }
+
+        [Column(TypeName = "decimal(15, 3)")]
+        public decimal TypeOfChange { get; set; }
+
+        [StringLength(100, ErrorMessage = "La provincia no puede exceder los 100 caracteres.")]
+        public string Province { get; set; }
+
         #region Relaciones
         public Seller Seller { get; set; }
         public TypeModel Type { get; set; }
@@ -58,7 +69,7 @@ namespace ProjectsMecsaSPA.Model
         public State State { get; set; }
         public ICollection<FileModel> Files { get; set; }
         public ICollection<Commentary> Commentaries { get; set; }
-        public ICollection<ProjectMember> ProjectMembers { get; set; }
+        public ICollection<Bill> Bills { get; set; }
         #endregion
     }
 }

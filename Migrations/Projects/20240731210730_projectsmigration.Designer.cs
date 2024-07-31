@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240724233506_ProjectsMigration")]
-    partial class ProjectsMigration
+    [Migration("20240731210730_projectsmigration")]
+    partial class projectsmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,57 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>
+                {
+                    b.Property<int>("BillId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillId"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(15,3)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("BillDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("BillNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastEditionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastEditor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BillId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Bill");
+                });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Commentary", b =>
                 {
@@ -66,11 +117,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("CustomerId");
 
@@ -122,44 +175,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.ToTable("Files");
                 });
 
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.Member", b =>
-                {
-                    b.Property<int>("MemberId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MemberId"), 1L, 1);
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MemberId");
-
-                    b.ToTable("Members");
-                });
-
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.MemberType", b =>
-                {
-                    b.Property<int>("MemberTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MemberTypeId"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MemberTypeId");
-
-                    b.ToTable("MemberTypes");
-                });
-
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Offer", b =>
                 {
                     b.Property<int>("OfferId")
@@ -173,25 +188,29 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<string>("Author")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("int");
 
                     b.Property<string>("CalculateBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("Creation")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Customer")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("RequireOther")
                         .HasColumnType("bit");
@@ -230,12 +249,18 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CurrencyType")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
@@ -245,10 +270,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<string>("OC")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("OCDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Province")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
@@ -258,18 +289,24 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<string>("TaskNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("TypeOfChange")
+                        .HasColumnType("decimal(15,3)");
+
                     b.Property<string>("Ubication")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("ProjectId");
 
@@ -282,37 +319,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasIndex("TypeId");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.ProjectMember", b =>
-                {
-                    b.Property<int>("ProjectMemberId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectMemberId"), 1L, 1);
-
-                    b.Property<int>("MemberId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MemberTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("Notify")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProjectMemberId");
-
-                    b.HasIndex("MemberId");
-
-                    b.HasIndex("MemberTypeId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("MembersMemberships");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Seller", b =>
@@ -355,8 +361,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("SendNotification")
-                        .HasColumnType("bit");
+                    b.Property<int>("OrderPriority")
+                        .HasColumnType("int");
 
                     b.Property<string>("StateName")
                         .IsRequired()
@@ -371,43 +377,50 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             StateId = 1,
                             IsDeleted = false,
-                            SendNotification = false,
+                            OrderPriority = 1,
                             StateName = "Pendiente"
                         },
                         new
                         {
                             StateId = 2,
                             IsDeleted = false,
-                            SendNotification = false,
+                            OrderPriority = 2,
                             StateName = "Coordinado"
                         },
                         new
                         {
                             StateId = 3,
                             IsDeleted = false,
-                            SendNotification = false,
-                            StateName = "Requisición"
+                            OrderPriority = 3,
+                            StateName = "En ejecución"
                         },
                         new
                         {
                             StateId = 4,
                             IsDeleted = false,
-                            SendNotification = false,
-                            StateName = "En ejecucion"
-                        },
-                        new
-                        {
-                            StateId = 6,
-                            IsDeleted = false,
-                            SendNotification = false,
-                            StateName = "Informe"
+                            OrderPriority = 4,
+                            StateName = "Pendiente Informe"
                         },
                         new
                         {
                             StateId = 5,
                             IsDeleted = false,
-                            SendNotification = false,
-                            StateName = "Revisión"
+                            OrderPriority = 5,
+                            StateName = "Informe en proceso"
+                        },
+                        new
+                        {
+                            StateId = 6,
+                            IsDeleted = false,
+                            OrderPriority = 6,
+                            StateName = "Ofertando"
+                        },
+                        new
+                        {
+                            StateId = 7,
+                            IsDeleted = false,
+                            OrderPriority = 7,
+                            StateName = "Finalizado"
                         });
                 });
 
@@ -436,7 +449,84 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                             TypeId = 1,
                             IsDeleted = false,
                             Name = "No Establecido"
+                        },
+                        new
+                        {
+                            TypeId = 2,
+                            IsDeleted = false,
+                            Name = "Mantenimiento DDCE"
+                        },
+                        new
+                        {
+                            TypeId = 3,
+                            IsDeleted = false,
+                            Name = "Mantenimiento Ionizante"
+                        },
+                        new
+                        {
+                            TypeId = 4,
+                            IsDeleted = false,
+                            Name = "Mantenimiento Torre"
+                        },
+                        new
+                        {
+                            TypeId = 5,
+                            IsDeleted = false,
+                            Name = "Instalación DDCE"
+                        },
+                        new
+                        {
+                            TypeId = 6,
+                            IsDeleted = false,
+                            Name = "Instalación Ionizante"
+                        },
+                        new
+                        {
+                            TypeId = 7,
+                            IsDeleted = false,
+                            Name = "Instalación Torre"
+                        },
+                        new
+                        {
+                            TypeId = 8,
+                            IsDeleted = false,
+                            Name = "Instalación SPAT"
+                        },
+                        new
+                        {
+                            TypeId = 9,
+                            IsDeleted = false,
+                            Name = "Instalación Supresores"
+                        },
+                        new
+                        {
+                            TypeId = 10,
+                            IsDeleted = false,
+                            Name = "Certificación SPAT"
+                        },
+                        new
+                        {
+                            TypeId = 11,
+                            IsDeleted = false,
+                            Name = "Eléctricos"
+                        },
+                        new
+                        {
+                            TypeId = 12,
+                            IsDeleted = false,
+                            Name = "Otros"
                         });
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
+                        .WithMany("Bills")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Commentary", b =>
@@ -496,55 +586,18 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Type");
                 });
 
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.ProjectMember", b =>
-                {
-                    b.HasOne("ProjectsMecsaSPA.Model.Member", "Member")
-                        .WithMany("ProjectMembers")
-                        .HasForeignKey("MemberId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectsMecsaSPA.Model.MemberType", "MemberType")
-                        .WithMany("ProjectMembers")
-                        .HasForeignKey("MemberTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
-                        .WithMany("ProjectMembers")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Member");
-
-                    b.Navigation("MemberType");
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Customer", b =>
                 {
                     b.Navigation("Projects");
                 });
 
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.Member", b =>
-                {
-                    b.Navigation("ProjectMembers");
-                });
-
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.MemberType", b =>
-                {
-                    b.Navigation("ProjectMembers");
-                });
-
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Project", b =>
                 {
+                    b.Navigation("Bills");
+
                     b.Navigation("Commentaries");
 
                     b.Navigation("Files");
-
-                    b.Navigation("ProjectMembers");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Seller", b =>
