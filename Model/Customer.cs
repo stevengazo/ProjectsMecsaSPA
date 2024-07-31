@@ -6,8 +6,17 @@ namespace ProjectsMecsaSPA.Model
     {
         [Key]
         public int CustomerId { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [StringLength(100, ErrorMessage = "El nombre no puede exceder los 100 caracteres.")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "El tipo es obligatorio.")]
+        [StringLength(50, ErrorMessage = "El tipo no puede exceder los 50 caracteres.")]
         public string Type { get; set; }
+
+        [Required(ErrorMessage = "El DNI es obligatorio.")]
+        [Range(1000000, 99999999, ErrorMessage = "El DNI debe estar entre 1,000,000 y 99,999,999.")]
         public int DNI { get; set; }
 
         #region Relaciones

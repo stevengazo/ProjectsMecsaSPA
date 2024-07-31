@@ -1,0 +1,56 @@
+﻿@inject ProjectsDBContext db
+
+<EditForm Model="customer" OnValidSubmit="Add">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name">
+            @nameof(customer.Name)
+        </label>
+        <InputText id="name" @bind-Value="customer.Name" class="form-control" />
+        <ValidationMessage For="@(() => customer.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="dni">
+            @nameof(customer.DNI)
+        </label>
+        <InputNumber id="dni" @bind-Value="customer.DNI" class="form-control" />
+        <ValidationMessage For="@(() => customer.DNI)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="type">
+            @nameof(customer.Type)
+        </label>
+        <InputSelect id="type" @bind-Value="customer.Type" class="form-select">
+            <option value="">Seleccione un tipo</option>
+            <option value="Publico">Público</option>
+            <option value="Privado">Privado</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => customer.Type)" />
+    </div>
+
+    <button type="submit" class="btn btn-outline-success">Agregar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    private Customer customer = new();
+
+    private async Task Add()
+    {
+        if (customer != null)
+        {
+            db.Customers.Add(customer);
+            await db.SaveChangesAsync();
+            // Llama al EventCallback si hay algún componente padre que necesita saber que se ha añadido un cliente
+            await OnAdded.InvokeAsync();
+            // Opcionalmente, puedes redirigir al usuario o limpiar el formulario
+            customer = new Customer(); // Limpiar el formulario
+        }
+    }
+}

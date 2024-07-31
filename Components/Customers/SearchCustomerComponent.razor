@@ -1,0 +1,79 @@
+﻿@page "/search-customer"
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h3>Buscar Clientes</h3>
+
+<EditForm Model="searchModel" OnValidSubmit="ApplyFilters">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name">Nombre</label>
+        <InputText id="name" @bind-Value="searchModel.Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="type">Tipo</label>
+        <InputSelect id="type" @bind-Value="searchModel.Type" class="form-select">
+            <option value="">Seleccione un tipo</option>
+            <option value="Publico">Público</option>
+            <option value="Privado">Privado</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</EditForm>
+
+@if (customers != null)
+{
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>DNI</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in customers)
+            {
+                <tr>
+                    <td>@customer.Name</td>
+                    <td>@customer.Type</td>
+                    <td>@customer.DNI</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private SearchModel searchModel = new();
+    private List<Customer> customers = new();
+
+    private async Task ApplyFilters()
+    {
+        using (var db = DbContextFactory.CreateDbContext())
+        {
+            var query = db.Customers.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchModel.Name))
+            {
+                query = query.Where(c => c.Name.Contains(searchModel.Name));
+            }
+
+            if (!string.IsNullOrEmpty(searchModel.Type))
+            {
+                query = query.Where(c => c.Type == searchModel.Type);
+            }
+
+            customers = await query.ToListAsync();
+        }
+    }
+
+    public class SearchModel
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
+}

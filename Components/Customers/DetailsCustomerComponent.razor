@@ -1,0 +1,39 @@
+﻿
+<table class="table">
+    <tr>
+        <th>
+            @nameof(customer.CustomerId)
+        </th>
+        <td>
+            @customer.CustomerId
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @nameof(customer.Name)
+        </th>
+        <td>
+            @customer.Name
+        </td>
+    </tr>
+        <tr>
+        <th>
+            @nameof(customer.Type)
+        </th>
+        <td>
+            @customer.Type
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @nameof(customer.DNI)
+        </th>
+        <td>
+            @customer.DNI
+        </td>
+    </tr>
+</table>
+@code {
+    [Parameter]
+    public Customer customer { get; set; }
+}
