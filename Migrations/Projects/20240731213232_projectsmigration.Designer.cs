@@ -12,7 +12,7 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240731210730_projectsmigration")]
+    [Migration("20240731213232_projectsmigration")]
     partial class projectsmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<bool>("RequiredLightningStrike")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OfferId");
 

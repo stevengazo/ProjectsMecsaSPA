@@ -2,7 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<EditForm Model="offer" OnValidSubmit="Add">
+<EditForm Model="offer" OnValidSubmit="Add" class="p-2">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -37,33 +37,77 @@
         <ValidationMessage For="@(() => offer.Author)" />
     </div>
     <div class="row mb-2">
-        <label>Requiere DDCE</label>
-        <InputCheckbox @bind-Value="offer.RequiredDDCE" class="form-check-input"></InputCheckbox>
+        <label>Tipo Oferta</label>
+        <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
+            <option  value="Mantenimiento">Mantenimiento</option>
+            <option value="Instalacion">Instalacion</option>
+            <option value="Mejoras">Mejoras</option>
+            <option value="Otro">Otro</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => offer.Author)" />
     </div>
-    <div class="justify-content-around mb-2 d-flex flex-row">
-        <label>Requiere Lightning Strike</label>
-        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" class="form-check-input"></InputCheckbox>
+
+    <div class="table-responsive">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere DDCE</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequiredDDCE" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere Lightning Strike</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere Torre</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequireTower" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere SPAT</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequireSPAT" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere Surge Protector</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <label>Requiere Otro</label>
+                    </td>
+                    <td class="text-center">
+                        <InputCheckbox @bind-Value="offer.RequireOther" class="form-check-input"></InputCheckbox>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="justify-content-around mb-2 d-flex flex-row">
-        <label>Requiere Torre</label>
-        <InputCheckbox @bind-Value="offer.RequireTower" class="form-check-input"></InputCheckbox>
-    </div>
-    <div class="justify-content-around mb-2 d-flex flex-row">
-        <label>Requiere SPAT</label>
-        <InputCheckbox @bind-Value="offer.RequireSPAT" class="form-check-input"></InputCheckbox>
-    </div>
-    <div class="justify-content-around mb-2 d-flex flex-row">
-        <label>Requiere Surge Protector</label>
-        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" class="form-check-input"></InputCheckbox>
-    </div>
-    <div class="justify-content-around mb-2 d-flex flex-row">
-        <label>Requiere Otro</label>
-        <InputCheckbox @bind-Value="offer.RequireOther" class="form-check-input"></InputCheckbox>
-    </div>
+
     <button type="submit" class="btn btn-outline-success">Agregar</button>
 </EditForm>
 
 @code {
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
     private Offer offer = new Offer
         {
             Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
@@ -74,9 +118,11 @@
         using var context = DbContextFactory.CreateDbContext();
         context.Offers.Add(offer);
         await context.SaveChangesAsync();
+        offer = new();
         offer = new Offer
             {
                 Creation = DateTime.Now // Reinicia el modelo después de agregar la oferta con la fecha actual
             };
+            OnAdded.InvokeAsync();
     }
 }

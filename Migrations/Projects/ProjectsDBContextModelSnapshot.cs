@@ -228,6 +228,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<bool>("RequiredLightningStrike")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("OfferId");
 
                     b.ToTable("Offers");
