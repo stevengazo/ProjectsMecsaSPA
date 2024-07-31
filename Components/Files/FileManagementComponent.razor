@@ -1,6 +1,5 @@
 ﻿@inject IJSRuntime JS
-@inject ProjectsDBContext db
-
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <div class="p-2 my-3 ">
     <div class="d-flex flex-row gap-2 align-middle justify-content-start">
@@ -41,8 +40,11 @@
     public int id { get; set; }
     List<FileModel> fileModels = new();
 
+    ProjectsDBContext db;
+
     protected override async Task OnInitializedAsync()
     {
+        db = DbContextFactory.CreateDbContext();
         await LoadFilesAsync();
     }
 

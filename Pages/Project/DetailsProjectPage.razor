@@ -10,60 +10,7 @@
     <div class="row">
         <!-- Detalles del Proyecto -->
         <div class="col-md-6 shadow p-1 border rounded ">
-            <table class="table table-hover border">
-                <tbody>
-                    <tr>
-                        <th>@nameof(project.ProjectId)</th>
-                        <td>@project.ProjectId</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Title)</th>
-                        <td>@project.Title</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Description)</th>
-                        <td>@project.Description</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.TaskNumber)</th>
-                        <td>@project.TaskNumber</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Customer)</th>
-                        <td>@project.Customer.Name</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Ubication)</th>
-                        <td>@project.Ubication</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Amount)</th>
-                        <td>@project.Amount</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.CreationDate)</th>
-                        <td>@project.CreationDate.ToLongDateString()</td>
-                    </tr>
-
-                    <tr>
-                        <th>@nameof(project.State)</th>
-                        <td>@project.State.StateName</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.Type)</th>
-                        <td>@project.Type.Name</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.OC)</th>
-                        <td>@project.OC</td>
-                    </tr>
-                    <tr>
-                        <th>@nameof(project.OCDate)</th>
-                        <td>@project.OCDate.ToLongDateString()</td>
-                    </tr>
-                </tbody>
-            </table>
-            <button class="btn btn-sm btn-outline-info" > Editar Proyecto</button>
+            <DetailsProjectTableComponent project="project" />
         </div>
         <!-- Comentarios -->
         <div class="col-md-6 shadow p-1 border rounded ">

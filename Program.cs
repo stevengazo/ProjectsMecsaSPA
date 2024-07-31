@@ -11,7 +11,8 @@ var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(UsersConnection));
-builder.Services.AddDbContext<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
+//builder.Services.AddDbContext<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
+builder.Services.AddDbContextFactory<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
 
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
