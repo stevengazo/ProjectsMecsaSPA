@@ -152,13 +152,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 {
                     BillId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    BillNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AuthorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastEditor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LastEditor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastEditionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BillDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false)

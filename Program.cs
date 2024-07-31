@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectsMecsaSPA.Areas.Identity;
 using ProjectsMecsaSPA.Data;
+using ProjectsMecsaSPA.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +17,11 @@ builder.Services.AddDbContextFactory<ProjectsDBContext>(options => options.UseSq
 
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<UserIdentityEx>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<UserIdentityEx>>();
 
 builder.Services.AddBlazorBootstrap();
 
@@ -43,6 +44,24 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (!db.Database.CanConnect())
+        {
+            db.Database.Migrate();
+        }
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Error in the Database Connection. {e.Message}");
+        Console.WriteLine($"Error in the Database Connection. {e.InnerException}");
+        throw;
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
