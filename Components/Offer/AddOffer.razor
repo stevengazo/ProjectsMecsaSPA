@@ -1,6 +1,8 @@
 ﻿@page "/add-offer"
+@using System.Security.Claims
 
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject ApplicationDbContext dbIdentity;
 
 @inject NavigationManager NAV
 
@@ -102,7 +104,7 @@
     </div>
     <div class="row mb-2">
         <label>Autor</label>
-        <InputText @bind-Value="offer.Author" class="form-control form-control-sm"></InputText>
+        <InputText @bind-Value="offer.Author" class="form-control form-control-sm" readonly></InputText>
         <ValidationMessage For="@(() => offer.Author)" />
     </div>
 
@@ -127,6 +129,7 @@
 @code {
     [Parameter]
     public EventCallback OnAdded { get; set; }
+
     private Offer offer = new Offer
         {
             Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
@@ -141,8 +144,15 @@
 
         if (user.Identity.IsAuthenticated)
         {
+            var u = user.FindFirst(ClaimTypes.Name)?.Value;
+            var d = dbIdentity.Users.FirstOrDefault(e => e.UserName == u);
+            offer.Author = d.Name + "" + d.LastName;
             // Asigna el ID del autor basado en el usuario autenticado
 
+        }
+        else
+        {
+            offer.Author = "Usuario no autenticado";
         }
         base.OnInitializedAsync();   
     }
