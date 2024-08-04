@@ -97,8 +97,8 @@
     <div class="form-group">
         <label for="IsCompleted">Moneda</label>
         <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
-            <option value="Dolar">Dolar</option>
-            <option value="Colon">Colon</option>
+            <option value="en-US">Dolar</option>
+            <option value="es-CR">Colon</option>
             <option value="Euro">Euro</option>
         </InputSelect>
         <ValidationMessage For="@(() => project.CurrencyType)" />
@@ -170,6 +170,8 @@
         // Validar y agregar el nuevo proyecto a la base de datos
         if (project != null)
         {
+            project.IsCompleted = false;
+            project.Isfactured = false;
             db.Projects.Add(project);
             await db.SaveChangesAsync();
 

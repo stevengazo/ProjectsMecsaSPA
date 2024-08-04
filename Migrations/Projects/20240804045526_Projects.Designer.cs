@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240731233335_projectsmigration")]
-    partial class projectsmigration
+    [Migration("20240804045526_Projects")]
+    partial class Projects
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -280,6 +280,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Isfactured")
                         .HasColumnType("bit");
 
                     b.Property<string>("OC")

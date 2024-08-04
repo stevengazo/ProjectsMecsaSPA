@@ -15,11 +15,7 @@
         <InputNumber @bind-Value="bill.Amount" class="form-control form-control-sm" step="0.001"></InputNumber>
         <ValidationMessage For="@(() => bill.Amount)" />
     </div>
-    <div class="row mb-2">
-        <label>Moneda</label>
-        <InputText @bind-Value="bill.Currency" class="form-control form-control-sm"></InputText>
-        <ValidationMessage For="@(() => bill.Currency)" />
-    </div>
+
     <div class="row mb-2">
         <label>Nota</label>
         <InputTextArea @bind-Value="bill.Note" class="form-control form-control-sm"></InputTextArea>
@@ -43,6 +39,8 @@
     [Parameter]
     public int ProjectId { get; set; }
     [Parameter]
+    public string CurrencyType { get; set; }
+    [Parameter]
     public EventCallback OnAdded { get; set; }
 
     Bill bill = new()
@@ -53,6 +51,7 @@
         };
     protected override Task OnInitializedAsync()
     {
+        bill.Currency = CurrencyType;
         return base.OnInitializedAsync();
         bill.ProjectId = ProjectId;
     }
@@ -61,6 +60,7 @@
     {
         bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
         bill.AuthorId = "";
+        bill.Currency = CurrencyType;
         bill.ProjectId = ProjectId;
         using var context = db;
         context.Bill.Add(bill);

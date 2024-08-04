@@ -1,5 +1,9 @@
 ﻿@page "/projects"
 
+
+
+
+
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 
@@ -14,25 +18,25 @@
 </div>
 <Offcanvas @ref="offcanvas" />
 
+<div class="mb-2 p-2">
+    <Tabs EnableFadeEffect="true">
+        <Tab Title="Todos" Active="true">
+            <Content>
+                <div class="p-1">
+                    <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+                </div>
 
-<Tabs EnableFadeEffect="true">
-    <Tab Title="Todos" Active="true">
-        <Content >
-            <div class="p-1">
-                <InfiniteScrollProjects @ref="infiniteScrollProjects" />
-            </div>
-            
-        </Content>
-    </Tab>
-    <Tab Title="Búsqueda">
-        <Content >
-            <div class="p-1">
-                <SearchProjectsComponent />
-            </div>
-        </Content>
-    </Tab>
-</Tabs>
-
+            </Content>
+        </Tab>
+        <Tab Title="Búsqueda">
+            <Content>
+                <div class="p-1">
+                    <SearchProjectsComponent />
+                </div>
+            </Content>
+        </Tab>
+    </Tabs>
+</div>
 
 
 @code {

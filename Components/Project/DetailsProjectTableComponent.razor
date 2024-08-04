@@ -2,6 +2,8 @@
 @inject ProjectsDBContext db
 
 @using System.ComponentModel.DataAnnotations
+@using System.Globalization
+
 
 @if (IsEditing)
 {
@@ -148,7 +150,7 @@ else
             </tr>
             <tr>
                 <th>@nameof(project.Amount)</th>
-                <td>@project.Amount</td>
+                <td>@project.Amount.ToString("C",AmountCulture)</td>
             </tr>
             <tr>
                 <th>@nameof(project.CreationDate)</th>
@@ -170,19 +172,77 @@ else
                 <th>@nameof(project.OCDate)</th>
                 <td>@project.OCDate.ToLongDateString()</td>
             </tr>
+            <tr>
+                <th>@nameof(project.Isfactured)</th>
+                <td>@if (project.Isfactured)
+                    {
+                        <label>Facturado</label>
+                    }
+                    else
+                    {
+                        <label>Pendiente de Completar facturación</label>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <th>@nameof(project.IsCompleted)</th>
+                <td>
+                    @if (project.IsCompleted)
+                    {
+                        <label>Proyecto Completo operativamente</label>
+                    }
+                    else
+                    {
+                        <label>Proyecto Incompleto</label>
+                    }
+                </td>
+            </tr>
         </tbody>
     </table>
-    @if(!project.IsDeleted){
-        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
-    }
+    <div class="d-flex flex-row gap-2">
+        <div>
+            @if (!project.IsDeleted)
+            {
+                <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+            }
+        </div>
+        <div>
+            @if (!project.Isfactured)
+            {
+                <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
+            }
+            @if (project.Isfactured)
+            {
+                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
+            }
+        </div>
+        <div>
+            @if (!project.IsCompleted)
+            {
+                <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
+            }
+            @if (project.IsCompleted)
+            {
+                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
+            }
+        </div>
+    </div>
+    
+
+
 }
 
 @code {
+
+    #region Parameters
+
     [Parameter]
     public Project project { get; set; }
     private bool IsEditing = false;
 
     private string? customerName;
+
+    CultureInfo AmountCulture ;
 
     private Dictionary<int, string> customers = new();
     private Dictionary<int, string> types = new();
@@ -191,8 +251,13 @@ else
 
     private string searchCustomer = "";
 
+    #endregion
+
+    #region Methods
+
     protected override async Task OnInitializedAsync()
     {
+        AmountCulture = new CultureInfo(project.CurrencyType);
         await LoadDataAsync();
     }
 
@@ -222,8 +287,6 @@ else
             project.CustomerId = customer.CustomerId;
         }
     }
-
-
 
     private void StartEdit()
     {
@@ -266,4 +329,21 @@ else
             Console.WriteLine($"Error al actualizar el proyecto: {ex.Message}");
         }
     }
+
+    private async Task UpdateIsComplete(bool state)
+    {
+        project.IsCompleted = state;
+        db.Projects.Update(project);
+        db.SaveChanges();
+    }
+
+    private async Task UpdateIsFactured(bool state)
+    {
+        project.Isfactured = state;
+        db.Projects.Update(project);
+        db.SaveChanges();
+    }
+
+
+    #endregion
 }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class projectsmigration : Migration
+    public partial class Projects : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -112,6 +112,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     OCDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    Isfactured = table.Column<bool>(type: "bit", nullable: false),
                     SellerId = table.Column<int>(type: "int", nullable: false),
                     StateId = table.Column<int>(type: "int", nullable: false),
                     CurrencyType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),

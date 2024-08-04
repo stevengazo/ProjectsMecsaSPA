@@ -3,6 +3,7 @@
 @page "/projects/{id}"
 @using Microsoft.EntityFrameworkCore
 
+<Offcanvas @ref="offcanvas" />
 
 <h3>Detalles del Proyecto</h3>
 @if (project.IsDeleted)
@@ -35,9 +36,16 @@
             </Tab>
             <Tab Title="Facturas">
                 <Content>
-                    <div class="p-1">
-                        <AddBillComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-                       
+                    <div class="p-1 d-flex flex-column">
+                        <div class="">
+                            <button @onclick="ShowAddBill" class="btn btn-outline-success">
+                                Agregar Factura
+                            </button>
+                        </div>
+
+                       <div>
+                           <BillTableComponent Bills="project.Bills.ToList()" />
+                       </div>
                     </div>
                 </Content>
             </Tab>
@@ -75,6 +83,9 @@
 
     public int _id;
 
+    private Offcanvas offcanvas = default!;
+    private InfiniteScrollProjects infiniteScrollProjects = default!;
+
     protected override async Task OnInitializedAsync()
     {
         base.OnInitializedAsync();
@@ -87,6 +98,7 @@
             .Include(e => e.Customer)
             .Include(e => e.Commentaries)
             .Include(e => e.Seller)
+            .Include(e => e.Bills)
             .FirstOrDefault(i => i.ProjectId == _id);
             project.Commentaries = project.Commentaries.OrderByDescending(i => i.CommentaryID).ToList();
 
@@ -101,5 +113,30 @@
     public async Task UpdateBills()
     {
         project.Bills = db.Bill.Where(i => i.ProjectId == project.ProjectId).ToList();
+    }
+    public async Task ShowAddBill()
+    {
+
+        var parameters = new Dictionary<string, object>
+        {
+
+            { nameof(AddBillComponent.OnAdded), EventCallback.Factory.Create(this, RefreshBills) },
+             { "ProjectId", project.ProjectId },
+             { "CurrencyType", project.CurrencyType }
+        };
+
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<AddBillComponent>("Agregar Información de Factura", parameters);
+    }
+
+    public async Task RefreshBills()
+    {
+        await offcanvas.HideAsync();
+
+        project.Bills = db.Bill.Where(i => i.ProjectId == _id).ToList();
+        
+
     }
 }

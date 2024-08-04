@@ -280,6 +280,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("Isfactured")
+                        .HasColumnType("bit");
+
                     b.Property<string>("OC")
                         .IsRequired()
                         .HasMaxLength(50)
