@@ -94,10 +94,12 @@
 <div class="d-flex flex-column">
     @foreach (var i in project.Commentaries)
     {
-        <div class="mx-2 my-1 p-2 border rounded">
-            <label>@i.CreationDate.ToLongDateString() @i.Author</label>
-            <p>
+        <div class="m-1 p-1 border rounded">
+            <label class="h6">@i.CreationDate.ToLongDateString() @i.Author</label>
+            <p class="text-muted">
+                <small>
                 @i.CommentaryText
+                </small>
             </p>
         </div>
     }
