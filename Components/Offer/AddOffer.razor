@@ -27,10 +27,23 @@
         <ValidationMessage For="@(() => offer.Description)" />
     </div>
     <div class="row mb-2">
+        <label>Tipo Contacto</label>
+        <InputSelect @bind-Value="offer.ContactType" class="form-control form-control-sm">
+            <option value=" ">Seleccione una opción</option>
+            <option value="Vendedor">Vendedor</option>
+            <option value="Reactivación">Reactivación</option>
+            <option value="Whatsapp">Whatsapp</option>
+            <option value="Correo">Correo</option>
+            <option value="Llamada">Llamada</option>
+            <option value="Otro">Otro</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => offer.Author)" />
+    </div>
+    <div class="row mb-2">
         <label>Tipo Oferta</label>
         <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
             <option value="Mantenimiento">Mantenimiento</option>
-            <option value="Instalacion">Instalacion</option>
+            <option value="Instalación">Instalación</option>
             <option value="Mejoras">Mejoras</option>
             <option value="Otro">Otro</option>
         </InputSelect>

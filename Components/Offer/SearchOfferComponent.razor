@@ -47,6 +47,9 @@
 <div class="d-flex gap-2 mb-3">
     <button class="btn btn-primary" @onclick="SearchOffers">Buscar</button>
     <button class="btn btn-secondary" @onclick="ClearFilters">Limpiar</button>
+    
+        <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
+    
 </div>
 
 @if (IsSearching)
@@ -165,4 +168,6 @@ else
         public string Type { get; set; }
         public string State { get; set; }
     }
+    private async Task DownloadReport() { }
+
 }

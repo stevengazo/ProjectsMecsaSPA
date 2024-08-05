@@ -17,7 +17,7 @@
         </a>
         @if (ProjectObj.IsDeleted)
         {
-            <button  class="btn btn-sm btn-outline-success mx-1">
+            <button  class="btn btn-sm btn-outline-success mx-1" @onclick="Enable" >
                 Activar Proyecto
             </button>
         }

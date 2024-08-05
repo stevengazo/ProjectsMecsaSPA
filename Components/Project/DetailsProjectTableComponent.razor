@@ -14,32 +14,32 @@
         <table class="table table-hover border">
             <tbody>
                 <tr>
-                    <th>@nameof(project.ProjectId)</th>
+                    <th>Número Proyecto</th>
                     <td>@project.ProjectId</td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Title)</th>
+                    <th>Titulo</th>
                     <td>
                         <InputText @bind-Value="project.Title" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.Title)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Description)</th>
+                    <th>Descripción</th>
                     <td>
                         <InputText @bind-Value="project.Description" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.Description)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.TaskNumber)</th>
+                    <th>Tarea</th>
                     <td>
                         <InputText @bind-Value="project.TaskNumber" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.TaskNumber)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Customer)</th>
+                    <th>Cliente</th>
                     <td>
 
                  
@@ -54,28 +54,28 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Ubication)</th>
+                    <th>Ubicación</th>
                     <td>
                         <InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.Ubication)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Amount)</th>
+                    <th>Monto</th>
                     <td>
                         <InputNumber @bind-Value="project.Amount" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.Amount)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.CreationDate)</th>
+                    <th>Creación</th>
                     <td>
                         <InputDate @bind-Value="project.CreationDate" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.CreationDate)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.State)</th>
+                    <th>Estado</th>
                     <td>
                         <InputSelect @bind-Value="project.StateId" class="form-control form-control-sm">
                             <option value="">Seleccionar estado</option>
@@ -88,7 +88,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.Type)</th>
+                    <th>Tipo Proyecto</th>
                     <InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
                         <option value="">Seleccionar un tipo</option>
                         @foreach (var item in types)
@@ -99,14 +99,14 @@
                     <ValidationMessage For="@(() => project.TypeId)" />
                 </tr>
                 <tr>
-                    <th>@nameof(project.OC)</th>
+                    <th>Orden de Compra</th>
                     <td>
                         <InputText @bind-Value="project.OC" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.OC)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(project.OCDate)</th>
+                    <th>Fecha Orden Compra</th>
                     <td>
                         <InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.OCDate)" />
@@ -125,55 +125,55 @@ else
     <table class="table table-hover border">
         <tbody>
             <tr>
-                <th>@nameof(project.ProjectId)</th>
+                <th>Número Proyecto</th>
                 <td>@project.ProjectId</td>
             </tr>
             <tr>
-                <th>@nameof(project.Title)</th>
+                <th>Titulo Proyecto</th>
                 <td>@project.Title</td>
             </tr>
             <tr>
-                <th>@nameof(project.Description)</th>
+                <th>Descripción</th>
                 <td>@project.Description</td>
             </tr>
             <tr>
-                <th>@nameof(project.TaskNumber)</th>
+                <th>Número Tarea</th>
                 <td>@project.TaskNumber</td>
             </tr>
             <tr>
-                <th>@nameof(project.Customer)</th>
+                <th>Cliente</th>
                 <td>@project.Customer?.Name </td>
             </tr>
             <tr>
-                <th>@nameof(project.Ubication)</th>
+                <th>Ubicación</th>
                 <td>@project.Ubication</td>
             </tr>
             <tr>
-                <th>@nameof(project.Amount)</th>
+                <th>Monto</th>
                 <td>@project.Amount.ToString("C",AmountCulture)</td>
             </tr>
             <tr>
-                <th>@nameof(project.CreationDate)</th>
+                <th>Fecha Registro</th>
                 <td>@project.CreationDate.ToLongDateString()</td>
             </tr>
             <tr>
-                <th>@nameof(project.State)</th>
+                <th>Estado del Proyecto</th>
                 <td>@project.State?.StateName</td>
             </tr>
             <tr>
-                <th>@nameof(project.Type)</th>
+                <th>Tipo de Proyecto</th>
                 <td>@project.Type?.Name</td>
             </tr>
             <tr>
-                <th>@nameof(project.OC)</th>
+                <th>Orden de Compra</th>
                 <td>@project.OC</td>
             </tr>
             <tr>
-                <th>@nameof(project.OCDate)</th>
+                <th>Fecha Orden de Compra</th>
                 <td>@project.OCDate.ToLongDateString()</td>
             </tr>
             <tr>
-                <th>@nameof(project.Isfactured)</th>
+                <th>Estado Facturación Proyecto</th>
                 <td>@if (project.Isfactured)
                     {
                         <label>Facturado</label>
@@ -185,7 +185,7 @@ else
                 </td>
             </tr>
             <tr>
-                <th>@nameof(project.IsCompleted)</th>
+                <th>¿Proyecto Completado?</th>
                 <td>
                     @if (project.IsCompleted)
                     {
@@ -193,7 +193,7 @@ else
                     }
                     else
                     {
-                        <label>Proyecto Incompleto</label>
+                        <label>Proyecto Incompleto (Revise la etapa y anotaciones)</label>
                     }
                 </td>
             </tr>

@@ -9,11 +9,11 @@ using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Projects
+namespace ProjectsMecsaSPA.Migrations.Prjects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240804045526_Projects")]
-    partial class Projects
+    [Migration("20240805160533_projectmigration")]
+    partial class projectmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -204,6 +204,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ContactType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Creation")
                         .HasColumnType("datetime2");

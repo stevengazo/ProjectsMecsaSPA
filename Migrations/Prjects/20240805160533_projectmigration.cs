@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Projects
+namespace ProjectsMecsaSPA.Migrations.Prjects
 {
-    public partial class Projects : Migration
+    public partial class projectmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -33,6 +33,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     Creation = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Customer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    ContactType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RequiredDDCE = table.Column<bool>(type: "bit", nullable: false),

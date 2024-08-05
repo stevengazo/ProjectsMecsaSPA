@@ -8,7 +8,7 @@ using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Projects
+namespace ProjectsMecsaSPA.Migrations.Prjects
 {
     [DbContext(typeof(ProjectsDBContext))]
     partial class ProjectsDBContextModelSnapshot : ModelSnapshot
@@ -202,6 +202,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ContactType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Creation")
                         .HasColumnType("datetime2");

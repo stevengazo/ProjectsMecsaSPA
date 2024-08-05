@@ -12,89 +12,108 @@
         <table class="table table-hover border">
             <tbody>
                 <tr>
-                    <th>@nameof(offer.OfferId)</th>
+                    <th>Número</th>
                     <td>@offer.OfferId</td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Creation)</th>
+                    <th>Fecha</th>
                     <td>
                         <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.Creation)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Customer)</th>
+                    <th>Cliente</th>
                     <td>
                         <InputText @bind-Value="offer.Customer" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.Customer)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Description)</th>
+                    <th>Descripción</th>
                     <td>
                         <InputText @bind-Value="offer.Description" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.Description)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Type)</th>
+                    <th>Tipo Contacto</th>
                     <td>
-                        <InputText @bind-Value="offer.Type" class="form-control form-control-sm" />
+                    <InputSelect @bind-Value="offer.ContactType" class="form-control form-control-sm">
+                        <option value=" ">Seleccione una opción</option>
+                        <option value="Vendedor">Vendedor</option>
+                        <option value="Reactivación">Reactivación</option>
+                        <option value="Whatsapp">Whatsapp</option>
+                        <option value="Correo">Correo</option>
+                        <option value="Llamada">Llamada</option>
+                        <option value="Otro">Otro</option>
+                    </InputSelect>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Tipo</th>
+                    <td>
+                        <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Instalación">Instalación</option>
+                            <option value="Mejoras">Mejoras</option>
+                            <option value="Otro">Otro</option>
+                        </InputSelect>
                         <ValidationMessage For="@(() => offer.Type)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequiredDDCE)</th>
+                    <th>Vincular a DDCE</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequiredDDCE" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequiredLightningStrike)</th>
+                    <th>Vincular a Pararrayos</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequiredLightningStrike" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequireTower)</th>
+                    <th>Vincula a Torre</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequireTower" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequireSPAT)</th>
+                    <th>Vincular a SPAT</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequireSPAT" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequireSurgeProtector)</th>
+                    <th>Vincular a supresores</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequireSurgeProtector" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.RequireOther)</th>
+                    <th>Vincular a Otros</th>
                     <td>
                         <InputCheckbox @bind-Value="offer.RequireOther" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Amount)</th>
+                    <th>Monto</th>
                     <td>
                         <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.Amount)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.CalculateBy)</th>
+                    <th>Calculado Por</th>
                     <td>
                         <InputText @bind-Value="offer.CalculateBy" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.CalculateBy)" />
                     </td>
                 </tr>
                 <tr>
-                    <th>@nameof(offer.Author)</th>
+                    <th>Autor</th>
                     <td>
                         <InputText @bind-Value="offer.Author" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => offer.Author)" />
@@ -125,63 +144,67 @@ else
     <table class="table table-hover border">
         <tbody>
             <tr>
-                <th>@nameof(offer.OfferId)</th>
+                <th>Número</th>
                 <td>@offer.OfferId</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Creation)</th>
-                <td>@offer.Creation.ToShortDateString()</td>
+                <th>Fecha</th>
+                <td>@offer.Creation.ToLongDateString()</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Customer)</th>
+                <th>Cliente</th>
                 <td>@offer.Customer</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Description)</th>
+                <th>Descripción</th>
                 <td>@offer.Description</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Type)</th>
+                <th>Tipo Contacto</th>
+                <td>@offer.ContactType</td>
+            </tr>
+            <tr>
+                <th>Tipo</th>
                 <td>@offer.Type</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequiredDDCE)</th>
+                <th>Require DDCE</th>
                 <td>@offer.RequiredDDCE</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequiredLightningStrike)</th>
+                <th>Requiere Ionizante</th>
                 <td>@offer.RequiredLightningStrike</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequireTower)</th>
+                <th>Requiere Torre</th>
                 <td>@offer.RequireTower</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequireSPAT)</th>
+                <th>Requiere SPAT</th>
                 <td>@offer.RequireSPAT</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequireSurgeProtector)</th>
+                <th>Require Supresor</th>
                 <td>@offer.RequireSurgeProtector</td>
             </tr>
             <tr>
-                <th>@nameof(offer.RequireOther)</th>
+                <th>Otros</th>
                 <td>@offer.RequireOther</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Amount)</th>
+                <th>Monto</th>
                 <td>@offer.Amount</td>
             </tr>
             <tr>
-                <th>@nameof(offer.CalculateBy)</th>
+                <th>Calculado Por</th>
                 <td>@offer.CalculateBy</td>
             </tr>
             <tr>
-                <th>@nameof(offer.Author)</th>
+                <th>Autor</th>
                 <td>@offer.Author</td>
             </tr>
             <tr>
-                <th>@nameof(offer.State)</th>
+                <th>Estado</th>
                 <td>@offer.State</td>
             </tr>
         </tbody>
