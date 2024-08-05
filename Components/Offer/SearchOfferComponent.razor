@@ -1,0 +1,165 @@
+﻿
+@using ProjectsMecsaSPA.Model
+@inject ProjectsDBContext DbContext
+
+<h3>Buscar Ofertas</h3>
+
+<div class="row mb-3">
+    <div class="col-md-2">
+        <label for="offerId" class="form-label">ID de Oferta:</label>
+        <input type="number" class="form-control" id="offerId" @bind="SearchCriteria.OfferId" />
+    </div>
+    <div class="col-md-2">
+        <label for="customer" class="form-label">Nombre del Cliente:</label>
+        <input type="text" class="form-control" id="customer" @bind="SearchCriteria.Customer" />
+        @if (!IsCustomerNameValid)
+        {
+            <div class="text-danger">El nombre del cliente debe tener al menos 5 caracteres.</div>
+        }
+    </div>
+    <div class="col-md-2">
+        <label for="creationDate" class="form-label">Fecha de Creación:</label>
+        <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
+    </div>
+    <div class="col-md-2">
+        <label for="type" class="form-label">Tipo de Oferta:</label>
+        <select class="form-select" id="type" @bind="SearchCriteria.Type">
+            <option value="">Seleccionar...</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+            <option value="Instalacion">Instalación</option>
+            <option value="Mejoras">Mejoras</option>
+            <option value="Otro">Otro</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="state" class="form-label">Estado:</label>
+        <select class="form-select" id="state" @bind="SearchCriteria.State">
+            <option value="">Seleccionar...</option>
+            <option value="Enviado">Enviado</option>
+            <option value="Negociación">Negociación</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Vendido">Vendido</option>
+            <option value="Cobro">Cobro</option>
+        </select>
+    </div>
+</div>
+
+<div class="d-flex gap-2 mb-3">
+    <button class="btn btn-primary" @onclick="SearchOffers">Buscar</button>
+    <button class="btn btn-secondary" @onclick="ClearFilters">Limpiar</button>
+</div>
+
+@if (IsSearching)
+{
+    <div class="d-flex justify-content-center">
+        <Spinner Type="SpinnerType.Dots" Class="me-3" Color="SpinnerColor.Success" />
+    </div>
+}
+else
+{
+    @if (IsSearchPerformed && !Offers.Any())
+    {
+        <div class="text-danger mt-3">No se encontraron ofertas.</div>
+    }
+
+    @if (Offers != null && Offers.Any())
+    {
+        <h4>Resultados:</h4>
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Cliente</th>
+                    <th>Fecha de Creación</th>
+                    <th>Tipo de Oferta</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var offer in Offers)
+                {
+                   <RowOfferComponent offer="offer"/>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="text-danger mt-3">@ErrorMessage</div>
+}
+
+@code {
+    private List<Offer> Offers { get; set; } = new List<Offer>();
+
+    private OfferSearchCriteria SearchCriteria { get; set; } = new OfferSearchCriteria();
+    private bool IsCustomerNameValid { get; set; } = true;
+    private bool IsSearchPerformed { get; set; } = false;
+    private bool IsSearching { get; set; } = false;
+    private string ErrorMessage { get; set; }
+
+    private async Task SearchOffers()
+    {
+        try
+        {
+            IsSearching = true;
+
+            IsCustomerNameValid = SearchCriteria.Customer == null || SearchCriteria.Customer.Length >= 5;
+
+            // Verificar si todos los campos están vacíos
+            if (SearchCriteria.OfferId == null && string.IsNullOrEmpty(SearchCriteria.Customer) &&
+                SearchCriteria.Creation == null && string.IsNullOrEmpty(SearchCriteria.Type) &&
+                string.IsNullOrEmpty(SearchCriteria.State))
+            {
+                ErrorMessage = "Debe ingresar al menos un criterio de búsqueda.";
+                Offers.Clear();
+                return;
+            }
+
+            // Verificar si el nombre del cliente es válido
+            if (!IsCustomerNameValid)
+            {
+                ErrorMessage = "El nombre del cliente debe tener al menos 5 caracteres.";
+                Offers.Clear();
+                return;
+            }
+
+            Offers = await DbContext.Offers
+                .Where(o => (SearchCriteria.OfferId == null || o.OfferId == SearchCriteria.OfferId) &&
+                            (SearchCriteria.Customer == null || o.Customer.Contains(SearchCriteria.Customer)) &&
+                            (SearchCriteria.Creation == null || o.Creation.Date == SearchCriteria.Creation.Value.Date) &&
+                            (SearchCriteria.Type == null || o.Type.Contains(SearchCriteria.Type)) &&
+                            (SearchCriteria.State == null || o.State.Contains(SearchCriteria.State)))
+                .ToListAsync();
+
+            IsSearchPerformed = true;
+            ErrorMessage = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Ocurrió un error al realizar la búsqueda: {ex.Message}";
+        }
+        finally
+        {
+            IsSearching = false;
+        }
+    }
+
+    private void ClearFilters()
+    {
+        SearchCriteria = new OfferSearchCriteria();
+        Offers.Clear();
+        IsSearchPerformed = false;
+        ErrorMessage = string.Empty;
+    }
+
+    private class OfferSearchCriteria
+    {
+        public int? OfferId { get; set; }
+        public string Customer { get; set; }
+        public DateTime? Creation { get; set; }
+        public string Type { get; set; }
+        public string State { get; set; }
+    }
+}
