@@ -24,14 +24,15 @@
         var dataset = new PieChartDataset()
         {
                 Data =dic.Values.ToList(),
-                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BackgroundColor = GenerateColors(dic.Values.Count),
                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderWidth = new List<double> { 0 },
 
         };
         datasets.Add(dataset);
         chartData = new() {  Datasets= datasets, Labels=labels};
-        
+
+
 
         // Inicializa los colores de fondo con una paleta predeterminada
         backgroundColors = ColorUtility.CategoricalTwelveColors;
@@ -43,6 +44,22 @@
         pieChartOptions.Plugins.Title.Display = true;
     }
 
+    private static readonly Random random = new Random();
+
+    private List<string?> GenerateColors(int count)
+    {
+        List<string?> colors = new List<string?>();
+        for (int i = 0; i < count; i++)
+        {
+            colors.Add(GenerateRandomColor());
+        }
+        return colors;
+    }
+
+    private string GenerateRandomColor()
+    {
+        return $"#{random.Next(0x1000000):X6}";
+    }
     // Método que se ejecuta después de que el componente se ha renderizado
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
