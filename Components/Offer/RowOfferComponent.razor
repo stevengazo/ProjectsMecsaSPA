@@ -1,23 +1,85 @@
-﻿
-<tr>
-    <td>@offer.OfferId</td>
-    <td>@offer.Creation.ToShortDateString()</td>
-    <td>@offer.Customer</td>
-    <td>@offer.State</td>
-    <td>@offer.Author</td>
-    <td>@offer.Description</td>
-    <td>$@offer.Amount</td>
-    <td>
-        <a href="/offers/@offer.OfferId" class="btn btn-outline-info">
-            Ver Oferta
-        </a>
-        <a class="btn btn-outline-success">
-            Modificar
-        </a>
-    </td>
-</tr>
+﻿@inject ProjectsDBContext db
+
+
+@if (!IsEditing)
+{
+    <tr>
+        <td>@offer.OfferId</td>
+        <td>@offer.Creation.ToShortDateString()</td>
+        <td>@offer.Customer</td>
+        <td>@offer.State</td>
+        <td>@offer.Author</td>
+        <td>@offer.Description</td>
+        <td>$@offer.Amount</td>
+        <td>
+            <a href="/offers/@offer.OfferId" class="btn btn-outline-info">
+                Ver Oferta
+            </a>
+            <a class="btn btn-outline-success" @onclick="()=> IsEditing = true">
+                Modificar
+            </a>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td>@offer.OfferId</td>
+        <td>
+            <EditForm Model="offer">
+                <InputDate @bind-Value="offer.Creation"> </InputDate>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="offer">
+                <InputText @bind-Value="offer.Customer"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="offer">
+                <InputSelect @bind-Value="offer.State">
+                    <option value="Enviado">Enviado</option>
+                    <option value="Negociación">Negociación</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Vendido">Vendido</option>
+                    <option value="Cobro">Cobro</option>
+                </InputSelect>
+            </EditForm>
+        </td>
+        <td>@offer.Author</td>
+        <td>
+            <EditForm Model="offer">
+                <InputText @bind-Value="offer.Description"></InputText>
+            </EditForm>
+
+        </td>
+        <td>
+            <EditForm Model="offer">
+                <InputNumber @bind-Value="offer.Amount"></InputNumber>
+            </EditForm>
+        </td>
+        <td>
+            <button class="btn btn-outline-danger" @onclick="()=> IsEditing=false"> 
+                Cancelar
+            </button>
+            <button class="btn btn-outline-success" @onclick="Update">
+                Guardar
+            </button>
+        </td>
+    </tr>
+}
+
+
 @code {
     [Parameter]
     public Offer offer { get; set; }
 
+    private bool IsEditing { get; set; }
+
+    private async Task Update()
+    {
+        db.Offers.Update(offer);
+        db.SaveChanges();
+        IsEditing = false;
+    }
 }
