@@ -4,107 +4,65 @@
 
 <PieChart @ref="pieChart" Width="500" />
 
-<div class="mt-5">
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await RandomizeAsync()"> Randomize </Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await AddDatasetAsync()"> Add Dataset </Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await AddDataAsync()">Add Data</Button>
-</div>
-
 @code {
+    // Referencia al componente PieChart para poder inicializarlo más tarde
     private PieChart pieChart = default!;
+
+    // Opciones para configurar el gráfico de pastel
     private PieChartOptions pieChartOptions = default!;
+
+    // Datos para el gráfico de pastel
     private ChartData chartData = default!;
+
+    // Colores de fondo para las secciones del gráfico
     private string[]? backgroundColors;
 
+    // Contadores para la cantidad de conjuntos de datos y etiquetas
     private int datasetsCount = 0;
     private int dataLabelsCount = 0;
 
+    // Instancia para generar datos aleatorios
     private Random random = new();
 
+    // Método que se ejecuta cuando el componente se inicializa
     protected override void OnInitialized()
     {
+        // Inicializa los colores de fondo con una paleta predeterminada
         backgroundColors = ColorUtility.CategoricalTwelveColors;
-        chartData = new ChartData { Labels = GetDefaultDataLabels(4), Datasets = GetDefaultDataSets(1) };
 
+        // Configura los datos del gráfico con etiquetas y conjuntos de datos predeterminados
+        chartData = new ChartData
+            {
+                Labels = GetDefaultDataLabels(4),
+                Datasets = GetDefaultDataSets(1)
+            };
+
+        // Configura las opciones del gráfico de pastel
         pieChartOptions = new();
         pieChartOptions.Responsive = true;
-        pieChartOptions.Plugins.Title!.Text = "2022 - Sales";
+        pieChartOptions.Plugins.Title!.Text = "Categorias 2024";
         pieChartOptions.Plugins.Title.Display = true;
     }
 
+    // Método que se ejecuta después de que el componente se ha renderizado
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            // Inicializa el gráfico de pastel con los datos y opciones configurados
             await pieChart.InitializeAsync(chartData, pieChartOptions);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task RandomizeAsync()
-    {
-        if (chartData is null || chartData.Datasets is null || !chartData.Datasets.Any()) return;
-
-        var newDatasets = new List<IChartDataset>();
-
-        foreach (var dataset in chartData.Datasets)
-        {
-            if (dataset is PieChartDataset pieChartDataset
-                && pieChartDataset is not null
-                && pieChartDataset.Data is not null)
-            {
-                var count = pieChartDataset.Data.Count;
-
-                var newData = new List<double?>();
-                for (var i = 0; i < count; i++)
-                {
-                    newData.Add(random.Next(0, 100));
-                }
-
-                pieChartDataset.Data = newData;
-                newDatasets.Add(pieChartDataset);
-            }
-        }
-
-        chartData.Datasets = newDatasets;
-
-        await pieChart.UpdateAsync(chartData, pieChartOptions);
-    }
-
-    private async Task AddDatasetAsync()
-    {
-        if (chartData is null || chartData.Datasets is null) return;
-
-        var chartDataset = GetRandomPieChartDataset();
-        chartData = await pieChart.AddDatasetAsync(chartData, chartDataset, pieChartOptions);
-    }
-
-    private async Task AddDataAsync()
-    {
-        if (dataLabelsCount >= 12)
-            return;
-
-        if (chartData is null || chartData.Datasets is null)
-            return;
-
-        var data = new List<IChartDatasetData>();
-        foreach (var dataset in chartData.Datasets)
-        {
-            if (dataset is PieChartDataset pieChartDataset)
-                data.Add(new PieChartDatasetData(pieChartDataset.Label, random.Next(0, 100), backgroundColors![dataLabelsCount]));
-        }
-
-        chartData = await pieChart.AddDataAsync(chartData, GetNextDataLabel(), data);
-
-        dataLabelsCount += 1;
-    }
-
     #region Data Preparation
 
+    // Método para obtener conjuntos de datos predeterminados
     private List<IChartDataset> GetDefaultDataSets(int numberOfDatasets)
     {
         var datasets = new List<IChartDataset>();
 
+        // Crea conjuntos de datos aleatorios según el número especificado
         for (var index = 0; index < numberOfDatasets; index++)
         {
             datasets.Add(GetRandomPieChartDataset());
@@ -113,12 +71,19 @@
         return datasets;
     }
 
+    // Método para obtener un conjunto de datos de gráfico de pastel aleatorio
     private PieChartDataset GetRandomPieChartDataset()
     {
         datasetsCount += 1;
-        return new() { Label = $"Team {datasetsCount}", Data = GetRandomData(), BackgroundColor = GetRandomBackgroundColors() };
+        return new()
+            {
+                Label = $"Team {datasetsCount}",
+                Data = GetRandomData(),
+                BackgroundColor = GetRandomBackgroundColors()
+            };
     }
 
+    // Método para obtener datos aleatorios para el gráfico
     private List<double?> GetRandomData()
     {
         var data = new List<double?>();
@@ -126,10 +91,10 @@
         {
             data.Add(random.Next(0, 100));
         }
-
         return data;
     }
 
+    // Método para obtener colores de fondo aleatorios para el gráfico
     private List<string> GetRandomBackgroundColors()
     {
         var colors = new List<string>();
@@ -141,6 +106,7 @@
         return colors;
     }
 
+    // Método para obtener etiquetas predeterminadas para el gráfico
     private List<string> GetDefaultDataLabels(int numberOfLabels)
     {
         var labels = new List<string>();
@@ -153,8 +119,10 @@
         return labels;
     }
 
+    // Método para obtener la siguiente etiqueta de datos
     private string GetNextDataLabel() => $"Product {dataLabelsCount + 1}";
 
+    // Método para obtener el siguiente color de fondo (no se usa en el código)
     private string GetNextDataBackgrounfColor() => backgroundColors![dataLabelsCount];
 
     #endregion  Data Preparation
