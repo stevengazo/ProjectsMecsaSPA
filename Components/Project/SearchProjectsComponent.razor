@@ -1,5 +1,6 @@
-﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-
+﻿@using ProjectsMecsaSPA.Utilities
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject IJSRuntime JS
 
 <!-- Contenedor para los filtros de búsqueda -->
 <div class="row mb-3">
@@ -68,10 +69,7 @@
         await LoadProjectsAsync();
     }
 
-    private async Task DownloadReport()
-    {
-        // Aquí iría el código para generar y descargar el reporte.
-    }
+    
 
     // Carga los proyectos según los filtros aplicados
     private async Task LoadProjectsAsync()
@@ -107,6 +105,16 @@
 
         // Forzar una actualización de la interfaz para asegurarse de que los datos se muestren correctamente
         await InvokeAsync(StateHasChanged);
+    }
+    public async Task DownloadReport()
+    {
+        var data = await XmlsGenerate.GenerateFileProjects(projects);
+        // Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
+        string pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos {DateTime.Now.ToShortTimeString()}.xlsx");
+
     }
 
 }
