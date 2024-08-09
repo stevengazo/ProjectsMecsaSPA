@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject ApplicationDbContext dbContext
+@inject SignInManager<UserIdentityEx> _signInManager
+@inject UserManager<UserIdentityEx> userManager
+
+<EditForm Model="user">
+    <div>
+        <label>Nombre</label>
+        <InputText @bind-Value="user.Name" class="form-control" > </InputText>
+    </div>
+    <div>
+        <label>Apellidos</label>
+        <InputText @bind-Value="user.LastName" class="form-control"> </InputText>
+    </div>
+    <div>
+        <label>Cedula</label>
+        <InputNumber @bind-Value="user.DNI" class="form-control"> </InputNumber>
+    </div>
+    <div>
+        <label>Nombre Usuario</label>
+        <InputText @bind-Value="user.UserName" class="form-control"> </InputText>
+    </div>
+    <div>
+        <label>Correo</label>
+        <InputText @bind-Value="user.Email" class="form-control"> </InputText>
+    </div>
+
+    <div>
+        <label>Telefono</label>
+        <InputText @bind-Value="user.PhoneNumber" class="form-control"> </InputText>
+    </div>
+</EditForm>
+<EditForm Model="PassObj">
+    <div>
+        <label>Contraseña</label>
+        <InputText @bind-Value="PassObj.Password" class="form-control"> </InputText>
+    </div>
+    <div> 
+        <label>Contraseña Confirmar</label>
+        <InputText @bind-Value="PassObj.ConfirmPass" class="form-control"> </InputText>
+    </div>
+</EditForm>
+
+<button  class="btn btn-outline-success" @onclick="Add">
+    Guardar Usuario
+</button>
+
+@code {
+    UserIdentityEx user = new();
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    private Pass PassObj = new();
+
+    private class Pass
+    {
+        public string Password { get; set; }
+        public string ConfirmPass { get; set; }
+    }
+
+
+    private async Task Add()
+    {
+        user.EmailConfirmed = true;
+        user.NormalizedEmail = user.Email.ToUpper();
+        user.NormalizedUserName = user.UserName.ToUpper();
+        if(PassObj.Password == PassObj.ConfirmPass)
+        {
+            userManager.CreateAsync(user, PassObj.Password);
+            OnAdded.InvokeAsync();
+        }
+    }
+
+}

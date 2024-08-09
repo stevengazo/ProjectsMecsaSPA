@@ -1,53 +1,19 @@
 ﻿@page "/users"
 
-@inject ApplicationDbContext db;
-
-<h3>IndexUsersPage</h3>
 
 
+<h3>Usuarios del Sistema</h3>
 
 
 
+<UsersTableComponent />
 
-<table class=" table table-hover">
-    <thead>
-        <tr>
-        <th>
-            Nombre
-        </th>
-           
-            <th>
-                Cedula
-            </th>
-            <th>
-                Email
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Users)
-        {
-            <tr>
-                <td>
-                    @item.Name           @item.LastName
-                </td>
-                <td>
-                    @item.DNI
-                </td>
-                <td>
-                    @item.Email
-                </td>
-            </tr>
 
-        }    </tbody>
-</table>
 
 @code {
-    List<UserIdentityEx> Users = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Users = db.Users.ToList();
         base.OnInitializedAsync();   
     }
 

@@ -1,0 +1,106 @@
+﻿@inject ApplicationDbContext dbContext;
+
+@if (IsEditing)
+{
+    <tr>
+        <td>
+            <EditForm Model="item" class="d-flex flex-row">
+                <InputText @bind-Value="item.Name" class="form-control form-control-sm"></InputText>
+                <InputText @bind-Value="item.LastName" class="form-control form-control-sm"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputNumber @bind-Value="item.DNI" class="form-control form-control-sm"></InputNumber>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputText @bind-Value="item.Email" class="form-control form-control-sm"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputText @bind-Value="item.UserName" class="form-control form-control-sm"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputCheckbox @bind-Value="item.EmailConfirmed" class=""></InputCheckbox>
+            </EditForm>
+        </td>
+        <td>
+            <button class="btn btn-outline-success btn-sm" @onclick="Update">
+                Guardar
+            </button>
+            <button class="btn btn-outline-danger btn-sm" @onclick="()=>IsEditing =false">
+                Cancelar
+            </button>
+        </td>
+    </tr>
+
+}
+else
+{
+    <tr>
+        <td>
+            @item.Name @item.LastName
+        </td>
+        <td>
+            @item.DNI
+        </td>
+        <td>
+            @item.Email
+        </td>
+        <td>
+            @item.UserName
+        </td>
+        @if (item.EmailConfirmed)
+        {
+            <td>
+                Activo
+            </td>
+        }
+        else
+        {
+            <td>
+                Inactivo
+            </td>
+        }
+        <td>
+            <a class="btn btn-outline-info btn-sm">
+                Ver
+            </a>
+            <button class="btn btn-outline-success btn-sm" @onclick="()=>IsEditing =true">
+                Editar
+            </button>
+            <a class="btn btn-outline-info btn-sm">
+                Contraseña
+            </a>
+
+            <a class="btn btn-outline-danger btn-sm">
+                Eliminar
+            </a>
+        </td>
+    </tr>
+
+}
+
+
+@code {
+    [Parameter]
+    public UserIdentityEx item { get; set; }
+
+
+    private bool IsEditing = false;
+
+    private async Task Update()
+    {
+        item.NormalizedEmail = item.Email.ToUpper();
+        item.NormalizedUserName = item.UserName.ToUpper();
+        dbContext.Users.Update(item);
+        dbContext.SaveChanges();
+        IsEditing = false;
+    }
+
+}
