@@ -10,46 +10,32 @@
    <thead>
         <tr>
             <td>
-                @nameof(Bill.BillNumber)
+                Numero
             </td>
             <td>
-                @nameof(Bill.BillDate)
+                Fecha
             </td>
             <td>
-                @nameof(Bill.Author)
+               Autor
             </td>
             <td>
-                @nameof(Bill.Amount)
+Monto
             </td>
             <td>
-                @nameof(Bill.Currency)
-            </td>
+     Moneda
+     </td>
             <td>
-                @nameof(Bill.Note)
+     Nota
+     </td>
+            <td>
+                Acciones
             </td>
         </tr>
    </thead>
     <tbody>
         @foreach (var item in Bills)
         {
-        <td>
-                @item.BillNumber
-        </td>
-        <td>
-                @item.BillDate.ToShortDateString()
-        </td>
-        <td>
-                @item.Author
-        </td>
-        <td>
-                @item.Amount.ToString("C",AmountCulture)
-        </td>
-        <td>
-                @item.Currency
-        </td>
-        <td>
-                @item.Note
-        </td>
+            <BillRowComponent AmountCulture="AmountCulture" item="item" />
         }   
         </tbody>
 </table>

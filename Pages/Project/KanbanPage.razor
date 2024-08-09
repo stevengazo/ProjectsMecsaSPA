@@ -1,6 +1,8 @@
 ﻿@page "/kanban"
 @using Microsoft.EntityFrameworkCore
 @inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
 
 
 <Offcanvas @ref="offcanvas" />
@@ -42,45 +44,99 @@
 
     protected override void OnInitialized()
     {
-        // Cargar estados
-        States = db.States.Where(i=>!i.IsDeleted).ToList();
-
-        // Inicializar el diccionario ProjectLists con listas vacías para cada estado
-        foreach (var state in States)
+        try
         {
-            ProjectLists[state] = GetProjectsByState(state.StateId);
+            // Cargar estados
+            States = db.States.Where(i => !i.IsDeleted).ToList();
+
+            // Inicializar el diccionario ProjectLists con listas vacías para cada estado
+            foreach (var state in States)
+            {
+                ProjectLists[state] = GetProjectsByState(state.StateId);
+            }
         }
+        catch (ObjectDisposedException e)
+        {
+            Console.WriteLine(e.Message);
+
+            using( var context = DbContextFactory.CreateDbContext())
+            {
+                States = db.States.Where(i => !i.IsDeleted).ToList();
+                
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.InnerException);
+            throw;
+        }
+
     }
 
     private List<Project> GetProjectsByState(int stateId)
     {
-        return 
-        db.Projects
-        .Include( e=> e.Type)
-        .Include(e => e.Commentaries)
-        .Include(e => e.Customer)
-        .Include(e => e.State)
-        .Include(e => e.Seller)
-        .OrderByDescending(e => e.ProjectId)
-        .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+        try
+        {
+                  return 
+       db.Projects
+       .Include(e => e.Type)
+       .Include(e => e.Commentaries)
+       .Include(e => e.Customer)
+       .Include(e => e.State)
+       .Include(e => e.Seller)
+       .OrderByDescending(e => e.ProjectId)
+       .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+        }
+        catch (ObjectDisposedException e)
+        {
+            Console.WriteLine(e.Message);
+
+            return
+  db.Projects
+  .Include(e => e.Type)
+  .Include(e => e.Commentaries)
+  .Include(e => e.Customer)
+  .Include(e => e.State)
+  .Include(e => e.Seller)
+  .OrderByDescending(e => e.ProjectId)
+  .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+
+
+        }
+
+        catch (Exception e)
+        {        
+            throw e;
+        }
+       
     }
 
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
     {
-        var TargetState = GetState(NameState);
-        var ProjectTemp = GetProject(TargetState, args.OldIndex);
-
-        ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
-        var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
-        if (args.NewIndex < size)
+        try
         {
-            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
-        }
-        else
-        {
-            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
-        }
+            var TargetState = GetState(NameState);
+            var ProjectTemp = GetProject(TargetState, args.OldIndex);
 
+            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
+            var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
+            if (args.NewIndex < size)
+            {
+                ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
+            }
+            else
+            {
+                ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
+            }
+
+        }
+        catch (Exception r)
+        {
+            
+            throw r;
+        }
+     
     }
 
     private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)

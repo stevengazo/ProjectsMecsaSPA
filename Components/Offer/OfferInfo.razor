@@ -9,7 +9,7 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <table class="table table-hover border">
+        <table class="table table-hover border table-sm">
             <tbody>
                 <tr>
                     <th>Número</th>
@@ -119,17 +119,20 @@
                         <ValidationMessage For="@(() => offer.Author)" />
                     </td>
                 </tr>
-                <div class="row mb-2">
-                    <label>Etapa</label>
-                    <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
-                        <option value="Enviado">Enviado</option>
-                        <option value="Negociación">Negociación</option>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Vendido">Vendido</option>
-                        <option value="Cobro">Cobro</option>
-                    </InputSelect>
-                    <ValidationMessage For="@(() => offer.State)" />
-                </div>
+                <tr>
+                    <th>Etapa</th>
+                    <td>
+                        <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
+                            <option value="Enviado">Enviado</option>
+                            <option value="Negociación">Negociación</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Vendido">Vendido</option>
+                            <option value="Cobro">Cobro</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => offer.State)" />
+                    </td>
+                </tr>
+              
 
                 <!-- Aquí puedes agregar más campos si es necesario -->
             </tbody>
@@ -141,7 +144,7 @@
 }
 else
 {
-    <table class="table table-hover border">
+    <table class="table table-hover border table-sm">
         <tbody>
             <tr>
                 <th>Número</th>
@@ -169,27 +172,76 @@ else
             </tr>
             <tr>
                 <th>Require DDCE</th>
-                <td>@offer.RequiredDDCE</td>
+                @if (offer.RequiredDDCE)
+                {
+                    <td>Vinculado a DDCE</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
             </tr>
             <tr>
                 <th>Requiere Ionizante</th>
-                <td>@offer.RequiredLightningStrike</td>
+                @if (offer.RequiredLightningStrike)
+                {
+                    <td>Vinculado a Ionizante</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
             </tr>
             <tr>
                 <th>Requiere Torre</th>
-                <td>@offer.RequireTower</td>
+                @if (offer.RequireTower)
+                {
+                    <td>Vinculado a Torres</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
             </tr>
             <tr>
                 <th>Requiere SPAT</th>
-                <td>@offer.RequireSPAT</td>
+                @if (offer.RequireSPAT)
+                {
+                    <td>Vinculado a SPAT</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
             </tr>
             <tr>
                 <th>Require Supresor</th>
-                <td>@offer.RequireSurgeProtector</td>
-            </tr>
+                @if (offer.RequireSurgeProtector)
+                {
+                    <td>Vinculado a Supresores</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
+        </tr>
+
             <tr>
                 <th>Otros</th>
-                <td>@offer.RequireOther</td>
+                @if (offer.RequireOther)
+                {
+                    <td>Vinculado a Otros</td>
+
+                }
+                else
+                {
+                    <td>No</td>
+                }
             </tr>
             <tr>
                 <th>Monto</th>

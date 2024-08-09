@@ -1,0 +1,33 @@
+﻿@using System.Globalization
+
+
+<tr>
+    <td>
+        @item.BillNumber
+    </td>
+    <td>
+        @item.BillDate.ToShortDateString()
+    </td>
+    <td>
+        @item.Author
+    </td>
+    <td>
+        @item.Amount.ToString("C", AmountCulture)
+    </td>
+    <td>
+        @AmountCulture.NumberFormat.CurrencySymbol
+    </td>
+    <td>
+        @item.Note
+    </td>
+    <td>
+    </td>
+</tr>
+
+
+@code {
+    [Parameter]
+    public Bill item { get; set; }
+    [Parameter]
+    public  CultureInfo AmountCulture { get; set; }
+}
