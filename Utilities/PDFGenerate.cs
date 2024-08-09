@@ -1,8 +1,5 @@
-﻿
-using System.IO;
-using System.Threading.Tasks;
+﻿using PdfSharp.Drawing;
 using PdfSharp.Drawing.Layout;
-using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using ProjectsMecsaSPA.Model;
 

@@ -12,10 +12,10 @@
         <td>@offer.Description</td>
         <td>$@offer.Amount</td>
         <td>
-            <a href="/offers/@offer.OfferId" class="btn btn-outline-info">
+            <a href="/offers/@offer.OfferId" class="btn btn-outline-info btn-sm">
                 Ver Oferta
             </a>
-            <a class="btn btn-outline-success" @onclick="()=> IsEditing = true">
+            <a class="btn btn-outline-success btn-sm" @onclick="()=> IsEditing = true">
                 Modificar
             </a>
         </td>
@@ -59,10 +59,10 @@ else
             </EditForm>
         </td>
         <td>
-            <button class="btn btn-outline-danger" @onclick="()=> IsEditing=false"> 
+            <button class="btn btn-outline-danger btn-sm" @onclick="()=> IsEditing=false"> 
                 Cancelar
             </button>
-            <button class="btn btn-outline-success" @onclick="Update">
+            <button class="btn btn-outline-success btn-sm" @onclick="Update">
                 Guardar
             </button>
         </td>
