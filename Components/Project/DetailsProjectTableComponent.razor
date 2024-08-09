@@ -1,8 +1,11 @@
 ﻿@page "/project-edit"
 @inject ProjectsDBContext db
+@inject IJSRuntime JS
+
 
 @using System.ComponentModel.DataAnnotations
 @using System.Globalization
+@using ProjectsMecsaSPA.Utilities
 
 
 @if (IsEditing)
@@ -227,7 +230,7 @@ else
             }
         </div>
         <div>
-            <button class="btn btn-sm btn-outline-warning" >
+            <button class="btn btn-sm btn-outline-warning" @onclick="Download" >
                <Icon Name="IconName.Download"></Icon> Descargar Información
                 </button>
 
@@ -348,6 +351,19 @@ else
         project.Isfactured = state;
         db.Projects.Update(project);
         db.SaveChanges();
+    }
+
+    private async Task Download()
+    {
+        project.Bills = db.Bill.Where(e => e.ProjectId == project.ProjectId).ToList();
+        var data = await PDFGenerate.PDFProjectReport(project);
+        // Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
+        string pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyecto {project.Title} {DateTime.Now.ToShortTimeString()}.pdf");
+
+        
     }
 
 
