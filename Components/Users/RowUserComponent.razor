@@ -68,18 +68,18 @@ else
             </td>
         }
         <td>
-            <a class="btn btn-outline-info btn-sm">
-                Ver
+            <a href="user/@item.Id" class="btn btn-outline-info btn-sm">
+                <Icon Name="IconName.Eye"/>
             </a>
             <button class="btn btn-outline-success btn-sm" @onclick="()=>IsEditing =true">
-                Editar
+                <Icon Name="IconName.PencilFill" />
             </button>
-            <a class="btn btn-outline-info btn-sm">
-                Contraseña
+            <a class="btn btn-outline-warning btn-sm">
+                <Icon Name="IconName.Asterisk" />
             </a>
 
             <a class="btn btn-outline-danger btn-sm">
-                Eliminar
+                <Icon Name="IconName.XCircleFill" />
             </a>
         </td>
     </tr>
@@ -90,7 +90,6 @@ else
 @code {
     [Parameter]
     public UserIdentityEx item { get; set; }
-
 
     private bool IsEditing = false;
 

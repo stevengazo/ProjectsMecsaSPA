@@ -21,14 +21,18 @@
                           OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
                           OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
                 <ItemTemplate>
-                    <div @onclick="() => HandleProjectView(project)">
-                        <h6><b>@project.Title</b></h6>
-                        <div class="d-flex flex-column">
-                            <label><i>@project.Type?.Name</i></label>
-                            <label><i>@project.Customer?.Name</i></label>
+
+                    <div class="card-body" @onclick="() => HandleProjectView(project)">
+                            <div class="d-flex justify-content-between">
+                                <label><b>@project.Title</b></label>
+                                <label class="text-muted">@project.ProjectId</label>
+                            </div>
+
+                            <div class="d-flex flex-column mt-2">
+                                <label><i>@project.Type?.Name</i></label>
+                                <label><i>@project.Customer?.Name</i></label>
+                            </div>
                         </div>
-                        
-                     </div>
                 </ItemTemplate>
             </SortableList>
         </div>

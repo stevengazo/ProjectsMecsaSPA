@@ -1,0 +1,28 @@
+﻿@page "/user/{id}"
+@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext dbContext;
+@inject ProjectsDBContext db
+
+
+<h3>Detalles del Usuario</h3>
+<UserDetailsComponent user="user" />
+@if (user != null)
+{
+    <RolListComponent id="@user.Id" />
+}
+
+
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    UserIdentityEx user = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = dbContext.Users.FirstOrDefault(e => e.Id == id);
+        await base.OnInitializedAsync();
+    }
+}

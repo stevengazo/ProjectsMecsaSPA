@@ -1,0 +1,175 @@
+﻿@inject ApplicationDbContext dbContext;
+
+@if (IsEditing)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Datos
+                </th>
+                <th>
+                    Información
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @nameof(user.Name)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputText class="form-control" @bind-Value="user.Name" />
+                    </EditForm>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.LastName)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputText class="form-control" @bind-Value="user.LastName" />
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.Email)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputText class="form-control" @bind-Value="user.Email" />
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.UserName)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputText class="form-control" @bind-Value="user.UserName" />
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.PhoneNumber)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputText class="form-control" @bind-Value="user.PhoneNumber" />
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.DNI)
+                </td>
+                <td>
+                    <EditForm Model="user">
+                        <InputNumber class="form-control" @bind-Value="user.DNI" />
+                    </EditForm>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-sm btn-outline-success" @onclick="UpdateUser">
+        Guardar
+    </button>
+    <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=false">
+        Cancelar
+    </button>
+
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Datos
+                </th>
+                <th>
+                    Información
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @nameof(user.Name)
+                </td>
+                <td>
+                    @user.Name
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.LastName)
+                </td>
+                <td>
+                    @user.LastName
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.Email)
+                </td>
+                <td>
+                    @user.Email
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.UserName)
+                </td>
+                <td>
+                    @user.UserName
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.PhoneNumber)
+                </td>
+                <td>
+                    @user.PhoneNumber
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @nameof(user.DNI)
+                </td>
+                <td>
+                    @user.DNI
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=true">
+        Editar
+    </button>
+}
+
+
+
+@code {
+    [Parameter]
+    public UserIdentityEx user { get; set; }
+
+    private bool IsEditing = false;
+
+
+    private async Task UpdateUser()
+    {
+        IsEditing = false;
+
+        user.NormalizedEmail = user.Email.ToUpper();
+        user.NormalizedUserName = user.UserName.ToUpper();
+        dbContext.Users.Update(user);
+        dbContext.SaveChanges();
+    }
+}

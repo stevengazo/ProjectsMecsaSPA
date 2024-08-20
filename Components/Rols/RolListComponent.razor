@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext dbContext;
+@inject ProjectsDBContext db
+
+@if (seller != null)
+{
+    <button class="btn btn-sm btn-outline-danger">Eliminar como Vendedor</button>
+}
+else
+{
+    <button class="btn btn-sm btn-outline-info">Suscribir como Vendedor</button>
+}
+
+
+
+<h3>
+    Roles
+</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Rol
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in usedRoles)
+        {
+            <tr>
+                <td>
+                    @i.Name
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    List<IdentityUserRole<string>> userRoles = new();
+    List<IdentityRole> usedRoles = new();
+
+    UserIdentityEx user = new();
+    Seller seller = null;
+
+     protected override async Task OnInitializedAsync()
+    {
+        user = dbContext.Users.FirstOrDefault(e => e.Id == id);
+        if (user != null)
+        {
+            seller = null;
+            userRoles = dbContext.UserRoles
+                .Where(e => e.UserId == id)
+                .ToList();
+
+            var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
+
+            usedRoles = dbContext.Roles
+                .Where(r => roleIds.Contains(r.Id))
+                .ToList();
+        }
+        else
+        {
+            seller = db.Seller.FirstOrDefault(e => e.SellerId == user.DNI);
+        }
+
+        await base.OnInitializedAsync();
+    }
+}
