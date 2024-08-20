@@ -2,52 +2,120 @@
 
 <ConfirmDialog @ref="dialog" />
 
-<tr class="@stylerow">
-    <td>@ProjectObj.ProjectId</td>
-    <td>@ProjectObj.Title</td>
-    <td>@ProjectObj.Customer.Name</td>
-    <td>@ProjectObj.State?.StateName</td>
-    <td>@ProjectObj.OC</td>
-    <td>@ProjectObj.Type?.Name</td>
-    <td>@ProjectObj.CreationDate.ToShortDateString()</td>
-    <td>@ProjectObj.Amount.ToString("C")</td>
-    <td >
-        <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
-        Ver
-        </a>
-        @if (ProjectObj.IsDeleted)
-        {
-            <button  class="btn btn-sm btn-outline-success mx-1" @onclick="Enable" >
-                Activar Proyecto
+
+@if (IsEditing)
+{
+    <tr class="@stylerow">
+        <td>@ProjectObj.ProjectId</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputText @bind-Value="ProjectObj.Title" />
+            </EditForm>
+        </td>
+        <td>@ProjectObj.Customer.Name</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputSelect id="StateId" class="form-control form-control-sm" @bind-Value="ProjectObj.StateId">
+                    <option value="">Select State</option>
+                    @foreach (var state in states)
+                    {
+                        <option value="@state.StateId">@state.StateName</option>
+                    }
+                </InputSelect>
+            </EditForm>
+        </td>
+        <td>@ProjectObj.OC</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputSelect id="TypeId" class="form-control" @bind-Value="ProjectObj.TypeId">
+                    <option value="">Select Type</option>
+                    @foreach (var type in types)
+                    {
+                        <option value="@type.TypeId">@type.Name</option>
+                    }
+                </InputSelect>
+            </EditForm>
+        </td>
+        <td>@ProjectObj.CreationDate.ToShortDateString()</td>
+        <td>@ProjectObj.Amount.ToString("C")</td>
+        <td>
+            <button class="btn btn-sm btn-success" @onclick="Update">
+                Guardar
             </button>
-        }
-        else
-        {
-            <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
-                Desactivar 
+        </td>
+        <td>
+            <button class="btn btn-sm btn-danger" @onclick="()=>IsEditing=false">
+                Cancelar
             </button>
-        }
-    </td>
-</tr>
+        </td>
+    </tr>
+}
+else
+{
+    <tr class="@stylerow">
+        <td>@ProjectObj.ProjectId</td>
+        <td>@ProjectObj.Title</td>
+        <td>@ProjectObj.Customer.Name</td>
+        <td>@ProjectObj.State?.StateName</td>
+        <td>@ProjectObj.OC</td>
+        <td>@ProjectObj.Type?.Name</td>
+        <td>@ProjectObj.CreationDate.ToShortDateString()</td>
+        <td>@ProjectObj.Amount.ToString("C")</td>
+        <td>
+            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
+                <Icon Name="IconName.Eye"></Icon>
+            </a>
+            <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing=true">
+                <Icon Name="IconName.PencilFill"></Icon>
+            </button>
+        </td>
+        <td>
+            @if (ProjectObj.IsDeleted)
+            {
+                <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
+                    <Icon Name="IconName.CheckCircle"></Icon>
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
+                    <Icon Name="IconName.XCircle"></Icon>
+                </button>
+            }
+        </td>
+    </tr>
+
+}
+
 
 
 @code {
     [Parameter]
     public Project ProjectObj { get; set; }
+    private bool IsEditing = false;
+
+    private List<State> states = new List<State>();
+
+    private List<TypeModel> types = new List<TypeModel>();
 
     string stylerow = "";
 
+
     protected override async Task OnInitializedAsync()
     {
-        if ( ProjectObj.IsDeleted)
+        if (ProjectObj.IsDeleted)
         {
             stylerow = "text-danger text-decoration-line-through";
         }
-        base.OnInitializedAsync();   
+        base.OnInitializedAsync();
+        states = db.States.ToList();
+        types = db.Types.ToList();
     }
 
     private void Update()
     {
+
+        IsEditing = false;
         db.Projects.Update(ProjectObj);
         db.SaveChanges();
         StateHasChanged();

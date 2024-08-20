@@ -17,7 +17,7 @@ namespace ProjectsMecsaSPA.Model
 
         [Required(ErrorMessage = "El DNI es obligatorio.")]
         [Range(1, 99999999999, ErrorMessage = "El DNI debe estar entre 1,0000,0000 y 999,9999,9999.")]
-        public int DNI { get; set; }
+        public long DNI { get; set; }
 
         #region Relaciones
         public ICollection<Project> Projects { get; set; }

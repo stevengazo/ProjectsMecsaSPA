@@ -2,7 +2,7 @@
 @inject ProjectsDBContext db
 
 <h6>
-    Monto Por Etapa
+    Monto Por Etapa @DateTime.Now.Year
 </h6>
 <BarChart @ref="barChart" />
 
@@ -20,7 +20,7 @@
     private List<double?> GetAmountsByState(List<string> states)
     {
         // Obtener todos los proyectos y convertir a una lista en memoria
-        var projects = db.Projects.ToList();
+        var projects = db.Projects.Where(e=>e.CreationDate.Year== DateTime.Now.Year).ToList();
 
         // Obtener todos los estados y convertir a una lista en memoria
         var stateList = db.States.ToList();

@@ -76,11 +76,12 @@
         using (var db = DbContextFactory.CreateDbContext()){
         Dictionary<string, double?> dicOffers = new();
         var Labels = (from i in db.Offers
+            where i.Creation.Year == DateTime.Now.Year
         select i.Author).Distinct().ToList();
 
         foreach (var item in Labels)
         {
-            var count =(double) db.Offers.Where(d => d.Author == item).Count();
+            var count =(double) db.Offers.Where(d => d.Author == item && d.Creation.Year == DateTime.Now.Year).Count();
             dicOffers.Add(item, count);
         }
 

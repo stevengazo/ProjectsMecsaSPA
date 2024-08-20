@@ -16,7 +16,7 @@
     private List<double?> GetCountByState(List<string> states)
     {
         // Obtener todos los proyectos y convertir a una lista en memoria
-        var projects = db.Projects.ToList();
+        var projects = db.Projects.Where(e=> e.CreationDate.Year == DateTime.Today.Year).ToList();
 
         // Obtener todos los estados y convertir a una lista en memoria
         var stateList = db.States.ToList();
