@@ -11,31 +11,31 @@
     <ValidationSummary />
 
     <div class="form-group">
-        <label for="Title">Title</label>
+        <label for="Title">Titulo</label>
         <InputText id="Title" class="form-control" @bind-Value="project.Title" />
         <ValidationMessage For="@(() => project.Title)" />
     </div>
 
     <div class="form-group">
-        <label for="Description">Description</label>
+        <label for="Description">Descripción</label>
         <InputTextArea id="Description" class="form-control" @bind-Value="project.Description" />
         <ValidationMessage For="@(() => project.Description)" />
     </div>
 
     <div class="form-group">
-        <label for="TaskNumber">Task Number</label>
+        <label for="TaskNumber">Número Tarea</label>
         <InputText id="TaskNumber" class="form-control" @bind-Value="project.TaskNumber" />
         <ValidationMessage For="@(() => project.TaskNumber)" />
     </div>
 
     <div class="form-group">
-        <label for="CreationDate">Creation Date</label>
+        <label for="CreationDate">Fecha Registro</label>
         <InputDate id="CreationDate" class="form-control" @bind-Value="project.CreationDate" />
         <ValidationMessage For="@(() => project.CreationDate)" />
     </div>
 
     <div class="form-group">
-        <label for="TypeId">Type</label>
+        <label for="TypeId">Tipo</label>
         <InputSelect id="TypeId" class="form-control" @bind-Value="project.TypeId">
             <option value="">Select Type</option>
             @foreach (var type in types)
@@ -47,7 +47,7 @@
     </div>
 
     <div class="form-group">
-        <label for="CustomerId">Customer</label>
+        <label for="CustomerId">Cliente</label>
         <InputSelect id="CustomerId" class="form-control" @bind-Value="project.CustomerId">
             <option value="">Select Customer</option>
             @foreach (var customer in customers)
@@ -59,7 +59,7 @@
     </div>
 
     <div class="form-group">
-        <label for="SellerId">Seller</label>
+        <label for="SellerId">Vendedor</label>
         <InputSelect id="SellerId" class="form-control" @bind-Value="project.SellerId">
             <option value="">Select Seller</option>
             @foreach (var seller in sellers)
@@ -71,7 +71,7 @@
     </div>
 
     <div class="form-group">
-        <label for="StateId">State</label>
+        <label for="StateId">Estado</label>
         <InputSelect id="StateId" class="form-control" @bind-Value="project.StateId">
             <option value="">Select State</option>
             @foreach (var state in states)
@@ -83,7 +83,7 @@
     </div>
 
     <div class="form-group">
-        <label for="Amount">Amount</label>
+        <label for="Amount">Monto</label>
         <InputNumber id="Amount" class="form-control" @bind-Value="project.Amount" />
         <ValidationMessage For="@(() => project.Amount)" />
     </div>
@@ -106,20 +106,20 @@
 
 
     <div class="form-group">
-        <label for="OC">OC</label>
+        <label for="OC">Orden Compra</label>
         <InputText id="OC" class="form-control" @bind-Value="project.OC" />
         <ValidationMessage For="@(() => project.OC)" />
     </div>
 
     <div class="form-group">
-        <label for="OCDate">OC Date</label>
+        <label for="OCDate">Fecha Orden Compra</label>
         <InputDate id="OCDate" class="form-control" @bind-Value="project.OCDate" />
         <ValidationMessage For="@(() => project.OCDate)" />
     </div>
 
 
     <div class="form-group">
-        <label for="Ubication">Ubication</label>
+        <label for="Ubication">Ubicación</label>
         <InputText id="IsDeleted" class="form-control" @bind-Value="project.Ubication" />
         <ValidationMessage For="@(() => project.Ubication)" />
     </div>
