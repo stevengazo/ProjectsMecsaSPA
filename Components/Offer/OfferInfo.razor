@@ -113,10 +113,15 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Autor</th>
+                    <th>Responsable</th>
                     <td>
-                        <InputText @bind-Value="offer.Author" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.Author)" />
+                        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm">
+                            @foreach (var item in sellers)
+                            {
+                                <option value="@item.SellerId">@item.SellerName</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => offer.ResponsibleId)" />
                     </td>
                 </tr>
                 <tr>
@@ -256,6 +261,10 @@ else
                 <td>@offer.Author</td>
             </tr>
             <tr>
+                <th>Responsable</th>
+                <td>@offer.Responsible</td>
+            </tr>
+            <tr>
                 <th>Estado</th>
                 <td>@offer.State</td>
             </tr>
@@ -271,9 +280,11 @@ else
     public Offer offer { get; set; }
     private bool IsEditing = false;
 
+    private List<Seller> sellers = new();
     protected override async Task OnInitializedAsync()
     {
         // Aquí puedes cargar datos iniciales si es necesario
+        sellers = db.Seller.Where(e => e.IsActive).ToList();
     }
 
     private void StartEdit()

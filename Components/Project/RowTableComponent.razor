@@ -56,10 +56,11 @@ else
         <td>@ProjectObj.ProjectId</td>
         <td>@ProjectObj.Title</td>
         <td>@ProjectObj.Customer.Name</td>
+        <td>@ProjectObj.Seller.SellerName</td>
         <td>@ProjectObj.State?.StateName</td>
         <td>@ProjectObj.OC</td>
         <td>@ProjectObj.Type?.Name</td>
-        <td>@ProjectObj.CreationDate.ToShortDateString()</td>
+        <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
             <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">

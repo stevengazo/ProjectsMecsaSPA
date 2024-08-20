@@ -5,10 +5,10 @@
 {
     <tr>
         <td>@offer.OfferId</td>
-        <td>@offer.Creation.ToShortDateString()</td>
+        <td>@offer.Creation.ToString("MMM-yyyy")</td>
         <td>@offer.Customer</td>
         <td>@offer.State</td>
-        <td>@offer.Author</td>
+        <td>@offer.Responsible</td>
         <td>@offer.Description</td>
         <td>$@offer.Amount</td>
         <td>

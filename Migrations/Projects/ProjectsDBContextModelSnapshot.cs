@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Prjects
+namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240805160533_projectmigration")]
-    partial class projectmigration
+    partial class ProjectsDBContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,8 +116,8 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"), 1L, 1);
 
-                    b.Property<int>("DNI")
-                        .HasColumnType("int");
+                    b.Property<long>("DNI")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -139,7 +137,7 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                         new
                         {
                             CustomerId = 1,
-                            DNI = 1,
+                            DNI = 1L,
                             Name = "Default",
                             Type = "Publico"
                         });
@@ -214,8 +212,8 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
 
                     b.Property<string>("Customer")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -239,6 +237,14 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
 
                     b.Property<bool>("RequiredLightningStrike")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Responsible")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsibleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -350,9 +356,15 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SellerId"), 1L, 1);
 
+                    b.Property<int>("DNI")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("SellerName")
                         .IsRequired()
@@ -366,7 +378,9 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                         new
                         {
                             SellerId = 1,
+                            DNI = 0,
                             Email = "",
+                            IsActive = false,
                             SellerName = "Sample"
                         });
                 });

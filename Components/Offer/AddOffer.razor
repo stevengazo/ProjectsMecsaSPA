@@ -116,11 +116,15 @@
         <ValidationMessage For="@(() => offer.CalculateBy)" />
     </div>
     <div class="row mb-2">
-        <label>Autor</label>
-        <InputText @bind-Value="offer.Author" class="form-control form-control-sm" readonly></InputText>
-        <ValidationMessage For="@(() => offer.Author)" />
+        <label>Responsable</label>
+        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm" >
+            @foreach (var item in sellers)
+            {
+                <option  value="@item.SellerId">@item.SellerName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => offer.Responsible)" />
     </div>
-
     <div class="row mb-2">
         <label>Etapa</label>
         <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
@@ -143,6 +147,7 @@
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
+    private List<Seller> sellers = new();
     private Offer offer = new Offer
         {
             Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
@@ -150,8 +155,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Obtén el estado de autenticación
 
+        using var context = DbContextFactory.CreateDbContext();
+        sellers = context.Seller.Where(e => e.IsActive).ToList();
+        // Obtén el estado de autenticación
         var s = asp.GetAuthenticationStateAsync();
         var user = s.Result.User;
 
@@ -172,6 +179,7 @@
     private async Task Add()
     {
         using var context = DbContextFactory.CreateDbContext();
+        offer.Responsible = sellers.FirstOrDefault(i => i.SellerId == i.SellerId).SellerName;
         context.Offers.Add(offer);
         await context.SaveChangesAsync();
         NAV.NavigateTo($"/offers/{offer.OfferId}");

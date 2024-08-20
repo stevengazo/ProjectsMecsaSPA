@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Prjects
+namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class projectmigration : Migration
+    public partial class projectsmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +17,7 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    DNI = table.Column<int>(type: "int", nullable: false)
+                    DNI = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,7 +31,7 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                     OfferId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Creation = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Customer = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Customer = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ContactType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -44,7 +45,9 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
                     CalculateBy = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    AuthorId = table.Column<int>(type: "int", nullable: false)
+                    AuthorId = table.Column<int>(type: "int", nullable: false),
+                    Responsible = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResponsibleId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,7 +61,9 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
                     SellerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SellerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DNI = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -225,12 +230,12 @@ namespace ProjectsMecsaSPA.Migrations.Prjects
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "CustomerId", "DNI", "Name", "Type" },
-                values: new object[] { 1, 1, "Default", "Publico" });
+                values: new object[] { 1, 1L, "Default", "Publico" });
 
             migrationBuilder.InsertData(
                 table: "Seller",
-                columns: new[] { "SellerId", "Email", "SellerName" },
-                values: new object[] { 1, "", "Sample" });
+                columns: new[] { "SellerId", "DNI", "Email", "IsActive", "SellerName" },
+                values: new object[] { 1, 0, "", false, "Sample" });
 
             migrationBuilder.InsertData(
                 table: "States",

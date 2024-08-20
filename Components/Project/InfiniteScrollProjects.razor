@@ -13,6 +13,7 @@
                 <th>N</th>
                 <th>Titulo</th>
                 <th>Cliente</th>
+                <th>Vendedor</th>
                 <th>Estado</th>
                 <th>OC</th>
                 <th>Tipo</th>
@@ -87,6 +88,7 @@
                                    .Include(i => i.Customer)
                                    .Include(i => i.State)
                                    .Include(i => i.Type)
+                                       .Include(i => i.Seller)
                                    
                                    .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por fecha de creación
                                    .Skip((currentPage - 1) * pageSize)
