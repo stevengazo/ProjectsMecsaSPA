@@ -29,7 +29,7 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/inventoryit:${{ env.TIMESTAMP }}
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/mecsa_projects:${{ env.TIMESTAMP }}
 
     - name: Log in to Docker Hub
       if: success()
