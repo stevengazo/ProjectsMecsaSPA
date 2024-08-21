@@ -157,7 +157,7 @@
     {
 
         using var context = DbContextFactory.CreateDbContext();
-        sellers = context.Seller.Where(e => e.IsActive).ToList();
+        sellers = context.Seller.Where(e => e.IsActive).OrderBy(e=>e.SellerName).ToList();
         // Obtén el estado de autenticación
         var s = asp.GetAuthenticationStateAsync();
         var user = s.Result.User;

@@ -44,6 +44,9 @@
 <button  class="btn btn-outline-success" @onclick="Add">
     Guardar Usuario
 </button>
+<label class="text-danger">
+    @errorMessage
+</label>
 
 @code {
     UserIdentityEx user = new();
@@ -51,6 +54,8 @@
     public EventCallback OnAdded { get; set; }
 
     private Pass PassObj = new();
+
+    string errorMessage = "";
 
     private class Pass
     {
@@ -60,15 +65,27 @@
 
 
     private async Task Add()
-    {
-        user.EmailConfirmed = true;
-        user.NormalizedEmail = user.Email.ToUpper();
-        user.NormalizedUserName = user.UserName.ToUpper();
-        if(PassObj.Password == PassObj.ConfirmPass)
+    {try
         {
-            userManager.CreateAsync(user, PassObj.Password);
-            OnAdded.InvokeAsync();
+            user.EmailConfirmed = true;
+            user.NormalizedEmail = user.Email.ToUpper();
+            user.NormalizedUserName = user.UserName.ToUpper();
+            if (PassObj.Password == PassObj.ConfirmPass)
+            {
+                var e = await userManager.CreateAsync(user, PassObj.Password);
+                if (e.Succeeded)
+                {
+                    OnAdded.InvokeAsync();
+                }
+
+            }
         }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+            throw;
+        }
+
     }
 
 }

@@ -1,11 +1,11 @@
 ﻿@page "/offer-edit"
-@inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 @using System.ComponentModel.DataAnnotations
 
 @if (IsEditing)
 {
-    <EditForm Model="offer" OnValidSubmit="Update">
+    <EditForm Model="tmpOffer" OnValidSubmit="Update">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -13,131 +13,131 @@
             <tbody>
                 <tr>
                     <th>Número</th>
-                    <td>@offer.OfferId</td>
+                    <td>@tmpOffer.OfferId</td>
                 </tr>
                 <tr>
                     <th>Fecha</th>
                     <td>
-                        <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.Creation)" />
+                        <InputDate @bind-Value="tmpOffer.Creation" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => tmpOffer.Creation)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Cliente</th>
                     <td>
-                        <InputText @bind-Value="offer.Customer" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.Customer)" />
+                        <InputText @bind-Value="tmpOffer.Customer" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => tmpOffer.Customer)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Descripción</th>
                     <td>
-                        <InputText @bind-Value="offer.Description" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.Description)" />
+                        <InputText @bind-Value="tmpOffer.Description" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => tmpOffer.Description)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Tipo Contacto</th>
                     <td>
-                    <InputSelect @bind-Value="offer.ContactType" class="form-control form-control-sm">
-                        <option value=" ">Seleccione una opción</option>
-                        <option value="Vendedor">Vendedor</option>
-                        <option value="Reactivación">Reactivación</option>
-                        <option value="Whatsapp">Whatsapp</option>
-                        <option value="Correo">Correo</option>
-                        <option value="Llamada">Llamada</option>
-                        <option value="Otro">Otro</option>
-                    </InputSelect>
+                        <InputSelect @bind-Value="tmpOffer.ContactType" class="form-control form-control-sm">
+                            <option value=" ">Seleccione una opción</option>
+                            <option value="Vendedor">Vendedor</option>
+                            <option value="Reactivación">Reactivación</option>
+                            <option value="Whatsapp">Whatsapp</option>
+                            <option value="Correo">Correo</option>
+                            <option value="Llamada">Llamada</option>
+                            <option value="Otro">Otro</option>
+                        </InputSelect>
                     </td>
                 </tr>
                 <tr>
                     <th>Tipo</th>
                     <td>
-                        <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
+                        <InputSelect @bind-Value="tmpOffer.Type" class="form-control form-control-sm">
                             <option value="Mantenimiento">Mantenimiento</option>
                             <option value="Instalación">Instalación</option>
                             <option value="Mejoras">Mejoras</option>
                             <option value="Otro">Otro</option>
                         </InputSelect>
-                        <ValidationMessage For="@(() => offer.Type)" />
+                        <ValidationMessage For="@(() => tmpOffer.Type)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincular a DDCE</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequiredDDCE" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequiredDDCE" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincular a Pararrayos</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequiredLightningStrike" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincula a Torre</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequireTower" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequireTower" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincular a SPAT</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequireSPAT" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequireSPAT" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincular a supresores</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequireSurgeProtector" />
                     </td>
                 </tr>
                 <tr>
                     <th>Vincular a Otros</th>
                     <td>
-                        <InputCheckbox @bind-Value="offer.RequireOther" />
+                        <InputCheckbox @bind-Value="tmpOffer.RequireOther" />
                     </td>
                 </tr>
                 <tr>
                     <th>Monto</th>
                     <td>
-                        <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.Amount)" />
+                        <InputNumber @bind-Value="tmpOffer.Amount" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => tmpOffer.Amount)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Calculado Por</th>
                     <td>
-                        <InputText @bind-Value="offer.CalculateBy" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => offer.CalculateBy)" />
+                        <InputText @bind-Value="tmpOffer.CalculateBy" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => tmpOffer.CalculateBy)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Responsable</th>
                     <td>
-                        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm">
+                        <InputSelect @bind-Value="tmpOffer.ResponsibleId" class="form-control form-control-sm">
                             @foreach (var item in sellers)
                             {
                                 <option value="@item.SellerId">@item.SellerName</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => offer.ResponsibleId)" />
+                        <ValidationMessage For="@(() => tmpOffer.ResponsibleId)" />
                     </td>
                 </tr>
                 <tr>
                     <th>Etapa</th>
                     <td>
-                        <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
+                        <InputSelect @bind-Value="tmpOffer.State" class="form-control form-control-sm">
                             <option value="Enviado">Enviado</option>
                             <option value="Negociación">Negociación</option>
                             <option value="Pendiente">Pendiente</option>
                             <option value="Vendido">Vendido</option>
                             <option value="Cobro">Cobro</option>
                         </InputSelect>
-                        <ValidationMessage For="@(() => offer.State)" />
+                        <ValidationMessage For="@(() => tmpOffer.State)" />
                     </td>
                 </tr>
-              
+
 
                 <!-- Aquí puedes agregar más campos si es necesario -->
             </tbody>
@@ -149,171 +149,62 @@
 }
 else
 {
-    <table class="table table-hover border table-sm">
-        <tbody>
-            <tr>
-                <th>Número</th>
-                <td>@offer.OfferId</td>
-            </tr>
-            <tr>
-                <th>Fecha</th>
-                <td>@offer.Creation.ToLongDateString()</td>
-            </tr>
-            <tr>
-                <th>Cliente</th>
-                <td>@offer.Customer</td>
-            </tr>
-            <tr>
-                <th>Descripción</th>
-                <td>@offer.Description</td>
-            </tr>
-            <tr>
-                <th>Tipo Contacto</th>
-                <td>@offer.ContactType</td>
-            </tr>
-            <tr>
-                <th>Tipo</th>
-                <td>@offer.Type</td>
-            </tr>
-            <tr>
-                <th>Require DDCE</th>
-                @if (offer.RequiredDDCE)
-                {
-                    <td>Vinculado a DDCE</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-            </tr>
-            <tr>
-                <th>Requiere Ionizante</th>
-                @if (offer.RequiredLightningStrike)
-                {
-                    <td>Vinculado a Ionizante</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-            </tr>
-            <tr>
-                <th>Requiere Torre</th>
-                @if (offer.RequireTower)
-                {
-                    <td>Vinculado a Torres</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-            </tr>
-            <tr>
-                <th>Requiere SPAT</th>
-                @if (offer.RequireSPAT)
-                {
-                    <td>Vinculado a SPAT</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-            </tr>
-            <tr>
-                <th>Require Supresor</th>
-                @if (offer.RequireSurgeProtector)
-                {
-                    <td>Vinculado a Supresores</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-        </tr>
-
-            <tr>
-                <th>Otros</th>
-                @if (offer.RequireOther)
-                {
-                    <td>Vinculado a Otros</td>
-
-                }
-                else
-                {
-                    <td>No</td>
-                }
-            </tr>
-            <tr>
-                <th>Monto</th>
-                <td>@offer.Amount</td>
-            </tr>
-            <tr>
-                <th>Calculado Por</th>
-                <td>@offer.CalculateBy</td>
-            </tr>
-            <tr>
-                <th>Autor</th>
-                <td>@offer.Author</td>
-            </tr>
-            <tr>
-                <th>Responsable</th>
-                <td>@offer.Responsible</td>
-            </tr>
-            <tr>
-                <th>Estado</th>
-                <td>@offer.State</td>
-            </tr>
-        </tbody>
-    </table>
-    
-        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Oferta</button>
-    
+   <TableOfferComponent offer="offer" /> 
+   <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Oferta</button>
 }
+
+@errorMessage
 
 @code {
     [Parameter]
     public Offer offer { get; set; }
     private bool IsEditing = false;
+    private Offer tmpOffer = new();
 
+    ProjectsDBContext projectsDB;
+
+    string errorMessage = "";
     private List<Seller> sellers = new();
     protected override async Task OnInitializedAsync()
     {
+        projectsDB = DbContextFactory.CreateDbContext();
+
         // Aquí puedes cargar datos iniciales si es necesario
-        sellers = db.Seller.Where(e => e.IsActive).ToList();
+        sellers = projectsDB.Seller.Where(e => e.IsActive).ToList();
     }
 
     private void StartEdit()
     {
+        tmpOffer = offer;
         IsEditing = true;
     }
 
     private void CancelEdit()
     {
         IsEditing = false;
+        tmpOffer = null;
+        StateHasChanged();
     }
 
     private async Task Update()
     {
         try
         {
-            if (offer != null)
+            if (tmpOffer != null)
             {
-                db.Offers.Update(offer);
-                await db.SaveChangesAsync();
-
-                // Recargar el objeto desde la base de datos si es necesario
-                offer = await db.Offers.FindAsync(offer.OfferId);
+                offer = null;
+                tmpOffer.Responsible = sellers.FirstOrDefault(i => i.DNI.ToString() == tmpOffer.ResponsibleId).SellerName;
+                projectsDB.Offers.Update(tmpOffer);
+                await projectsDB.SaveChangesAsync();
+                offer = tmpOffer;
 
                 IsEditing = false;
+                StateHasChanged();
             }
         }
         catch (Exception ex)
         {
+            errorMessage = ex.Message;
             // Manejar el error de actualización aquí
             Console.WriteLine($"Error al actualizar la oferta: {ex.Message}");
         }

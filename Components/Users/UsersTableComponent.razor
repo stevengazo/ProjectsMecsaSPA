@@ -53,7 +53,7 @@
     protected override async Task OnInitializedAsync()
     {
 
-        Users = await dbContext.Users.ToListAsync();
+        Users = await dbContext.Users.OrderBy(e=>e.Name).ToListAsync();
         base.OnInitializedAsync();
     }
 
@@ -73,11 +73,11 @@
     }
     private async Task HandleUserAdded()
     {
-        Users = await dbContext.Users.ToListAsync();
+        Users = await dbContext.Users.OrderBy(e => e.Name).ToListAsync();
           await offcanvas.HideAsync();
             messages.Add(new()
                 {
-                    Message = "Proyecto Agregado",
+                    Message = "Usuario Agregado",
                     Type = ToastType.Success
                 });
         

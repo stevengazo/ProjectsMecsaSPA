@@ -25,7 +25,7 @@ namespace ProjectsMecsaSPA.Model
         public bool RequireSurgeProtector { get; set; }
         public bool RequireOther { get; set; }
         [Required(ErrorMessage = "El monto es requerido")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0")]
+        [Range(0.0, double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0")]
         [Column(TypeName = "decimal(15, 3)")]
         public decimal Amount { get; set; }
         [Required(ErrorMessage = "El campo Cotizado Por es requerido")]

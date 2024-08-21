@@ -1,0 +1,129 @@
+﻿
+<table class="table table-hover border table-sm">
+    <tbody>
+        <tr>
+            <th>Número</th>
+            <td>@offer.OfferId</td>
+        </tr>
+        <tr>
+            <th>Fecha</th>
+            <td>@offer.Creation.ToLongDateString()</td>
+        </tr>
+        <tr>
+            <th>Cliente</th>
+            <td>@offer.Customer</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td>@offer.Description</td>
+        </tr>
+        <tr>
+            <th>Tipo Contacto</th>
+            <td>@offer.ContactType</td>
+        </tr>
+        <tr>
+            <th>Tipo</th>
+            <td>@offer.Type</td>
+        </tr>
+        <tr>
+            <th>Require DDCE</th>
+            @if (offer.RequiredDDCE)
+            {
+                <td>Vinculado a DDCE</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+        <tr>
+            <th>Requiere Ionizante</th>
+            @if (offer.RequiredLightningStrike)
+            {
+                <td>Vinculado a Ionizante</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+        <tr>
+            <th>Requiere Torre</th>
+            @if (offer.RequireTower)
+            {
+                <td>Vinculado a Torres</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+        <tr>
+            <th>Requiere SPAT</th>
+            @if (offer.RequireSPAT)
+            {
+                <td>Vinculado a SPAT</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+        <tr>
+            <th>Require Supresor</th>
+            @if (offer.RequireSurgeProtector)
+            {
+                <td>Vinculado a Supresores</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+
+        <tr>
+            <th>Otros</th>
+            @if (offer.RequireOther)
+            {
+                <td>Vinculado a Otros</td>
+
+            }
+            else
+            {
+                <td>No</td>
+            }
+        </tr>
+        <tr>
+            <th>Monto</th>
+            <td>@offer.Amount</td>
+        </tr>
+        <tr>
+            <th>Calculado Por</th>
+            <td>@offer.CalculateBy</td>
+        </tr>
+        <tr>
+            <th>Autor</th>
+            <td>@offer.Author</td>
+        </tr>
+        <tr>
+            <th>Responsable</th>
+            <td>@offer.Responsible</td>
+        </tr>
+        <tr>
+            <th>Estado</th>
+            <td>@offer.State</td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public Offer offer { get; set; }
+
+}
