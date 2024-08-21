@@ -26,6 +26,7 @@
         <InputTextArea @bind-Value="offer.Description" class="form-control form-control-sm"></InputTextArea>
         <ValidationMessage For="@(() => offer.Description)" />
     </div>
+
     <div class="row mb-2">
         <label>Tipo Contacto</label>
         <InputSelect @bind-Value="offer.ContactType" class="form-control form-control-sm">
@@ -37,11 +38,12 @@
             <option value="Llamada">Llamada</option>
             <option value="Otro">Otro</option>
         </InputSelect>
-        <ValidationMessage For="@(() => offer.Author)" />
+        <ValidationMessage For="@(() => offer.ContactType)" />
     </div>
     <div class="row mb-2">
         <label>Tipo Oferta</label>
         <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
+            <option value="">Seleccione</option>
             <option value="Mantenimiento">Mantenimiento</option>
             <option value="Instalación">Instalación</option>
             <option value="Mejoras">Mejoras</option>
@@ -128,6 +130,7 @@
     <div class="row mb-2">
         <label>Etapa</label>
         <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
+            <option value="">Seleccione</option>
             <option value="Enviado">Enviado</option>
             <option value="Negociación">Negociación</option>
             <option value="Pendiente">Pendiente</option>

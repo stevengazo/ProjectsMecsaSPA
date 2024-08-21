@@ -29,9 +29,15 @@
     <table class="table table-striped mt-3 table-hover">
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>DNI</th>
+                <th>
+                    <button @onclick="() => SortByColumn(nameof(Customer.Name))" >Nombre</button>
+                </th>
+                <th>
+                    <button @onclick="() => SortByColumn(nameof(Customer.Type))" >Tipo</button>
+                </th>
+                <th>
+                    <button @onclick="() => SortByColumn(nameof(Customer.DNI))" >DNI</button>
+                </th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -57,6 +63,9 @@
     private SearchModel searchModel = new();
     private List<Customer> customers = new();
 
+    private string currentSortColumn;
+    private bool isAscending = true;
+
     private async Task ApplyFilters()
     {
         using (var db = DbContextFactory.CreateDbContext())
@@ -73,8 +82,30 @@
                 query = query.Where(c => c.Type == searchModel.Type);
             }
 
+            // Aplicar el ordenamiento
+            if (!string.IsNullOrEmpty(currentSortColumn))
+            {
+                query = isAscending ? query.OrderBy(c => EF.Property<object>(c, currentSortColumn))
+                                    : query.OrderByDescending(c => EF.Property<object>(c, currentSortColumn));
+            }
+
             customers = await query.ToListAsync();
         }
+    }
+
+    private void SortByColumn(string columnName)
+    {
+        if (currentSortColumn == columnName)
+        {
+            isAscending = !isAscending;
+        }
+        else
+        {
+            currentSortColumn = columnName;
+            isAscending = true;
+        }
+
+        ApplyFilters();
     }
 
     public class SearchModel

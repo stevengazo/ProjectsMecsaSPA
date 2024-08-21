@@ -16,7 +16,9 @@ namespace ProjectsMecsaSPA.Model
         [StringLength(500, ErrorMessage = "La descripción no puede exceder los 500 caracteres")]
         public string Description { get; set; }
         public string ContactType { get; set; }
+        [Required(ErrorMessage = "El tipo es requerido")]
         public string Type { get; set; }
+        [Required(ErrorMessage = "El estado es requerido")]
         public string State { get; set; }
         public bool RequiredDDCE { get; set; }
         public bool RequiredLightningStrike { get; set; }
