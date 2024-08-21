@@ -1,5 +1,4 @@
-﻿@inject ProjectsDBContext db
-@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 
 
@@ -8,7 +7,7 @@
 
 @if (IsEditing)
 {
-    <tr class="@stylerow">
+    <tr style="font-size:14px;" class="@stylerow">
         <td>@ProjectObj.ProjectId</td>
         <td>
             <EditForm Model="ProjectObj">
@@ -55,7 +54,7 @@
 }
 else
 {
-    <tr class="@stylerow">
+    <tr style="font-size:14px;" class="@stylerow">
         <td>@ProjectObj.ProjectId</td>
         <td>@ProjectObj.Title</td>
         <td>@ProjectObj.Customer.Name</td>
@@ -101,7 +100,7 @@ else
     private List<State> states = new List<State>();
 
     private List<TypeModel> types = new List<TypeModel>();
-
+    ProjectsDBContext db;
     string stylerow = "";
 
 
@@ -109,6 +108,7 @@ else
     {
         try
         {
+            db = DbContextFactory.CreateDbContext();
             if (ProjectObj.IsDeleted)
             {
                 stylerow = "text-danger text-decoration-line-through";
@@ -119,22 +119,39 @@ else
         }
         catch (InvalidOperationException e)
         {
-            using (db = DbContextFactory.CreateDbContext())
-            {
+            
                 states = db.States.ToList();
                 types = db.Types.ToList();
-            }
+            
         }
-      
+
     }
 
     private void Update()
     {
+        try
+        {
+            IsEditing = false;
+            db.Projects.Update(ProjectObj);
+            db.SaveChanges();
 
-        IsEditing = false;
-        db.Projects.Update(ProjectObj);
-        db.SaveChanges();
-        StateHasChanged();
+        }
+        catch (InvalidOperationException e)
+        {
+            using (var d = DbContextFactory.CreateDbContext())
+            {
+                IsEditing = false;
+              //  ProjectObj.State = null;
+              //  ProjectObj.Seller = null;
+               
+                d.Projects.Update(ProjectObj);
+                d.SaveChanges();
+            }
+        }
+        finally
+        {
+            StateHasChanged();
+        }     
     }
 
     private void Disable()

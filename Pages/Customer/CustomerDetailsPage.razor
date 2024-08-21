@@ -11,12 +11,14 @@
             <th>N</th>
             <th>Titulo</th>
             <th>Cliente</th>
+            <th></th>
             <th>Estado</th>
             <th>OC</th>
-            <th>Tipo</th>
-            <th>Creación</th>
+            <th>Tipo Proyecto</th>
+
+            <th>Fecha Registro</th>
             <th>Monto</th>
-            <th>Acciones</th>
+            <th colspan="3">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -41,7 +43,9 @@
         {
             customer = db.Customers
             .Include(i=>i.Projects) 
-            .ThenInclude(i=>i.State)
+                 .ThenInclude(i=>i.State)
+            .Include(i=>i.Projects)
+                .ThenInclude(i => i.Type)
             .FirstOrDefault(w => w.CustomerId == customerid);
         }
     }

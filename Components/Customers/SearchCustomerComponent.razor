@@ -26,7 +26,7 @@
 
 @if (customers != null)
 {
-    <table class="table table-striped mt-3">
+    <table class="table table-striped mt-3 table-hover">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -42,9 +42,11 @@
                     <td>@customer.Name</td>
                     <td>@customer.Type</td>
                     <td>@customer.DNI</td>
-                    <a href="/customers/@customer.CustomerId" class="btn btn-sm btn-outline-info">
-                        Ver
-                    </a>
+                    <td>
+                        <a href="/customers/@customer.CustomerId" class="btn btn-sm btn-outline-info">
+                            Ver
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
