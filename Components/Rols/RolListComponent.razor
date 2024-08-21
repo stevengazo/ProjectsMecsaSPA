@@ -1,0 +1,139 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject ApplicationDbContext dbContext;
+@inject ProjectsDBContext db
+
+@if (seller != null )
+{
+    if (seller.IsActive)
+    {
+        <button class="ml-1 btn btn-sm btn-outline-danger" @onclick="DisableSeller">Eliminar como Vendedor</button>
+    }
+    else{
+        <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">Suscribir como Vendedor</button>
+    }
+}
+else
+{
+    <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">Suscribir como Vendedor</button>
+}
+
+
+
+<h3>
+    Roles
+</h3>
+
+<div>
+    <label>
+        Roles
+    </label>
+    <select>
+        @foreach (var i in Roles)
+        {
+            <option value="@i.Id">@i.Name</option>
+        }
+    </select>
+    <button>
+        Agregar Rol
+    </button>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Rol
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in usedRoles)
+        {
+            <tr>
+                <td>
+                    @i.Name
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    List<IdentityUserRole<string>> userRoles = new();
+    List<IdentityRole> usedRoles = new();
+
+    List<IdentityRole> Roles = new();
+
+    UserIdentityEx user = new();
+    Seller seller = null;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = dbContext.Roles.ToList();
+        user = dbContext.Users.FirstOrDefault(e => e.Id == id);
+        if (user != null)
+        {
+            userRoles = dbContext.UserRoles
+                .Where(e => e.UserId == id)
+                .ToList();
+
+            var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
+
+            usedRoles = dbContext.Roles
+                .Where(r => roleIds.Contains(r.Id))
+                .ToList();
+            seller = db.Seller.FirstOrDefault(e => e.SellerId == user.DNI);
+
+        }
+        else
+        {
+            seller = null;
+
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+
+    private async Task DisableSeller()
+    {
+        seller.IsActive = false;
+        db.Seller.Update(seller);
+        db.SaveChanges();
+    }
+
+    private async Task SuscribeSeller()
+    {
+        seller = db.Seller.FirstOrDefault(w => w.SellerId == user.DNI);
+        if (seller == null)
+        {
+            seller = new Seller()
+                {
+                    SellerId = user.DNI,
+                    SellerName = $"{user.Name} {user.LastName}",
+                    Email = user.Email,
+                    DNI = user.DNI,
+                    IsActive = true
+                };
+            using (var transaction = db.Database.BeginTransaction())
+            {
+                db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] ON");
+                db.Seller.Add(seller);
+                db.SaveChanges();
+                db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] OFF");
+                transaction.Commit();
+            }
+        }
+        else {
+            seller.IsActive = true;
+            db.Seller.Update(seller);
+            db.SaveChanges();
+        }
+    }
+}

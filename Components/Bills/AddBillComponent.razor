@@ -1,0 +1,76 @@
+﻿@page "/add-bill"
+@inject ProjectsDBContext db
+
+<EditForm Model="bill" OnValidSubmit="Add">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row mb-2">
+        <label>Número de Factura</label>
+        <InputText @bind-Value="bill.BillNumber" class="form-control form-control-sm"></InputText>
+        <ValidationMessage For="@(() => bill.BillNumber)" />
+    </div>
+    <div class="row mb-2">
+        <label>Importe</label>
+        <InputNumber @bind-Value="bill.Amount" class="form-control form-control-sm" step="0.001"></InputNumber>
+        <ValidationMessage For="@(() => bill.Amount)" />
+    </div>
+
+    <div class="row mb-2">
+        <label>Nota</label>
+        <InputTextArea @bind-Value="bill.Note" class="form-control form-control-sm"></InputTextArea>
+        <ValidationMessage For="@(() => bill.Note)" />
+    </div>
+    <div class="row mb-2">
+        <label>Autor</label>
+        <InputText @bind-Value="bill.Author" class="form-control form-control-sm"></InputText>
+        <ValidationMessage For="@(() => bill.Author)" />
+    </div>
+    <div class="row mb-2">
+        <label>Fecha de Factura</label>
+        <InputDate @bind-Value="bill.BillDate" class="form-control form-control-sm"></InputDate>
+        <ValidationMessage For="@(() => bill.BillDate)" />
+    </div>
+
+    <button type="submit" class="btn btn-outline-success">Agregar Factura</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public string CurrencyType { get; set; }
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    Bill bill = new()
+        {
+
+            LastEditionDate = DateTime.Now,
+            BillDate = DateTime.Now
+        };
+    protected override Task OnInitializedAsync()
+    {
+        bill.Currency = CurrencyType;
+        return base.OnInitializedAsync();
+        bill.ProjectId = ProjectId;
+    }
+
+    private async Task Add()
+    {
+        bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
+        bill.AuthorId = "";
+        bill.Currency = CurrencyType;
+        bill.ProjectId = ProjectId;
+        using var context = db;
+        context.Bill.Add(bill);
+        await context.SaveChangesAsync();
+        bill = new Bill
+            {
+                ProjectId = ProjectId,
+                LastEditionDate = DateTime.Now,
+                BillDate = DateTime.Now
+            };
+        await OnAdded.InvokeAsync(null);
+    }
+}

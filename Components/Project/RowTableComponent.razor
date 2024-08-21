@@ -1,0 +1,187 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
+<ConfirmDialog @ref="dialog" />
+
+
+@if (IsEditing)
+{
+    <tr style="font-size:14px;" class="@stylerow">
+        <td>@ProjectObj.ProjectId</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputText @bind-Value="ProjectObj.Title" />
+            </EditForm>
+        </td>
+        <td>@ProjectObj.Customer.Name</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputSelect id="StateId" class="form-control form-control-sm" @bind-Value="ProjectObj.StateId">
+                    <option value="">Select State</option>
+                    @foreach (var state in states)
+                    {
+                        <option value="@state.StateId">@state.StateName</option>
+                    }
+                </InputSelect>
+            </EditForm>
+        </td>
+        <td>@ProjectObj.OC</td>
+        <td>
+            <EditForm Model="ProjectObj">
+                <InputSelect id="TypeId" class="form-control" @bind-Value="ProjectObj.TypeId">
+                    <option value="">Select Type</option>
+                    @foreach (var type in types)
+                    {
+                        <option value="@type.TypeId">@type.Name</option>
+                    }
+                </InputSelect>
+            </EditForm>
+        </td>
+        <td>@ProjectObj.CreationDate.ToShortDateString()</td>
+        <td>@ProjectObj.Amount.ToString("C")</td>
+        <td>
+            <button class="btn btn-sm btn-success" @onclick="Update">
+                Guardar
+            </button>
+        </td>
+        <td>
+            <button class="btn btn-sm btn-danger" @onclick="()=>IsEditing=false">
+                Cancelar
+            </button>
+        </td>
+    </tr>
+}
+else
+{
+    <tr style="font-size:14px;" class="@stylerow">
+        <td>@ProjectObj.ProjectId</td>
+        <td>@ProjectObj.Title</td>
+        <td>@ProjectObj.Customer.Name</td>
+        <td>@ProjectObj.Seller?.SellerName</td>
+        <td>@ProjectObj.State?.StateName</td>
+        <td>@ProjectObj.OC</td>
+        <td>@ProjectObj.Type?.Name</td>
+        <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
+        <td>@ProjectObj.Amount.ToString("C")</td>
+        <td>
+            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
+                <Icon Name="IconName.Eye"></Icon>
+            </a>
+            <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
+                <Icon Name="IconName.PencilFill"></Icon>
+            </button>
+        </td>
+        <td>
+            @if (ProjectObj.IsDeleted)
+            {
+                <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
+                    <Icon Name="IconName.CheckCircle"></Icon>
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
+                    <Icon Name="IconName.XCircle"></Icon>
+                </button>
+            }
+        </td>
+    </tr>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public Project ProjectObj { get; set; }
+    private bool IsEditing = false;
+
+    private List<State> states = new List<State>();
+
+    private List<TypeModel> types = new List<TypeModel>();
+    ProjectsDBContext db;
+    string stylerow = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            db = DbContextFactory.CreateDbContext();
+            if (ProjectObj.IsDeleted)
+            {
+                stylerow = "text-danger text-decoration-line-through";
+            }
+            base.OnInitializedAsync();
+            states = db.States.ToList();
+            types = db.Types.ToList();
+        }
+        catch (InvalidOperationException e)
+        {
+            
+                states = db.States.ToList();
+                types = db.Types.ToList();
+            
+        }
+
+    }
+
+    private void Update()
+    {
+        try
+        {
+            IsEditing = false;
+            db.Projects.Update(ProjectObj);
+            db.SaveChanges();
+
+        }
+        catch (InvalidOperationException e)
+        {
+            using (var d = DbContextFactory.CreateDbContext())
+            {
+                IsEditing = false;
+              //  ProjectObj.State = null;
+              //  ProjectObj.Seller = null;
+               
+                d.Projects.Update(ProjectObj);
+                d.SaveChanges();
+            }
+        }
+        finally
+        {
+            StateHasChanged();
+        }     
+    }
+
+    private void Disable()
+    {
+        ProjectObj.IsDeleted = true;
+        Update();
+    }
+    private void Enable()
+    {
+        ProjectObj.IsDeleted = false;
+        Update();
+    }
+
+
+    private ConfirmDialog dialog = default!;
+
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Borrado de Proyecto",
+            message1: "El proyecto no será borrado de la base de datos. Solamente se marcará como \"Eliminado\". No podrá agregar mas información o modificarlo.",
+            message2: "Desea proceder?");
+
+        if (confirmation)
+        {
+            Disable();
+        }
+        else
+        {
+            Enable();
+        }
+    }
+}

@@ -1,0 +1,118 @@
+﻿@inject ProjectsDBContext db
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Categoria
+            </th>
+            <th>
+                Datos
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                Id
+            </td>
+            <td>
+                @project.ProjectId
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Titulo
+            </td>
+            <td>
+                @project.Title
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Cliente
+            </td>
+            <td>
+                @project.Customer?.Name
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Vendedor
+            </td>
+            <td>
+                @project.Seller?.SellerName
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Etapa
+            </td>
+            <td>
+                @project.State?.StateName
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Tipo Proyecto
+            </td>
+            <td>
+                @project.Type?.Name
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Tarea
+            </td>
+            <td>
+                @project.TaskNumber
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Creación
+            </td>
+            <td>
+                @project.CreationDate.ToLongDateString()
+            </td>
+        </tr>
+        <tr>
+            <td>
+                OC
+            </td>
+            <td>
+                @project.OC
+            </td>
+        </tr>
+    </tbody>
+</table>
+<a href="/projects/@project.ProjectId" class="btn btn-sm btn-outline-info">Ver Proyecto</a>
+<h5>
+    Comentarios
+</h5>
+<CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+<div class="d-flex flex-column">
+    @foreach (var i in project.Commentaries)
+    {
+        <div class="m-1 p-1 border rounded">
+            <label class="h6">@i.CreationDate.ToLongDateString() @i.Author</label>
+            <p class="text-muted">
+                <small>
+                @i.CommentaryText
+                </small>
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Project project { get; set; }
+
+    public async Task UpdateCommentaries()
+    {
+        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).OrderByDescending(e=>e.CommentaryID).ToList();
+        
+    }
+
+}

@@ -1,0 +1,80 @@
+﻿@page "/projects"
+
+
+
+
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+
+<div class="d-flex flex-row justify-content-between">
+    <h3>Proyectos</h3>
+    
+    <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
+</div>
+
+<div class="mt-3 bg-success text-white bg-opacity-75">
+    @message
+</div>
+<Offcanvas @ref="offcanvas" />
+
+<div class="mb-2 p-2">
+    <Tabs EnableFadeEffect="true">
+        <Tab Title="Todos" Active="true">
+            <Content>
+                <div class="p-1">
+                    <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+                </div>
+            </Content>
+        </Tab>
+        <Tab Title="Búsqueda">
+            <Content>
+                <div class="p-1">
+                    <SearchProjectsComponent />
+                </div>
+            </Content>
+        </Tab>
+    </Tabs>
+</div>
+
+
+@code {
+    private Offcanvas offcanvas = default!;
+    private InfiniteScrollProjects infiniteScrollProjects = default!;
+    private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+
+
+    private async Task ShowEmployeeComponent()
+    {
+        // Crear un diccionario para pasar parámetros al componente AddProject
+        var parameters = new Dictionary<string, object>
+        {
+            // Usar EventCallback.Factory.Create para crear un EventCallback para el método HandleProjectAdded
+            { nameof(AddProject.OnAdded), EventCallback.Factory.Create(this, HandleProjectAdded) }
+        };
+
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<AddProject>("Agregar Proyecto", parameters);
+    }
+
+    private async Task HandleProjectAdded()
+    {
+        // Solicitar al componente InfiniteScrollProjects que vuelva a cargar los datos
+        if (infiniteScrollProjects != null)
+        {
+
+            await infiniteScrollProjects.RefreshProjectsAsync();
+            await offcanvas.HideAsync();
+            messages.Add(new()
+                {
+                    Message = "Proyecto Agregado",
+                    Type = ToastType.Success
+                });
+        }
+    }
+
+}

@@ -1,0 +1,205 @@
+﻿@page "/create-project"
+@inject ProjectsDBContext db
+
+
+@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+
+
+<EditForm Model="@project" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Title">Titulo</label>
+        <InputText id="Title" class="form-control" @bind-Value="project.Title" />
+        <ValidationMessage For="@(() => project.Title)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Descripción</label>
+        <InputTextArea id="Description" class="form-control" @bind-Value="project.Description" />
+        <ValidationMessage For="@(() => project.Description)" />
+    </div>
+
+    <div class="form-group">
+        <label for="TaskNumber">Número Tarea</label>
+        <InputText id="TaskNumber" class="form-control" @bind-Value="project.TaskNumber" />
+        <ValidationMessage For="@(() => project.TaskNumber)" />
+    </div>
+
+    <div class="form-group">
+        <label for="CreationDate">Fecha Registro</label>
+        <InputDate id="CreationDate" class="form-control" @bind-Value="project.CreationDate" />
+        <ValidationMessage For="@(() => project.CreationDate)" />
+    </div>
+
+    <div class="form-group">
+        <label for="TypeId">Tipo</label>
+        <InputSelect id="TypeId" class="form-control" @bind-Value="project.TypeId">
+            <option value="">Select Type</option>
+            @foreach (var type in types)
+            {
+                <option value="@type.TypeId">@type.Name</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => project.TypeId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerId">Cliente</label>
+        <AutoComplete @bind-Value="customerName"
+                      TItem="Customer"
+                      class="text-danger"
+                      DataProvider="CustomersDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search a customer..."
+                      OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+
+       
+        <ValidationMessage For="@(() => project.CustomerId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="SellerId">Vendedor</label>
+        <InputSelect id="SellerId" class="form-control" @bind-Value="project.SellerId">
+            <option value="">Select Seller</option>
+            @foreach (var seller in sellers)
+            {
+                <option value="@seller.SellerId">@seller.SellerName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => project.SellerId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="StateId">Estado</label>
+        <InputSelect id="StateId" class="form-control" @bind-Value="project.StateId">
+            <option value="">Select State</option>
+            @foreach (var state in states)
+            {
+                <option value="@state.StateId">@state.StateName</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => project.StateId)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Amount">Monto</label>
+        <InputNumber id="Amount" class="form-control" @bind-Value="project.Amount" />
+        <ValidationMessage For="@(() => project.Amount)" />
+    </div>
+
+    <div class="form-group">
+        <label for="TypeOfChange">Tipo Cambio</label>
+        <InputNumber id="TypeOfChange" class="form-control" @bind-Value="project.TypeOfChange" />
+        <ValidationMessage For="@(() => project.TypeOfChange)" />
+    </div>
+
+    <div class="form-group">
+        <label for="IsCompleted">Moneda</label>
+        <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
+            <option value="en-US">Dolar</option>
+            <option value="es-CR">Colon</option>
+            <option value="Euro">Euro</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => project.CurrencyType)" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="OC">Orden Compra</label>
+        <InputText id="OC" class="form-control" @bind-Value="project.OC" />
+        <ValidationMessage For="@(() => project.OC)" />
+    </div>
+
+    <div class="form-group">
+        <label for="OCDate">Fecha Orden Compra</label>
+        <InputDate id="OCDate" class="form-control" @bind-Value="project.OCDate" />
+        <ValidationMessage For="@(() => project.OCDate)" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="Ubication">Ubicación</label>
+        <InputText id="IsDeleted" class="form-control" @bind-Value="project.Ubication" />
+        <ValidationMessage For="@(() => project.Ubication)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Province">Provincia</label>
+        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+            <option value="San Josse">San Jose</option>
+            <option value="Heredia">Heredia</option>
+            <option value="Alajuela">Alajuela</option>
+            <option value="Cartago">Cartago</option>
+            <option value="Puntarenas">Puntarenas</option>
+            <option value="Guanacaste">Guanacaste</option>
+            <option value="Limon">Limon</option>
+        </InputSelect>
+        <ValidationMessage For="@(() => project.CurrencyType)" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-success btn-sm my-1 w-100">Crear Proyecto</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    private Project project = new Project();
+    private List<TypeModel> types = new List<TypeModel>();
+    private List<Customer> customers = new List<Customer>();
+    private List<Seller> sellers = new List<Seller>();
+    private List<State> states = new List<State>();
+
+    private string? customerName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Cargar las dependencias desde la base de datos
+        types = db.Types.ToList();
+        customers = db.Customers.ToList();
+        sellers = db.Seller.ToList();
+        project.CurrencyType = "Dolar";
+        states =  db.States.ToList();
+
+        project.CreationDate = DateTime.Now;
+        project.OCDate = DateTime.Now;
+    }
+    private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
+    {
+        var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
+        return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
+    }
+    private void OnAutoCompleteChanged(Customer customer)
+    {
+        if (customer != null)
+        {
+            customerName = customer.Name;
+            project.Customer = customer;
+            project.CustomerId = customer.CustomerId;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Validar y agregar el nuevo proyecto a la base de datos
+        if (project != null)
+        {
+            project.IsCompleted = false;
+            project.Isfactured = false;
+            db.Projects.Add(project);
+            await db.SaveChangesAsync();
+
+            project = new();
+            project.CreationDate = DateTime.Now;
+            project.OCDate = DateTime.Now;
+        }
+        if (OnAdded.HasDelegate)
+        {
+            await OnAdded.InvokeAsync();
+        }
+    }
+}

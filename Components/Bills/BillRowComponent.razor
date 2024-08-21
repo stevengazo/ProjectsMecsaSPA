@@ -1,0 +1,100 @@
+﻿@using System.Globalization
+@inject ProjectsDBContext db
+
+@if (IsEditing)
+{
+    <tr>
+        <td>
+            <EditForm Model="item">
+                <InputText @bind-Value="item.BillNumber" ></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputDate @bind-Value="item.BillDate"></InputDate>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputText @bind-Value="item.Author"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputNumber @bind-Value="item.Amount"></InputNumber>
+            </EditForm>
+        </td>
+        <td>
+            @AmountCulture.NumberFormat.CurrencySymbol
+        </td>
+        <td>
+            <EditForm Model="item">
+                <InputText @bind-Value="item.Note"></InputText>
+            </EditForm>
+        </td>
+        <td>
+            <button class="btn btn-outline-danger btn-sm" @onclick="()=>IsEditing=false">
+                Cancelar
+            </button>
+            <button class="btn btn-outline-success  btn-sm" @onclick="Update">
+                Guardar
+            </button>
+        </td>
+    </tr>    
+}
+else
+{
+    <tr>
+        <td>
+            @item.BillNumber
+        </td>
+        <td>
+            @item.BillDate.ToShortDateString()
+        </td>
+        <td>
+            @item.Author
+        </td>
+        <td>
+            @item.Amount.ToString("C", AmountCulture)
+        </td>
+        <td>
+            @AmountCulture.NumberFormat.CurrencySymbol
+        </td>
+        <td>
+            @item.Note
+        </td>
+        <td>
+            <button class="btn btn-outline-info" @onclick="()=>IsEditing=true" >
+                Editar
+            </button>
+        </td>
+    </tr>
+
+}
+
+
+@code {
+    [Parameter]
+    public Bill item { get; set; }
+    [Parameter]
+    public  CultureInfo AmountCulture { get; set; }
+
+    private bool IsEditing { get; set; }
+
+
+    private void Update()
+    {
+        try
+        {
+            db.Bill.Update(item);
+            db.SaveChanges();
+            IsEditing = false;
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+}

@@ -1,0 +1,52 @@
+﻿@page "/customers/{id}"
+
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h3>Información del Cliente</h3>
+<DetailsCustomerComponent  customer="customer" />
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>N</th>
+            <th>Titulo</th>
+            <th>Cliente</th>
+            <th></th>
+            <th>Estado</th>
+            <th>OC</th>
+            <th>Tipo Proyecto</th>
+
+            <th>Fecha Registro</th>
+            <th>Monto</th>
+            <th colspan="3">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in customer.Projects)
+        {
+            <RowTableComponent ProjectObj="project" />
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    private Customer customer = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        base.OnInitializedAsync();
+        int.TryParse(id, out int customerid);
+        using (var db = DbContextFactory.CreateDbContext())
+        {
+            customer = db.Customers
+            .Include(i=>i.Projects) 
+                 .ThenInclude(i=>i.State)
+            .Include(i=>i.Projects)
+                .ThenInclude(i => i.Type)
+            .FirstOrDefault(w => w.CustomerId == customerid);
+        }
+    }
+}

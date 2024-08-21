@@ -1,0 +1,53 @@
+﻿@typeparam TItem
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        <li class="page-item">
+            <a class="page-link" @onclick="() => OnPageChange(1)" aria-label="First">
+                <span aria-hidden="true">@FirstLinkIcon</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" @onclick="() => OnPageChange(CurrentPage - 1)" aria-label="Previous">
+                <span aria-hidden="true">@PreviousLinkIcon</span>
+            </a>
+        </li>
+        @for (var i = 1; i <= TotalPages; i++)
+        {
+            <li class="page-item @(i == ActivePageNumber ? "active" : "")">
+                <a class="page-link" @onclick="() => OnPageChange(i)">@i</a>
+            </li>
+        }
+        <li class="page-item">
+            <a class="page-link" @onclick="() => OnPageChange(CurrentPage + 1)" aria-label="Next">
+                <span aria-hidden="true">@NextLinkIcon</span>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" @onclick="() => OnPageChange(TotalPages)" aria-label="Last">
+                <span aria-hidden="true">@LastLinkIcon</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+@code {
+    [Parameter] public int ActivePageNumber { get; set; }
+    [Parameter] public int TotalPages { get; set; }
+    [Parameter] public int DisplayPages { get; set; }
+    [Parameter] public string FirstLinkIcon { get; set; }
+    [Parameter] public string PreviousLinkIcon { get; set; }
+    [Parameter] public string NextLinkIcon { get; set; }
+    [Parameter] public string LastLinkIcon { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+
+    private int CurrentPage => ActivePageNumber;
+
+    private async Task OnPageChange(int newPage)
+    {
+        if (newPage < 1 || newPage > TotalPages)
+            return;
+
+        await OnPageChanged.InvokeAsync(newPage);
+    }
+}

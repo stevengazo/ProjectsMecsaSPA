@@ -1,0 +1,120 @@
+﻿@using ProjectsMecsaSPA.Utilities
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject IJSRuntime JS
+
+<!-- Contenedor para los filtros de búsqueda -->
+<div class="row mb-3">
+    <div class="col-md-2 mb-2">
+        <input type="text" @bind="searchName" placeholder="Buscar por nombre" class="form-control" />
+    </div>
+    <div class="col-md-2 mb-2">
+        <input type="number" @bind="searchProjectId" placeholder="Buscar por número de proyecto" class="form-control" />
+    </div>
+    <div class="col-md-2 mb-2">
+        <input type="month" @bind="searchMonth" class="form-control" />
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-2">
+        <button @onclick="ApplyFilters" class="btn btn-primary w-100">Buscar</button>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-2">
+        <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
+    </div>
+</div>
+
+
+<!-- Contenedor para la tabla de proyectos -->
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>N</th>
+                <th>Titulo</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>OC</th>
+                <th>Tipo</th>
+                <th>Creación</th>
+                <th>Monto</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var project in projects)
+            {
+                <RowTableComponent ProjectObj="project" />
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<Project> projects = new List<Project>();
+    private string searchName = "";
+    private int searchProjectId = 0;
+    private DateTime searchMonth = DateTime.Now ; // YYYY-MM
+
+
+    ProjectsDBContext db;
+
+    // Cargar los proyectos iniciales
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+        await LoadProjectsAsync();
+    }
+
+    // Aplica los filtros y recarga los proyectos
+    private async Task ApplyFilters()
+    {
+        await LoadProjectsAsync();
+    }
+
+    
+
+    // Carga los proyectos según los filtros aplicados
+    private async Task LoadProjectsAsync()
+    {
+        using (var db = DbContextFactory.CreateDbContext())
+        {
+            var query = db.Projects.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                query = query.Where(p => p.Title.Contains(searchName));
+            }
+
+            if (searchProjectId > 0)
+            {
+                query = query.Where(p => p.ProjectId == searchProjectId);
+            }
+
+            if (searchMonth != default(DateTime))
+            {
+                var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+                query = query.Where(p => p.CreationDate >= startDate && p.CreationDate <= endDate);
+            }
+
+            projects = await query
+                .Include(i => i.State)
+                .Include(i => i.Customer)
+                .Include(i => i.Type)
+                .OrderByDescending(p => p.ProjectId)
+                .ToListAsync();
+        }
+
+        // Forzar una actualización de la interfaz para asegurarse de que los datos se muestren correctamente
+        await InvokeAsync(StateHasChanged);
+    }
+    public async Task DownloadReport()
+    {
+        var data = await XmlsGenerate.GenerateFileProjects(projects);
+        // Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
+        string pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos {DateTime.Now.ToShortTimeString()}.xlsx");
+
+    }
+
+}

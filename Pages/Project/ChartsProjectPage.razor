@@ -1,0 +1,46 @@
+﻿@page "/chartsprojects"
+
+<Tabs EnableFadeEffect="true">
+    <Tab Title="Proyectos" Active="true">
+        <Content>
+            <div class="p-1">
+                <div class="container mt-4">
+                    <div class="row ">
+                        <!-- Primer componente en una columna de 12 espacios (total de la fila) -->
+                        <div class="col-md-6 mb-4  border rounded p-3">
+                            <ChartCountByStateComponent />
+                        </div>
+                        <!-- Tercer componente en una columna de 6 espacios (mitad de la fila) -->
+                        <div class="col-md-6 mb-4 border rounded p-3">
+                        </div>
+
+                    </div>
+                    <div class="row ">
+
+                        <!-- Segundo componente en una columna de 6 espacios (mitad de la fila) -->
+                        <div class="col-md-6 mb-4 border rounded p-3">
+                            <ChartAmountByState />
+                        </div>
+
+                        <!-- Tercer componente en una columna de 6 espacios (mitad de la fila) -->
+                        <div class="col-md-6 mb-4  border rounded p-3">
+                            <ChartCountBySeller />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </Content>
+    </Tab>
+    <Tab Title="Ofertas">
+        <Content>
+            <div class="p-1">
+                <h4>
+                    estadisticas de ofertas
+                </h4>
+                <ChartOfferByContactTypeComponent />
+            </div>
+        </Content>
+    </Tab>
+</Tabs>

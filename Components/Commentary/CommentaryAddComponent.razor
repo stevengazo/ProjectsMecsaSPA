@@ -1,0 +1,39 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
+    <div >
+        <InputTextArea @bind-Value="commentary.CommentaryText" class="form-control" />
+    </div>
+    <button class="btn w-100 btn-sm btn-outline-success" @onclick="Add">Agregar</button>
+</EditForm>
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    ProjectsDBContext db;
+
+    private Commentary commentary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+        commentary = new();
+
+        commentary.ProjectId = ProjectId;
+        base.OnInitializedAsync();   
+    }
+
+    private async Task Add()
+    {
+        commentary.Author = "";// A;adir autor
+        commentary.CreationDate = DateTime.Now;
+        commentary.ProjectId = ProjectId;
+        db.Comments.Add(commentary);
+        await db.SaveChangesAsync();
+        OnAdded.InvokeAsync();
+        commentary = new();
+        
+    }
+}
