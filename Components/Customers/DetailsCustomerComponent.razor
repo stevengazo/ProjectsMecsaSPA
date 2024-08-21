@@ -1,42 +1,112 @@
-﻿
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
 <div class="border rounded m-1 shadow" >
-    <table class="table table-sm">
-        <tr>
-            <th>
-                @nameof(customer.CustomerId)
-            </th>
-            <td>
-                @customer.CustomerId
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(customer.Name)
-            </th>
-            <td>
-                @customer.Name
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(customer.Type)
-            </th>
-            <td>
-                @customer.Type
-            </td>
-        </tr>
-        <tr>
-            <th>
-                @nameof(customer.DNI)
-            </th>
-            <td>
-                @customer.DNI
-            </td>
-        </tr>
-    </table>
+    @if (IsEditing)
+    {
+        <table class="table table-sm">
+            <tr>
+                <th>
+                    @nameof(customer.CustomerId)
+                </th>
+                <td>
+                    @customer.CustomerId
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @nameof(customer.Name)
+                </th>
+                <td>
+                    <EditForm Model="customer">
+                        <InputText class="form-control" @bind-Value="customer.Name"></InputText>
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Tipo
+                </th>
+                <td>
+                    <EditForm Model="customer">
+                        <InputSelect id="type" @bind-Value="customer.Type" class="form-select">
+                            <option value="Publico">Público</option>
+                            <option value="Privado">Privado</option>
+                        </InputSelect>
+                    </EditForm>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    @nameof(customer.DNI)
+                </th>
+                <td>
+                    <EditForm Model="customer">
+                        <InputNumber class="form-control" @bind-Value="customer.DNI" ></InputNumber>
+                    </EditForm>
+                </td>
+            </tr>
+        </table>
+        <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
+        <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
+
+    }
+    else
+    {
+        <table class="table table-sm">
+            <tr>
+                <th>
+                  Id Interno
+                </th>
+                <td>
+                    @customer.CustomerId
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Nombre
+                </th>
+                <td>
+                    @customer.Name
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Tipo
+                </th>
+                <td>
+                    @customer.Type
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Cédula
+                </th>
+                <td>
+                    @customer.DNI
+                </td>
+            </tr>
+        </table>
+        <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+
+    }
+
 </div>
 
 @code {
     [Parameter]
     public Customer customer { get; set; }
+
+
+    public bool IsEditing = false;
+
+    private async Task Update()
+    {
+        ProjectsDBContext db = DbContextFactory.CreateDbContext();
+        db.Customers.Update(customer);
+        db.SaveChanges();
+        IsEditing = false;
+        StateHasChanged();
+    }
 }
