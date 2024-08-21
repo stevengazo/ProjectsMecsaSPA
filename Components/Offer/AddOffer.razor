@@ -10,7 +10,12 @@
 <EditForm Model="offer" OnValidSubmit="Add" class="p-2">
     <DataAnnotationsValidator />
     <ValidationSummary />
+    <div class="row mb-2">
+        <label>Autor</label>
 
+        <InputText @bind-Value="offer.Author" readonly />
+
+    </div>
     <div class="row mb-2">
         <label>Fecha Registro</label>
         <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm"></InputDate>

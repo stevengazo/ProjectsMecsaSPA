@@ -1,5 +1,11 @@
 ﻿@inject ApplicationDbContext dbContext;
 
+
+<Offcanvas @ref="offcanvas" />
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+
+
 @if (IsEditing)
 {
     <table class="table table-hover">
@@ -152,7 +158,7 @@ else
     <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=true">
         Editar
     </button>
-    <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=true">
+    <button class="btn btn-sm btn-outline-warning" @onclick="ShowPasswordChange">
         Cambio Contraseña
     </button>
 }
@@ -162,6 +168,12 @@ else
 @code {
     [Parameter]
     public UserIdentityEx user { get; set; }
+
+    private Offcanvas offcanvas = default!;
+    private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+
 
     private bool IsEditing = false;
 
@@ -174,5 +186,22 @@ else
         user.NormalizedUserName = user.UserName.ToUpper();
         dbContext.Users.Update(user);
         dbContext.SaveChanges();
+    }
+
+    private async Task ShowPasswordChange()
+    {
+        // Crear un diccionario para pasar parámetros al componente AddProject
+        var parameters = new Dictionary<string, object>
+        {
+            // Usar EventCallback.Factory.Create para crear un EventCallback para el método HandleProjectAdded
+            { "user",user }
+        };
+
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<ChangePasswordComponent>("Cambio Contraseña", parameters);
+
+
     }
 }
