@@ -48,13 +48,15 @@
 
     <div class="form-group">
         <label for="CustomerId">Cliente</label>
-        <InputSelect id="CustomerId" class="form-control" @bind-Value="project.CustomerId">
-            <option value="">Select Customer</option>
-            @foreach (var customer in customers)
-            {
-                <option value="@customer.CustomerId">@customer.Name</option>
-            }
-        </InputSelect>
+        <AutoComplete @bind-Value="customerName"
+                      TItem="Customer"
+                      class="text-danger"
+                      DataProvider="CustomersDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search a customer..."
+                      OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+
+       
         <ValidationMessage For="@(() => project.CustomerId)" />
     </div>
 
@@ -152,6 +154,8 @@
     private List<Seller> sellers = new List<Seller>();
     private List<State> states = new List<State>();
 
+    private string? customerName;
+
     protected override async Task OnInitializedAsync()
     {
         // Cargar las dependencias desde la base de datos
@@ -163,6 +167,20 @@
 
         project.CreationDate = DateTime.Now;
         project.OCDate = DateTime.Now;
+    }
+    private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
+    {
+        var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
+        return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
+    }
+    private void OnAutoCompleteChanged(Customer customer)
+    {
+        if (customer != null)
+        {
+            customerName = customer.Name;
+            project.Customer = customer;
+            project.CustomerId = customer.CustomerId;
+        }
     }
 
     private async Task HandleValidSubmit()

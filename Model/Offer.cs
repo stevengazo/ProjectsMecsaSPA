@@ -37,7 +37,7 @@ namespace ProjectsMecsaSPA.Model
         public int AuthorId { get; set; }
         public string Responsible { get; set; }
         public string ResponsibleId { get; set; }
-       
+
         #region Relaciones
         // Aquí se pueden agregar las relaciones si es necesario
         #endregion

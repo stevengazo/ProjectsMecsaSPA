@@ -9,7 +9,7 @@ namespace ProjectsMecsaSPA.Model
         public string SellerName { get; set; }
         public int DNI { get; set; }
         public string Email { get; set; }
-        public bool IsActive { get; set; } 
+        public bool IsActive { get; set; }
         public ICollection<Project> Projects { get; set; }
     }
 }

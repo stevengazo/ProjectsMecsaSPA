@@ -1,4 +1,7 @@
 ﻿@inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
 
 <ConfirmDialog @ref="dialog" />
 
@@ -104,13 +107,25 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (ProjectObj.IsDeleted)
+        try
         {
-            stylerow = "text-danger text-decoration-line-through";
+            if (ProjectObj.IsDeleted)
+            {
+                stylerow = "text-danger text-decoration-line-through";
+            }
+            base.OnInitializedAsync();
+            states = db.States.ToList();
+            types = db.Types.ToList();
         }
-        base.OnInitializedAsync();
-        states = db.States.ToList();
-        types = db.Types.ToList();
+        catch (InvalidOperationException e)
+        {
+            using (db = DbContextFactory.CreateDbContext())
+            {
+                states = db.States.ToList();
+                types = db.Types.ToList();
+            }
+        }
+      
     }
 
     private void Update()

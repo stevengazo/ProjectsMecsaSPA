@@ -156,7 +156,13 @@ else
             </tr>
             <tr>
                 <th>Cliente</th>
-                <td>@project.Customer?.Name </td>
+
+                <td>
+                    <a href="/customers/@project.CustomerId">
+                        @project.Customer?.Name
+                    </a>
+
+                    </td>
             </tr>
             <tr>
                 <th>Ubicación</th>

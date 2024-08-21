@@ -45,28 +45,37 @@
         await LoadProjectsAsync();
     }
 
-  
+
 
     // Maneja el evento de scroll
     private async Task OnScroll()
     {
-        if (scrollTimer != null)
+        try
         {
-            scrollTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            if (scrollTimer != null)
+            {
+                scrollTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            }
+
+            scrollTimer = new Timer(async _ =>
+            {
+                var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
+                var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
+                var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
+
+                if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
+                {
+                    currentPage++;
+                    await LoadProjectsAsync();
+                }
+            }, null, 300, Timeout.Infinite);
+        }
+        catch (Exception r)
+        {
+
+            throw;
         }
 
-        scrollTimer = new Timer(async _ =>
-        {
-            var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
-            var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
-            var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
-
-            if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
-            {
-                currentPage++;
-                await LoadProjectsAsync();
-            }
-        }, null, 300, Timeout.Infinite);
     }
 
     // Método para recargar la lista de proyectos
@@ -89,7 +98,7 @@
                                    .Include(i => i.State)
                                    .Include(i => i.Type)
                                        .Include(i => i.Seller)
-                                   
+
                                    .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por fecha de creación
                                    .Skip((currentPage - 1) * pageSize)
                                    .Take(pageSize)
