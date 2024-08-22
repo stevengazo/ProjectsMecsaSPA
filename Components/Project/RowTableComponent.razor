@@ -68,23 +68,33 @@ else
             <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
                 <Icon Name="IconName.Eye"></Icon>
             </a>
-            <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
-                <Icon Name="IconName.PencilFill"></Icon>
-            </button>
+            <AuthorizeView Roles="administrador,ingeniero">
+                <Authorized>
+                    <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
+                        <Icon Name="IconName.PencilFill"></Icon>
+                    </button>
+                </Authorized>
+            </AuthorizeView>
+       
         </td>
         <td>
-            @if (ProjectObj.IsDeleted)
-            {
-                <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
-                    <Icon Name="IconName.CheckCircle"></Icon>
-                </button>
-            }
-            else
-            {
-                <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
-                    <Icon Name="IconName.XCircle"></Icon>
-                </button>
-            }
+            <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+                <Authorized>
+                    @if (ProjectObj.IsDeleted)
+                    {
+                        <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
+                            <Icon Name="IconName.CheckCircle"></Icon>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
+                            <Icon Name="IconName.XCircle"></Icon>
+                        </button>
+                    }
+                </Authorized>
+            </AuthorizeView>
+           
         </td>
     </tr>
 

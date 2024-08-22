@@ -224,36 +224,43 @@ else
         </tbody>
     </table>
     <div class="d-flex flex-row gap-2">
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+
+                <div>
+                    @if (!project.IsDeleted)
+                    {
+                        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+                    }
+                </div>
+                <div>
+                    @if (!project.Isfactured)
+                    {
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
+                    }
+                    @if (project.Isfactured)
+                    {
+                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
+                    }
+                </div>
+                <div>
+                    @if (!project.IsCompleted)
+                    {
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
+                    }
+                    @if (project.IsCompleted)
+                    {
+                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
+                    }
+                </div>
+               
+
+            </Authorized>
+        </AuthorizeView>
         <div>
-            @if (!project.IsDeleted)
-            {
-                <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
-            }
-        </div>
-        <div>
-            @if (!project.Isfactured)
-            {
-                <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
-            }
-            @if (project.Isfactured)
-            {
-                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
-            }
-        </div>
-        <div>
-            @if (!project.IsCompleted)
-            {
-                <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
-            }
-            @if (project.IsCompleted)
-            {
-                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
-            }
-        </div>
-        <div>
-            <button class="btn btn-sm btn-outline-warning" @onclick="Download" >
-               <Icon Name="IconName.Download"></Icon> Descargar Información
-                </button>
+            <button class="btn btn-sm btn-outline-warning" @onclick="Download">
+                <Icon Name="IconName.Download"></Icon> Descargar Información
+            </button>
 
         </div>
     </div>

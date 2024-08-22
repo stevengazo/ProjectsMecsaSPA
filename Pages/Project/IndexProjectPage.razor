@@ -4,15 +4,24 @@
 <Offcanvas @ref="offcanvas" />
 
 
+
+<div class="d-flex flex-row justify-content-between">
+    <h3>Proyectos</h3>
+       
+            <AuthorizeView Roles="administrador,ingeniero">
+                <Authorized>
+            <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
+        </Authorized>
+   </AuthorizeView>
+               
+
+</div>
+<div class="mt-3 bg-success text-white bg-opacity-75">
+    @message
+</div>
+
 <AuthorizeView>
     <Authorized>
-        <div class="d-flex flex-row justify-content-between">
-            <h3>Proyectos</h3>
-            <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
-        </div>
-        <div class="mt-3 bg-success text-white bg-opacity-75">
-            @message
-        </div>
         <div class="mb-2 p-2">
             <Tabs EnableFadeEffect="true">
                 <Tab Title="Búsqueda" Active="true">
@@ -36,7 +45,6 @@
         <ErrorViewComponent />
     </NotAuthorized>
 </AuthorizeView>
-
 
 
 
