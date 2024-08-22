@@ -20,20 +20,21 @@
 
 <div class="mb-2 p-2">
     <Tabs EnableFadeEffect="true">
-        <Tab Title="Todos" Active="true">
-            <Content>
-                <div class="p-1">
-                    <InfiniteScrollProjects @ref="infiniteScrollProjects" />
-                </div>
-            </Content>
-        </Tab>
-        <Tab Title="Búsqueda">
+        <Tab Title="Búsqueda" Active="true">
             <Content>
                 <div class="p-1">
                     <SearchProjectsComponent />
                 </div>
             </Content>
         </Tab>
+        <Tab Title="Todos" >
+            <Content>
+                <div class="p-1">
+                    <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+                </div>
+            </Content>
+        </Tab>
+     
     </Tabs>
 </div>
 

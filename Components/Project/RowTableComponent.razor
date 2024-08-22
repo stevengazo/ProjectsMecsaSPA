@@ -119,10 +119,10 @@ else
         }
         catch (InvalidOperationException e)
         {
-            
-                states = db.States.ToList();
-                types = db.Types.ToList();
-            
+
+            states = db.States.ToList();
+            types = db.Types.ToList();
+
         }
 
     }
@@ -134,7 +134,7 @@ else
             IsEditing = false;
             db.Projects.Update(ProjectObj);
             db.SaveChanges();
-
+            ProjectObj.State = states.FirstOrDefault(e => e.StateId == ProjectObj.StateId);
         }
         catch (InvalidOperationException e)
         {

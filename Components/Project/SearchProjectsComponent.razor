@@ -14,13 +14,15 @@
         <input type="month" @bind="searchMonth" class="form-control" />
     </div>
     <div class="col-md-2 d-flex align-items-end mb-2">
-        <button @onclick="ApplyFilters" class="btn btn-primary w-100">Buscar</button>
+        <button @onclick="ApplyFiltersAsync" class="btn btn-primary w-100">Buscar</button>
     </div>
     <div class="col-md-2 d-flex align-items-end mb-2">
-        <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
+        <button @onclick="DownloadReportAsync" class="btn btn-outline-warning w-100">Descargar</button>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-2">
+        <button @onclick="ClearFilters" class="btn btn-secondary w-100">Limpiar</button>
     </div>
 </div>
-
 
 <!-- Contenedor para la tabla de proyectos -->
 <div>
@@ -28,7 +30,7 @@
         <thead>
             <tr>
                 <th>N</th>
-                <th>Titulo</th>
+                <th>Título</th>
                 <th>Cliente</th>
                 <th>Estado</th>
                 <th>OC</th>
@@ -48,73 +50,74 @@
 </div>
 
 @code {
-    private List<Project> projects = new List<Project>();
-    private string searchName = "";
-    private int searchProjectId = 0;
-    private DateTime searchMonth = DateTime.Now ; // YYYY-MM
-
-
-    ProjectsDBContext db;
+    private List<Project> projects = new();
+    private string searchName = string.Empty;
+    private int searchProjectId;
+    private DateTime searchMonth = DateTime.Now;
 
     // Cargar los proyectos iniciales
     protected override async Task OnInitializedAsync()
     {
-        db = DbContextFactory.CreateDbContext();
         await LoadProjectsAsync();
     }
 
     // Aplica los filtros y recarga los proyectos
-    private async Task ApplyFilters()
+    private async Task ApplyFiltersAsync()
     {
         await LoadProjectsAsync();
     }
 
-    
+    // Limpia los filtros de búsqueda y recarga la lista de proyectos
+    private async Task ClearFilters()
+    {
+        searchName = string.Empty;
+        searchProjectId = 0;
+        searchMonth = DateTime.Now;
+
+        await LoadProjectsAsync();
+    }
 
     // Carga los proyectos según los filtros aplicados
     private async Task LoadProjectsAsync()
     {
-        using (var db = DbContextFactory.CreateDbContext())
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        var query = db.Projects.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchName))
         {
-            var query = db.Projects.AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchName))
-            {
-                query = query.Where(p => p.Title.Contains(searchName));
-            }
-
-            if (searchProjectId > 0)
-            {
-                query = query.Where(p => p.ProjectId == searchProjectId);
-            }
-
-            if (searchMonth != default(DateTime))
-            {
-                var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
-                var endDate = startDate.AddMonths(1).AddDays(-1);
-                query = query.Where(p => p.CreationDate >= startDate && p.CreationDate <= endDate);
-            }
-
-            projects = await query
-                .Include(i => i.State)
-                .Include(i => i.Customer)
-                .Include(i => i.Type)
-                .OrderByDescending(p => p.ProjectId)
-                .ToListAsync();
+            query = query.Where(p => p.Title.Contains(searchName));
         }
 
-        // Forzar una actualización de la interfaz para asegurarse de que los datos se muestren correctamente
+        if (searchProjectId > 0)
+        {
+            query = query.Where(p => p.ProjectId == searchProjectId);
+        }
+
+        if (searchMonth != default)
+        {
+            var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
+            var endDate = startDate.AddMonths(1);
+            query = query.Where(p => p.CreationDate >= startDate && p.CreationDate < endDate);
+        }
+
+        projects = await query
+            .Include(p => p.State)
+            .Include(p => p.Customer)
+            .Include(p => p.Type)
+            .OrderByDescending(p => p.ProjectId)
+            .ToListAsync();
+
+        // Forzar una actualización de la interfaz
         await InvokeAsync(StateHasChanged);
     }
-    public async Task DownloadReport()
+
+    // Genera y descarga el reporte
+    private async Task DownloadReportAsync()
     {
         var data = await XmlsGenerate.GenerateFileProjects(projects);
-        // Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
-        string pdfBase64 = Convert.ToBase64String(data);
+        var pdfBase64 = Convert.ToBase64String(data);
 
         // Invocar una función JavaScript para iniciar la descarga del PDF
-        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos {DateTime.Now.ToShortTimeString()}.xlsx");
-
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
     }
-
 }

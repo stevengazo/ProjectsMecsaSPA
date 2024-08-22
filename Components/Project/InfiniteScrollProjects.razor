@@ -4,7 +4,6 @@
 @using Microsoft.EntityFrameworkCore
 @using System.Linq
 
-
 <!-- Contenedor para la tabla de proyectos con evento de scroll -->
 <div @ref="scrollContainer" @onscroll="OnScroll" class="" style="height: 600px; overflow-y:auto;">
     <table class="table table-striped">
@@ -23,9 +22,21 @@
             </tr>
         </thead>
         <tbody>
+                <Virtualize Items="projects">
+                <ItemContent>
+                    <RowTableComponent ProjectObj="context" />
+                </ItemContent>
+                <Placeholder>
+                    <p>
+                        Loading&hellip;
+                    </p>
+                </Placeholder>
+
+
+    </Virtualize>
             @foreach (var project in projects)
             {
-                <RowTableComponent ProjectObj="project" />
+              
             }
         </tbody>
     </table>
@@ -35,7 +46,7 @@
     private List<Project> projects = new List<Project>();  // Lista para almacenar proyectos
     private int currentPage = 1;      // Página actual
     private bool isLoading = false;   // Indicador de carga
-    private Timer scrollTimer;         // Timer para debounce
+    private Timer scrollTimer;        // Timer para debounce
 
     private ElementReference scrollContainer;
 
@@ -45,37 +56,29 @@
         await LoadProjectsAsync();
     }
 
-
-
     // Maneja el evento de scroll
     private async Task OnScroll()
     {
-        try
+        if (scrollTimer == null)
         {
-            if (scrollTimer != null)
-            {
-                scrollTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            }
-
-            scrollTimer = new Timer(async _ =>
-            {
-                var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
-                var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
-                var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
-
-                if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
-                {
-                    currentPage++;
-                    await LoadProjectsAsync();
-                }
-            }, null, 300, Timeout.Infinite);
-        }
-        catch (Exception r)
-        {
-
-            throw;
+            scrollTimer = new Timer(async _ => await CheckScrollPosition(), null, Timeout.Infinite, Timeout.Infinite);
         }
 
+        scrollTimer.Change(300, Timeout.Infinite);
+    }
+
+    // Verifica la posición del scroll y carga más proyectos si es necesario
+    private async Task CheckScrollPosition()
+    {
+        var scrollPosition = await JSRuntime.InvokeAsync<double>("getScrollPosition", scrollContainer);
+        var clientHeight = await JSRuntime.InvokeAsync<double>("getClientHeight", scrollContainer);
+        var scrollHeight = await JSRuntime.InvokeAsync<double>("getScrollHeight", scrollContainer);
+
+        if (scrollPosition + clientHeight >= scrollHeight - 100 && !isLoading)
+        {
+            currentPage++;
+            await LoadProjectsAsync();
+        }
     }
 
     // Método para recargar la lista de proyectos
@@ -93,13 +96,12 @@
         int pageSize = 40;
 
         var newProjects = await db.Projects
+                                   .AsNoTracking()
                                    .Include(i => i.State)
                                    .Include(i => i.Customer)
-                                   .Include(i => i.State)
                                    .Include(i => i.Type)
-                                       .Include(i => i.Seller)
-
-                                   .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por fecha de creación
+                                   .Include(i => i.Seller)
+                                   .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por ID
                                    .Skip((currentPage - 1) * pageSize)
                                    .Take(pageSize)
                                    .ToListAsync();
