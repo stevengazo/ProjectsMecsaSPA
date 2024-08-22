@@ -3,17 +3,19 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
+namespace ProjectsMecsaSPA.Migrations.AppDbContext
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240822161336_ApplicationDb")]
+    partial class ApplicationDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,35 +54,35 @@ namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
                         new
                         {
                             Id = "1",
-                            ConcurrencyStamp = "c1647978-2b6e-491f-8694-66062323a171",
+                            ConcurrencyStamp = "5f5bd6a8-15b1-4ef6-b218-82f1b1e5b819",
                             Name = "administrador",
                             NormalizedName = "ADMINISTRADOR"
                         },
                         new
                         {
                             Id = "2",
-                            ConcurrencyStamp = "2e2e6cc9-9e0f-4e67-ba3f-38a3cc2c6dee",
+                            ConcurrencyStamp = "98802094-42cf-42f8-b77a-d434f9c5d4c8",
                             Name = "ingeniero",
                             NormalizedName = "INGENIERO"
                         },
                         new
                         {
                             Id = "3",
-                            ConcurrencyStamp = "6a44c849-fc7b-4f18-a8e9-22a6a4eb3a3f",
+                            ConcurrencyStamp = "cc50af6e-28cf-4a72-af64-8e02a3836565",
                             Name = "asistente",
                             NormalizedName = "asistente"
                         },
                         new
                         {
                             Id = "4",
-                            ConcurrencyStamp = "a11c36ed-33b5-44da-8266-61bb16f58db5",
+                            ConcurrencyStamp = "40273df5-e677-4a8f-9895-83e0e835746f",
                             Name = "vendedor",
                             NormalizedName = "VENDEDOR"
                         },
                         new
                         {
                             Id = "5",
-                            ConcurrencyStamp = "ac8ef3b3-4480-46b3-9db2-3e989f3ac462",
+                            ConcurrencyStamp = "61296637-0e56-4b7f-8ccb-ec8a6ac3d141",
                             Name = "contabilidad",
                             NormalizedName = "CONTABILIDAD"
                         });
@@ -283,7 +285,7 @@ namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e92859ab-eb34-4b0c-9e69-3f54b5b75f69",
+                            ConcurrencyStamp = "baf8a51b-e798-4685-9510-872fc1919214",
                             DNI = 0,
                             Email = "admin@admin.com",
                             EmailConfirmed = true,
@@ -292,10 +294,10 @@ namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
                             Name = "Administrator",
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEDDTsjM+1GXD5ngXmXl6Oaj3QoM44DX3plbX+UzW0Xe/jwXhaUBzm+cJdTUUNZfyrA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAENY8Hg0Rky4rJcT+22dj+yVMdUwOiArtym5p5QW53dxakvyGXobt/a6jKxMMyLaCcg==",
                             PhoneNumber = "",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "72ff26c6-10dd-4acd-a94b-8527251e462e",
+                            SecurityStamp = "a906e049-612c-4fe2-a376-3742231be322",
                             TwoFactorEnabled = false,
                             UserName = "admin"
                         });

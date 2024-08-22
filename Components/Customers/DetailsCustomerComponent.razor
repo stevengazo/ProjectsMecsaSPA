@@ -48,9 +48,12 @@
                 </td>
             </tr>
         </table>
-        <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
-        <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
+        <div class="d-flex flex-row gap-2">
+            <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
+            <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
 
+            </div>
+       
     }
     else
     {
@@ -88,8 +91,12 @@
                 </td>
             </tr>
         </table>
-        <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+<div>
 
+            <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+            <button class="btn btn-sm btn-outline-info" @onclick="Delete">Eliminar</button>
+
+    </div>
     }
 
 </div>
@@ -100,6 +107,13 @@
 
 
     public bool IsEditing = false;
+
+
+    private async Task Delete()
+    {
+        
+    }
+
 
     private async Task Update()
     {
