@@ -3,11 +3,9 @@
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-
-
 <Offcanvas @ref="offcanvas" />
 
-<AuthorizeView>
+<AuthorizeView Roles="administrador,ingeniero,asistente">
     <Authorized>
         <div class="row overflow-scroll">
             @foreach (var Obj in ProjectLists)
@@ -42,6 +40,7 @@
         <ErrorViewComponent />
     </NotAuthorized>
 </AuthorizeView>
+
 
 
 
@@ -122,8 +121,11 @@
 
     }
 
+
+
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
     {
+
         try
         {
             var TargetState = GetState(NameState);

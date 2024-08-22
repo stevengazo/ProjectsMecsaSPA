@@ -296,7 +296,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         AmountCulture = new CultureInfo(project.CurrencyType);
-        sellers = db.Seller.Where(e => e.IsActive).ToList();
+        sellers = db.Seller.Where(e => e.IsActive).OrderBy(e=>e.SellerName).ToList();
         await LoadDataAsync();
     }
 

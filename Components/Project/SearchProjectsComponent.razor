@@ -2,6 +2,9 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject IJSRuntime JS
 
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
 <!-- Contenedor para los filtros de búsqueda -->
 <div class="row mb-3">
     <div class="col-md-2 mb-2">
@@ -26,34 +29,49 @@
 
 <!-- Contenedor para la tabla de proyectos -->
 <div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>N</th>
-                <th>Título</th>
-                <th>Cliente</th>
-                <th>Estado</th>
-                <th>OC</th>
-                <th>Tipo</th>
-                <th>Creación</th>
-                <th>Monto</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var project in projects)
-            {
-                <RowTableComponent ProjectObj="project" />
-            }
-        </tbody>
-    </table>
+    @if (Searching)
+    {
+        <div class="d-flex justify-content-center">
+            <Spinner Type="SpinnerType.Border" />
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Título</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th>OC</th>
+                    <th>Tipo</th>
+                    <th>Creación</th>
+                    <th>Monto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in projects)
+                {
+                    <RowTableComponent ProjectObj="project" />
+                }
+            </tbody>
+        </table>
+    }
+  
 </div>
 
 @code {
+    private bool Searching = false;
     private List<Project> projects = new();
     private string searchName = string.Empty;
     private int searchProjectId;
-    private DateTime searchMonth = DateTime.Now;
+    private DateTime searchMonth = DateTime.MinValue;
+
+    private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
+
 
     // Cargar los proyectos iniciales
     protected override async Task OnInitializedAsync()
@@ -72,7 +90,7 @@
     {
         searchName = string.Empty;
         searchProjectId = 0;
-        searchMonth = DateTime.Now;
+        searchMonth = DateTime.MinValue;
 
         await LoadProjectsAsync();
     }
@@ -80,40 +98,68 @@
     // Carga los proyectos según los filtros aplicados
     private async Task LoadProjectsAsync()
     {
-        await using var db = await DbContextFactory.CreateDbContextAsync();
-        var query = db.Projects.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(searchName))
+        Searching = true;
+        bool canSearch = false;
+        using (var db = await DbContextFactory.CreateDbContextAsync())
         {
-            query = query.Where(p => p.Title.Contains(searchName));
+            var query = db.Projects.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(p => p.Title.Contains(searchName));
+                canSearch = true;
+            }
+
+            if (searchProjectId > 0)
+            {
+                query = query.Where(p => p.ProjectId == searchProjectId);
+                canSearch = true;
+            }
+
+            if (searchMonth != default)
+            {
+                var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
+                var endDate = startDate.AddMonths(1);
+                query = query.Where(p => p.CreationDate >= startDate && p.CreationDate < endDate);
+                canSearch = true;
+            }
+            if (canSearch)
+            {
+
+                projects = await query
+                .AsNoTracking()
+                    .Include(p => p.State)
+                    .Include(p => p.Customer)
+                    .Include(p => p.Type)
+                    .OrderByDescending(p => p.ProjectId)
+                    .ToListAsync();
+                if (projects.Count == 0)
+                {
+                    messages.Add(new()
+                        {
+                            Message = "No hay resultados",
+                            Type = ToastType.Danger
+                        });
+                }
+
+            }
+          
+
+            // Forzar una actualización de la interfaz
         }
+        Searching = false;
 
-        if (searchProjectId > 0)
-        {
-            query = query.Where(p => p.ProjectId == searchProjectId);
-        }
-
-        if (searchMonth != default)
-        {
-            var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
-            var endDate = startDate.AddMonths(1);
-            query = query.Where(p => p.CreationDate >= startDate && p.CreationDate < endDate);
-        }
-
-        projects = await query
-            .Include(p => p.State)
-            .Include(p => p.Customer)
-            .Include(p => p.Type)
-            .OrderByDescending(p => p.ProjectId)
-            .ToListAsync();
-
-        // Forzar una actualización de la interfaz
         await InvokeAsync(StateHasChanged);
     }
 
     // Genera y descarga el reporte
     private async Task DownloadReportAsync()
     {
+        messages.Add(new()
+            {
+                Message = "Generando Documento",
+                Type = ToastType.Danger
+            });
         var data = await XmlsGenerate.GenerateFileProjects(projects);
         var pdfBase64 = Convert.ToBase64String(data);
 
