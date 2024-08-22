@@ -7,37 +7,43 @@
 
 <Offcanvas @ref="offcanvas" />
 
-<div class="row overflow-scroll">
-    @foreach (var Obj in ProjectLists)
-    {
-        <div class="col h-100">
-            <h5>@Obj.Key.StateName</h5>
-            <SortableList  
-                          class="h-100"
-                          TItem="Project"
-                          Name="@($"{Obj.Key.StateName}")"
-                          Data="@Obj.Value"
-                          Context="project"
-                          OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
-                          OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
-                <ItemTemplate>
-
-                    <div class="card-body" @onclick="() => HandleProjectView(project)">
-                            <div class="d-flex justify-content-between">
-                            <label style="font-size:16px;"><b>@project.Title</b></label>
-                            <label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
+<AuthorizeView>
+    <Authorized>
+        <div class="row overflow-scroll">
+            @foreach (var Obj in ProjectLists)
+            {
+                <div class="col h-100">
+                    <h5>@Obj.Key.StateName</h5>
+                    <SortableList class="h-100"
+                                  TItem="Project"
+                                  Name="@($"{Obj.Key.StateName}")"
+                                  Data="@Obj.Value"
+                                  Context="project"
+                                  OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
+                                  OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
+                        <ItemTemplate>
+                            <div class="card-body" @onclick="() => HandleProjectView(project)">
+                                <div class="d-flex justify-content-between">
+                                    <label style="font-size:16px;"><b>@project.Title</b></label>
+                                    <label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
+                                </div>
+                                <div class="d-flex flex-column mt-2">
+                                    <label style="font-size:14px;"><i>@project.Type?.Name</i></label>
+                                    <label style="font-size:12px;"><i>@project.Customer?.Name</i></label>
+                                </div>
                             </div>
-
-                            <div class="d-flex flex-column mt-2">
-                                <label style="font-size:14px;"><i>@project.Type?.Name</i></label>
-                            <label style="font-size:12px;"><i>@project.Customer?.Name</i></label>
-                            </div>
-                        </div>
-                </ItemTemplate>
-            </SortableList>
+                        </ItemTemplate>
+                    </SortableList>
+                </div>
+            }
         </div>
-    }
-</div>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 
 @code {
@@ -63,10 +69,10 @@
         {
             Console.WriteLine(e.Message);
 
-            using( var context = DbContextFactory.CreateDbContext())
+            using (var context = DbContextFactory.CreateDbContext())
             {
                 States = db.States.Where(i => !i.IsDeleted).ToList();
-                
+
             }
 
         }
@@ -82,38 +88,38 @@
     {
         try
         {
-                  return 
-       db.Projects
-       .Include(e => e.Type)
-       .Include(e => e.Commentaries)
-       .Include(e => e.Customer)
-       .Include(e => e.State)
-       .Include(e => e.Seller)
-       .OrderByDescending(e => e.ProjectId)
-       .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+            return
+     db.Projects
+     .Include(e => e.Type)
+     .Include(e => e.Commentaries)
+     .Include(e => e.Customer)
+     .Include(e => e.State)
+     .Include(e => e.Seller)
+     .OrderByDescending(e => e.ProjectId)
+     .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
         }
         catch (ObjectDisposedException e)
         {
             Console.WriteLine(e.Message);
 
             return
-  db.Projects
-  .Include(e => e.Type)
-  .Include(e => e.Commentaries)
-  .Include(e => e.Customer)
-  .Include(e => e.State)
-  .Include(e => e.Seller)
-  .OrderByDescending(e => e.ProjectId)
-  .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+      db.Projects
+      .Include(e => e.Type)
+      .Include(e => e.Commentaries)
+      .Include(e => e.Customer)
+      .Include(e => e.State)
+      .Include(e => e.Seller)
+      .OrderByDescending(e => e.ProjectId)
+      .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
 
 
         }
 
         catch (Exception e)
-        {        
+        {
             throw e;
         }
-       
+
     }
 
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
@@ -137,10 +143,10 @@
         }
         catch (Exception r)
         {
-            
+
             throw r;
         }
-     
+
     }
 
     private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)

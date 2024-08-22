@@ -1,42 +1,45 @@
 ﻿@page "/projects"
 
-
-
-
-
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
-
-
-<div class="d-flex flex-row justify-content-between">
-    <h3>Proyectos</h3>
-    
-    <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
-</div>
-
-<div class="mt-3 bg-success text-white bg-opacity-75">
-    @message
-</div>
 <Offcanvas @ref="offcanvas" />
 
-<div class="mb-2 p-2">
-    <Tabs EnableFadeEffect="true">
-        <Tab Title="Búsqueda" Active="true">
-            <Content>
-                <div class="p-1">
-                    <SearchProjectsComponent />
-                </div>
-            </Content>
-        </Tab>
-        <Tab Title="Todos" >
-            <Content>
-                <div class="p-1">
-                    <InfiniteScrollProjects @ref="infiniteScrollProjects" />
-                </div>
-            </Content>
-        </Tab>
-     
-    </Tabs>
-</div>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex flex-row justify-content-between">
+            <h3>Proyectos</h3>
+            <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
+        </div>
+        <div class="mt-3 bg-success text-white bg-opacity-75">
+            @message
+        </div>
+        <div class="mb-2 p-2">
+            <Tabs EnableFadeEffect="true">
+                <Tab Title="Búsqueda" Active="true">
+                    <Content>
+                        <div class="p-1">
+                            <SearchProjectsComponent />
+                        </div>
+                    </Content>
+                </Tab>
+                <Tab Title="Todos">
+                    <Content>
+                        <div class="p-1">
+                            <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+                        </div>
+                    </Content>
+                </Tab>
+            </Tabs>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
 
 
 @code {

@@ -1,12 +1,17 @@
 ﻿@page "/users"
 
 
+<AuthorizeView>
+    <Authorized>
+        <h3>Usuarios del Sistema</h3>
+        <UsersTableComponent />
 
-<h3>Usuarios del Sistema</h3>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent></ErrorViewComponent>
+    </NotAuthorized>
+</AuthorizeView>
 
-
-
-<UsersTableComponent />
 
 
 

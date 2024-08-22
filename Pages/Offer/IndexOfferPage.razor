@@ -1,23 +1,29 @@
 ﻿@page "/offers"
 
+<AuthorizeView>
+    <Authorized>
 
-<h3>
-    Ofertas
-</h3>
-<Tabs EnableFadeEffect="true">
-    <Tab Title="Todos" Active="true">
-        <Content>
-            <div class="p-1">
-                <PaginationOfferComponent />
-            </div>
-        </Content>
-    </Tab>
-    <Tab Title="Búsqueda">
-        <Content>
-            <div class="p-1">
-                <SearchOfferComponent />
-            </div>
-        </Content>
-    </Tab>
-</Tabs>
-
+        <h3>
+            Ofertas
+        </h3>
+        <Tabs EnableFadeEffect="true">
+            <Tab Title="Todos" Active="true">
+                <Content>
+                    <div class="p-1">
+                        <PaginationOfferComponent />
+                    </div>
+                </Content>
+            </Tab>
+            <Tab Title="Búsqueda">
+                <Content>
+                    <div class="p-1">
+                        <SearchOfferComponent />
+                    </div>
+                </Content>
+            </Tab>
+        </Tabs>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>

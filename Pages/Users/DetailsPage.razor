@@ -1,16 +1,23 @@
 ﻿@page "/user/{id}"
 @using Microsoft.AspNetCore.Identity
-
 @inject ApplicationDbContext dbContext;
 @inject ProjectsDBContext db
 
+<AuthorizeView>
+    <Authorized>
+        <h3>Detalles del Usuario</h3>
+        <UserDetailsComponent user="user" />
+        @if (user != null)
+        {
+            <RolListComponent id="@user.Id" />
+        }
 
-<h3>Detalles del Usuario</h3>
-<UserDetailsComponent user="user" />
-@if (user != null)
-{
-    <RolListComponent id="@user.Id" />
-}
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>
+
 
 
 
