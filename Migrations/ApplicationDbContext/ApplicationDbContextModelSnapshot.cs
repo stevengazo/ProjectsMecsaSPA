@@ -8,7 +8,7 @@ using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
+namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -47,6 +47,43 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            ConcurrencyStamp = "c1647978-2b6e-491f-8694-66062323a171",
+                            Name = "administrador",
+                            NormalizedName = "ADMINISTRADOR"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            ConcurrencyStamp = "2e2e6cc9-9e0f-4e67-ba3f-38a3cc2c6dee",
+                            Name = "ingeniero",
+                            NormalizedName = "INGENIERO"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            ConcurrencyStamp = "6a44c849-fc7b-4f18-a8e9-22a6a4eb3a3f",
+                            Name = "asistente",
+                            NormalizedName = "asistente"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            ConcurrencyStamp = "a11c36ed-33b5-44da-8266-61bb16f58db5",
+                            Name = "vendedor",
+                            NormalizedName = "VENDEDOR"
+                        },
+                        new
+                        {
+                            Id = "5",
+                            ConcurrencyStamp = "ac8ef3b3-4480-46b3-9db2-3e989f3ac462",
+                            Name = "contabilidad",
+                            NormalizedName = "CONTABILIDAD"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -136,6 +173,13 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "1",
+                            RoleId = "1"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -233,6 +277,28 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "e92859ab-eb34-4b0c-9e69-3f54b5b75f69",
+                            DNI = 0,
+                            Email = "admin@admin.com",
+                            EmailConfirmed = true,
+                            LastName = "",
+                            LockoutEnabled = false,
+                            Name = "Administrator",
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAEAACcQAAAAEDDTsjM+1GXD5ngXmXl6Oaj3QoM44DX3plbX+UzW0Xe/jwXhaUBzm+cJdTUUNZfyrA==",
+                            PhoneNumber = "",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "72ff26c6-10dd-4acd-a94b-8527251e462e",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

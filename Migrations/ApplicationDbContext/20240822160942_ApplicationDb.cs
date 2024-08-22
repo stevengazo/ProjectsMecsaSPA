@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
+namespace ProjectsMecsaSPA.Migrations.ApplicationDbContext
 {
-    public partial class appidentity : Migration
+    public partial class ApplicationDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -155,6 +156,28 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "1", "c1647978-2b6e-491f-8694-66062323a171", "administrador", "ADMINISTRADOR" },
+                    { "2", "2e2e6cc9-9e0f-4e67-ba3f-38a3cc2c6dee", "ingeniero", "INGENIERO" },
+                    { "3", "6a44c849-fc7b-4f18-a8e9-22a6a4eb3a3f", "asistente", "asistente" },
+                    { "4", "a11c36ed-33b5-44da-8266-61bb16f58db5", "vendedor", "VENDEDOR" },
+                    { "5", "ac8ef3b3-4480-46b3-9db2-3e989f3ac462", "contabilidad", "CONTABILIDAD" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DNI", "Email", "EmailConfirmed", "LastName", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "1", 0, "e92859ab-eb34-4b0c-9e69-3f54b5b75f69", 0, "admin@admin.com", true, "", false, null, "Administrator", "ADMIN@ADMIN.COM", "ADMIN", "AQAAAAEAACcQAAAAEDDTsjM+1GXD5ngXmXl6Oaj3QoM44DX3plbX+UzW0Xe/jwXhaUBzm+cJdTUUNZfyrA==", "", false, "72ff26c6-10dd-4acd-a94b-8527251e462e", false, "admin" });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[] { "1", "1" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
