@@ -1,4 +1,7 @@
-﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+﻿@using System.Security.Claims
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject ApplicationDbContext dbIdentity;
+@inject AuthenticationStateProvider asp;
 
 <EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
     <div >
@@ -20,20 +23,42 @@
     {
         db = DbContextFactory.CreateDbContext();
         commentary = new();
-
+     
         commentary.ProjectId = ProjectId;
         base.OnInitializedAsync();   
     }
 
     private async Task Add()
     {
-        commentary.Author = "";// A;adir autor
+        GetAuthor();
+      
         commentary.CreationDate = DateTime.Now;
         commentary.ProjectId = ProjectId;
         db.Comments.Add(commentary);
         await db.SaveChangesAsync();
         OnAdded.InvokeAsync();
         commentary = new();
-        
+
     }
+
+    private async Task GetAuthor()
+    {
+        var s = asp.GetAuthenticationStateAsync();
+        var user = s.Result.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var u = user.FindFirst(ClaimTypes.Name)?.Value;
+            var d = dbIdentity.Users.FirstOrDefault(e => e.UserName == u);
+            commentary.Author = d.Name + "" + d.LastName;
+          
+            // Asigna el ID del autor basado en el usuario autenticado
+
+        }
+        else
+        {
+            commentary.Author = "Usuario no autenticado";
+        }
+    }
+
 }
