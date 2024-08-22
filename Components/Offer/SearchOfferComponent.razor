@@ -1,8 +1,12 @@
-﻿
-@using ProjectsMecsaSPA.Model
+﻿@using ProjectsMecsaSPA.Model
+@using ProjectsMecsaSPA.Utilities
 @inject ProjectsDBContext DbContext
+@inject IJSRuntime JS
 
 <h3>Buscar Ofertas</h3>
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
 
 <div class="row mb-3">
     <div class="col-md-2">
@@ -47,9 +51,7 @@
 <div class="d-flex gap-2 mb-3">
     <button class="btn btn-primary" @onclick="SearchOffers">Buscar</button>
     <button class="btn btn-secondary" @onclick="ClearFilters">Limpiar</button>
-    
-        <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
-    
+    <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
 </div>
 
 @if (IsSearching)
@@ -84,7 +86,7 @@ else
             <tbody>
                 @foreach (var offer in Offers)
                 {
-                   <RowOfferComponent offer="offer"/>
+                    <RowOfferComponent offer="offer" />
                 }
             </tbody>
         </table>
@@ -98,49 +100,63 @@ else
 
 @code {
     private List<Offer> Offers { get; set; } = new List<Offer>();
-
+    private const int MaxResults = 1500; // Límite de resultados
     private OfferSearchCriteria SearchCriteria { get; set; } = new OfferSearchCriteria();
     private bool IsCustomerNameValid { get; set; } = true;
     private bool IsSearchPerformed { get; set; } = false;
     private bool IsSearching { get; set; } = false;
     private string ErrorMessage { get; set; }
 
+    private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
+
     private async Task SearchOffers()
     {
         try
         {
             IsSearching = true;
+            ValidateCustomerName();
 
-            IsCustomerNameValid = SearchCriteria.Customer == null || SearchCriteria.Customer.Length >= 5;
-
-            // Verificar si todos los campos están vacíos
-            if (SearchCriteria.OfferId == null && string.IsNullOrEmpty(SearchCriteria.Customer) &&
-                SearchCriteria.Creation == null && string.IsNullOrEmpty(SearchCriteria.Type) &&
-                string.IsNullOrEmpty(SearchCriteria.State))
-            {
-                ErrorMessage = "Debe ingresar al menos un criterio de búsqueda.";
-                Offers.Clear();
-                return;
-            }
-
-            // Verificar si el nombre del cliente es válido
             if (!IsCustomerNameValid)
             {
-                ErrorMessage = "El nombre del cliente debe tener al menos 5 caracteres.";
                 Offers.Clear();
                 return;
             }
 
-            Offers = await DbContext.Offers
-                .Where(o => (SearchCriteria.OfferId == null || o.OfferId == SearchCriteria.OfferId) &&
-                            (SearchCriteria.Customer == null || o.Customer.Contains(SearchCriteria.Customer)) &&
-                            (SearchCriteria.Creation == null || o.Creation.Date == SearchCriteria.Creation.Value.Date) &&
-                            (SearchCriteria.Type == null || o.Type.Contains(SearchCriteria.Type)) &&
-                            (SearchCriteria.State == null || o.State.Contains(SearchCriteria.State)))
-                .ToListAsync();
+            var query = DbContext.Offers.AsQueryable();
 
+            if (SearchCriteria.OfferId.HasValue)
+                query = query.Where(o => o.OfferId == SearchCriteria.OfferId);
+
+            if (!string.IsNullOrEmpty(SearchCriteria.Customer))
+                query = query.Where(o => o.Customer.Contains(SearchCriteria.Customer));
+
+            if (SearchCriteria.Creation.HasValue)
+                query = query.Where(o => o.Creation.Year == SearchCriteria.Creation.Value.Year  
+                    && o.Creation.Month == SearchCriteria.Creation.Value.Month);
+
+            if (!string.IsNullOrEmpty(SearchCriteria.Type))
+                query = query.Where(o => o.Type == SearchCriteria.Type);
+
+            if (!string.IsNullOrEmpty(SearchCriteria.State))
+                query = query.Where(o => o.State.Contains(SearchCriteria.State));
+
+            Offers = await query.Take(MaxResults).ToListAsync();
+            if(Offers.Count == MaxResults)
+            {
+                messages.Add(new()
+                    {
+                        Message = "El sistema limito la cantidad de ofertas obtenidas",
+                        Type = ToastType.Warning
+                    });
+                messages.Add(new()
+                    {
+                        Message = "Establezca filtros más especificos e intentelo de nuevo",
+                        Type = ToastType.Warning
+                    });
+            }
             IsSearchPerformed = true;
-            ErrorMessage = string.Empty;
+            ErrorMessage = Offers.Any() ? string.Empty : "No se encontraron ofertas.";
         }
         catch (Exception ex)
         {
@@ -149,6 +165,15 @@ else
         finally
         {
             IsSearching = false;
+        }
+    }
+
+    private void ValidateCustomerName()
+    {
+        IsCustomerNameValid = string.IsNullOrEmpty(SearchCriteria.Customer) || SearchCriteria.Customer.Length >= 5;
+        if (!IsCustomerNameValid)
+        {
+            ErrorMessage = "El nombre del cliente debe tener al menos 5 caracteres.";
         }
     }
 
@@ -168,6 +193,13 @@ else
         public string Type { get; set; }
         public string State { get; set; }
     }
-    private async Task DownloadReport() { }
 
+    private async Task DownloadReport() 
+    {
+        var data = await XmlsGenerate.GenerateFileOffers(Offers);
+        var pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Ofertas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+    }
 }
