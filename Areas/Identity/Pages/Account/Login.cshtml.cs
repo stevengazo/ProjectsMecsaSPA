@@ -108,7 +108,10 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                string email = _applicationDbContext.Users.FirstOrDefault(e => e.UserName == Input.UserName).Email;
+                string email = _applicationDbContext.Users.FirstOrDefault(e => e.UserName == Input.UserName)?.Email;
+
+                email = (email == null) ? string.Empty : email;
+                
 
                 var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
