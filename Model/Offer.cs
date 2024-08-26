@@ -10,7 +10,7 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "La fecha de registro es requerida")]
         public DateTime Creation { get; set; }
         [Required(ErrorMessage = "El cliente es requerido")]
-        [StringLength(200, ErrorMessage = "El nombre del cliente no puede exceder los 200 caracteres")]
+        [StringLength(300, ErrorMessage = "El nombre del cliente no puede exceder los 300 caracteres")]
         public string Customer { get; set; }
         [Required(ErrorMessage = "La descripción es requerida")]
         [StringLength(500, ErrorMessage = "La descripción no puede exceder los 500 caracteres")]

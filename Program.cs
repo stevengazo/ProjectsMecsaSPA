@@ -11,10 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(UsersConnection));
-//builder.Services.AddDbContext<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
-builder.Services.AddDbContextFactory<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(UsersConnection));
 
+builder.Services.AddDbContextFactory<ProjectsDBContext>(options =>
+    options.UseSqlServer(ProjectsConnection));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<UserIdentityEx>(options => options.SignIn.RequireConfirmedAccount = true)

@@ -59,6 +59,12 @@
        
         <ValidationMessage For="@(() => project.CustomerId)" />
     </div>
+    <div>
+        <label >Oferta</label>
+        <InputTextArea id="Offer" class="form-control" @bind-Value="project.OfferId" />
+        <ValidationMessage For="@(() => project.OfferId)" />
+
+    </div>
 
     <div class="form-group">
         <label for="SellerId">Vendedor</label>
@@ -129,15 +135,16 @@
     <div class="form-group">
         <label for="Province">Provincia</label>
         <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
-            <option value="San Josse">San Jose</option>
+            <option value="">Seleccione</option>
+            <option value="San José">San Jose</option>
             <option value="Heredia">Heredia</option>
             <option value="Alajuela">Alajuela</option>
             <option value="Cartago">Cartago</option>
             <option value="Puntarenas">Puntarenas</option>
             <option value="Guanacaste">Guanacaste</option>
-            <option value="Limon">Limon</option>
+            <option value="Limón">Limón</option>
         </InputSelect>
-        <ValidationMessage For="@(() => project.CurrencyType)" />
+        <ValidationMessage For="@(() => project.Province)" />
     </div>
     <div class="form-group">
         <button type="submit" class="btn btn-success btn-sm my-1 w-100">Crear Proyecto</button>

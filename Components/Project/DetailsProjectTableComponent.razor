@@ -63,6 +63,24 @@
                         <ValidationMessage For="@(() => project.Ubication)" />
                     </td>
                 </tr>
+                <tr >
+                    <th>
+                        <label for="Province">Provincia</label>
+                    </th>
+                    <th>
+                        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+                            <option value="San José">San Jose</option>
+                            <option value="Heredia">Heredia</option>
+                            <option value="Alajuela">Alajuela</option>
+                            <option value="Cartago">Cartago</option>
+                            <option value="Puntarenas">Puntarenas</option>
+                            <option value="Guanacaste">Guanacaste</option>
+                            <option value="Limón">Limón</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => project.Province)" />
+
+                    </th>
+                    </tr>
                 <tr>
                     <th>Monto</th>
                     <td>
@@ -113,6 +131,13 @@
                     <td>
                         <InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.OCDate)" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>Número de Oferta</th>
+                    <td>
+                        <InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => project.OfferId)" />
                     </td>
                 </tr>
                 <tr>
@@ -175,6 +200,10 @@ else
             <tr>
                 <th>Fecha Registro</th>
                 <td>@project.CreationDate.ToLongDateString()</td>
+            </tr>
+            <tr>
+                <th>Oferta</th>
+                <td>@project.OfferId</td>
             </tr>
             <tr>
                 <th>Estado del Proyecto</th>

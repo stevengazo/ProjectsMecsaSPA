@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240820205700_projects-migration")]
-    partial class projectsmigration
+    [Migration("20240826162639_ProjectMigration")]
+    partial class ProjectMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -214,8 +214,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<string>("Customer")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -304,6 +304,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<DateTime>("OCDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("OfferId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Province")
                         .IsRequired()

@@ -41,7 +41,8 @@ namespace ProjectsMecsaSPA.Model
 
         [Required(ErrorMessage = "La fecha de OC es obligatoria.")]
         public DateTime OCDate { get; set; }
-
+        [MaxLength(100,ErrorMessage ="El tamaño no puede ser mayor a 100 caracteres")]
+        public string OfferId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsCompleted { get; set; }
         public bool Isfactured { get; set; }
