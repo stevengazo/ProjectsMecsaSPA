@@ -102,6 +102,7 @@
         if (d)
         {
             project = db.Projects
+            .AsNoTracking()
             .Include(e => e.State)
             .Include(e => e.Type)
             .Include(e => e.Customer)
@@ -143,9 +144,10 @@
     public async Task RefreshBills()
     {
         await offcanvas.HideAsync();
-
+        StateHasChanged();
+        project.Bills.Clear();
         project.Bills = db.Bill.Where(i => i.ProjectId == _id).ToList();
-        
+        StateHasChanged();
 
     }
 }
