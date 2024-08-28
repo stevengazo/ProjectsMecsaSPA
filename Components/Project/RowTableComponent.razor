@@ -57,7 +57,11 @@ else
     <tr style="font-size:14px;" class="@stylerow">
         <td>@ProjectObj.ProjectId</td>
         <td>@ProjectObj.Title</td>
-        <td>@ProjectObj.Customer.Name</td>
+        <td>
+            <a target="_blank" href="/customers/@ProjectObj.CustomerId" class="text-decoration-none">
+                @ProjectObj.Customer.Name
+            </a>
+        </td>
         <td>@ProjectObj.Seller?.SellerName</td>
         <td>@ProjectObj.State?.StateName</td>
         <td>@ProjectObj.OC</td>
@@ -65,7 +69,7 @@ else
         <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
-            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
+            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info" target="_blank">
                 <Icon Name="IconName.Eye"></Icon>
             </a>
             <AuthorizeView Roles="administrador,ingeniero">
@@ -75,7 +79,7 @@ else
                     </button>
                 </Authorized>
             </AuthorizeView>
-       
+
         </td>
         <td>
             <AuthorizeView Roles="administrador,ingeniero,contabilidad">
@@ -94,7 +98,7 @@ else
                     }
                 </Authorized>
             </AuthorizeView>
-           
+
         </td>
     </tr>
 
@@ -151,9 +155,9 @@ else
             using (var d = DbContextFactory.CreateDbContext())
             {
                 IsEditing = false;
-              //  ProjectObj.State = null;
-              //  ProjectObj.Seller = null;
-               
+                //  ProjectObj.State = null;
+                //  ProjectObj.Seller = null;
+
                 d.Projects.Update(ProjectObj);
                 d.SaveChanges();
             }
@@ -161,7 +165,7 @@ else
         finally
         {
             StateHasChanged();
-        }     
+        }
     }
 
     private void Disable()

@@ -45,7 +45,7 @@
                     <th>Cliente</th>
                     <td>
 
-                 
+
                         <AutoComplete @bind-Value="customerName"
                                       TItem="Customer"
                                       class="text-danger"
@@ -53,7 +53,7 @@
                                       PropertyName="Name"
                                       Placeholder="Search a customer..."
                                       OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
-                                     
+
                     </td>
                 </tr>
                 <tr>
@@ -63,7 +63,7 @@
                         <ValidationMessage For="@(() => project.Ubication)" />
                     </td>
                 </tr>
-                <tr >
+                <tr>
                     <th>
                         <label for="Province">Provincia</label>
                     </th>
@@ -80,7 +80,7 @@
                         <ValidationMessage For="@(() => project.Province)" />
 
                     </th>
-                    </tr>
+                </tr>
                 <tr>
                     <th>Monto</th>
                     <td>
@@ -145,16 +145,16 @@
                     <td>
                         <InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
                             @foreach (var item in sellers)
-                        {
-                            <option value="@item.SellerId">@item.SellerName</option>
-                        }
-                            </InputSelect>
+                            {
+                                <option value="@item.SellerId">@item.SellerName</option>
+                            }
+                        </InputSelect>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        
+
         <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
         <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
     </EditForm>
@@ -186,8 +186,7 @@ else
                     <a href="/customers/@project.CustomerId">
                         @project.Customer?.Name
                     </a>
-
-                    </td>
+                </td>
             </tr>
             <tr>
                 <th>Ubicación</th>
@@ -195,7 +194,7 @@ else
             </tr>
             <tr>
                 <th>Monto</th>
-                <td>@project.Amount.ToString("C",AmountCulture)</td>
+                <td>@project.Amount.ToString("C", AmountCulture)</td>
             </tr>
             <tr>
                 <th>Fecha Registro</th>
@@ -227,7 +226,8 @@ else
             </tr>
             <tr>
                 <th>Estado Facturación Proyecto</th>
-                <td>@if (project.Isfactured)
+                <td>
+                    @if (project.Isfactured)
                     {
                         <label>Facturado</label>
                     }
@@ -282,7 +282,7 @@ else
                         <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
                     }
                 </div>
-               
+
 
             </Authorized>
         </AuthorizeView>
@@ -293,7 +293,7 @@ else
 
         </div>
     </div>
-    
+
 
 
 }
@@ -308,7 +308,7 @@ else
 
     private string? customerName;
 
-    CultureInfo AmountCulture ;
+    CultureInfo AmountCulture;
 
     private Dictionary<int, string> customers = new();
     private Dictionary<int, string> types = new();
@@ -325,7 +325,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         AmountCulture = new CultureInfo(project.CurrencyType);
-        sellers = db.Seller.Where(e => e.IsActive).OrderBy(e=>e.SellerName).ToList();
+        sellers = db.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
         await LoadDataAsync();
     }
 
@@ -348,7 +348,7 @@ else
 
     private void OnAutoCompleteChanged(Customer customer)
     {
-        if(customer != null)
+        if (customer != null)
         {
             customerName = customer.Name;
             project.Customer = customer;
@@ -422,7 +422,7 @@ else
         // Invocar una función JavaScript para iniciar la descarga del PDF
         await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyecto {project.Title} {DateTime.Now.ToShortTimeString()}.pdf");
 
-        
+
     }
 
 
