@@ -3,7 +3,18 @@
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
+<select @onchange="OnYearChanged" class="form-control-sm">
+    @foreach (var year in availableYears)
+    {
+        <option value="@year">@year</option>
+    }
+</select>
+
+
+
 <PieChart @ref="pieChart" Width="500" />
+
+
 
 @code {
 
@@ -11,28 +22,60 @@
     private PieChartOptions pieChartOptions = default!; // Opciones para configurar el gráfico de pastel
     private ChartData chartData = default!; // Datos para el gráfico de pastel
     private string[]? backgroundColors;  // Colores de fondo para las secciones del gráfico
+    private List<int> availableYears = new List<int>();
+    private static readonly Random random = new Random();
 
+    private int SelectedYear = DateTime.Now.Year;
 
     // Método que se ejecuta cuando el componente se inicializa
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Dictionary<string,double?> dic = await GetData();
-        List<string> labels = dic.Keys.ToList();
 
+        await LoadYears();
+
+        UpdateChartAsync();
+    }
+
+    private async Task LoadYears()
+    {
+        using (var dbtmp = DbContextFactory.CreateDbContext())
+        {
+            availableYears = dbtmp.Offers.AsNoTracking()
+                                .Select(e => e.Creation.Year)
+                                .Distinct()
+                                .OrderBy(year=>year)
+                                .ToList();
+
+        }
+    }
+
+    private async Task OnYearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var year))
+        {
+            SelectedYear = year;
+            await UpdateChartAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdateChartAsync()
+    {
         var datasets = new List<IChartDataset>();
 
+        Dictionary<string, double?> dic = await GetData();
+        List<string> labels = await GetLabels(dic);
+
         var dataset = new PieChartDataset()
-        {
-                Data =dic.Values.ToList(),
+            {
+                Data = dic.Values.ToList(),
                 BackgroundColor = GenerateColors(dic.Values.Count),
                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderWidth = new List<double> { 0 },
+            };
 
-        };
         datasets.Add(dataset);
-        chartData = new() {  Datasets= datasets, Labels=labels};
-
-
+        chartData = new() { Datasets = datasets, Labels = labels };
 
         // Inicializa los colores de fondo con una paleta predeterminada
         backgroundColors = ColorUtility.CategoricalTwelveColors;
@@ -40,11 +83,26 @@
         // Configura las opciones del gráfico de pastel
         pieChartOptions = new();
         pieChartOptions.Responsive = true;
-        pieChartOptions.Plugins.Title!.Text = "Categorias 2024";
+        pieChartOptions.Plugins.Title!.Text = $"Categorias {SelectedYear}";
         pieChartOptions.Plugins.Title.Display = true;
+
+
+        if(pieChart != null)
+        {
+            await pieChart.UpdateAsync(chartData, pieChartOptions);   
+        }
+     
+
+     //   pieChart.UpdateAsync(chartData, pieChartOptions);
+
+
     }
 
-    private static readonly Random random = new Random();
+    private async Task<List<string>> GetLabels(Dictionary<string,double?> dic)
+    {
+        return dic.Keys.ToList();
+    }
+
 
     private List<string?> GenerateColors(int count)
     {
@@ -60,7 +118,7 @@
     {
         return $"#{random.Next(0x1000000):X6}";
     }
-    // Método que se ejecuta después de que el componente se ha renderizado
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -71,27 +129,24 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task<Dictionary<string,double?>> GetData()
+    private async Task<Dictionary<string, double?>> GetData()
     {
-        using (var db = DbContextFactory.CreateDbContext()){
-        Dictionary<string, double?> dicOffers = new();
-        var Labels = (from i in db.Offers
-            where i.Creation.Year == DateTime.Now.Year
-        select i.Author).Distinct().ToList();
-
-        foreach (var item in Labels)
+        using (var db = DbContextFactory.CreateDbContext())
         {
-            var count =(double) db.Offers.Where(d => d.Author == item && d.Creation.Year == DateTime.Now.Year).Count();
-            dicOffers.Add(item, count);
+            Dictionary<string, double?> dicOffers = new();
+
+            var Labels = (from i in db.Offers
+                          where i.Creation.Year == DateTime.Now.Year
+                          select i.Responsible).Distinct().ToList();
+
+            foreach (var item in Labels)
+            {
+                var count = (double)db.Offers.Where(d => d.Responsible == item && d.Creation.Year == SelectedYear).Count();
+                dicOffers.Add(item, count);
+            }
+
+            return dicOffers;
         }
 
-        return dicOffers;    
-        }
-        
     }
-
-
-
-
-   
 }

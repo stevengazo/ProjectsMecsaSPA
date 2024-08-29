@@ -2,7 +2,7 @@
 
 <h6>Vendidor por Vendedor</h6>
 
-<select @onchange="OnYearChanged">
+<select @onchange="OnYearChanged" class="form-control-sm">
     @foreach (var year in availableYears)
     {
         <option value="@year">@year</option>
@@ -88,9 +88,10 @@
 
     private async Task UpdateChartAsync()
     {
-        var labels = GetLabelsSellers();
         var datasets = new List<IChartDataset>();
-
+        
+        var labels = GetLabelsSellers();
+        
         var dataset1 = new BarChartDataset()
             {
                 Data = GetAmountBySeller(labels),
