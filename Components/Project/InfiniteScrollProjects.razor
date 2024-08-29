@@ -92,28 +92,37 @@
     // Carga los proyectos de la página especificada
     private async Task LoadProjectsAsync()
     {
-        isLoading = true;
-        int pageSize = 40;
-
-        var newProjects = await db.Projects
-                                   .AsNoTracking()
-                                   .Include(i => i.State)
-                                   .Include(i => i.Customer)
-                                   .Include(i => i.Type)
-                                   .Include(i => i.Seller)
-                                   .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por ID
-                                   .Skip((currentPage - 1) * pageSize)
-                                   .Take(pageSize)
-                                   .ToListAsync();
-
-        if (newProjects.Any())
+        try
         {
-            projects.AddRange(newProjects);
+            isLoading = true;
+            int pageSize = 40;
+
+            var newProjects = await db.Projects
+                                       .AsNoTracking()
+                                       .Include(i => i.State)
+                                       .Include(i => i.Customer)
+                                       .Include(i => i.Type)
+                                       .Include(i => i.Seller)
+                                       .OrderByDescending(p => p.ProjectId) // Ordena los proyectos por ID
+                                       .Skip((currentPage - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToListAsync();
+
+            if (newProjects.Any())
+            {
+                projects.AddRange(newProjects);
+            }
+
+            isLoading = false;
+
+            // Forzar una actualización de la interfaz para asegurarse de que el contenedor de desplazamiento se actualice
+            await InvokeAsync(StateHasChanged);
         }
-
-        isLoading = false;
-
-        // Forzar una actualización de la interfaz para asegurarse de que el contenedor de desplazamiento se actualice
-        await InvokeAsync(StateHasChanged);
+        catch (Exception)
+        {
+            
+            
+        }
+        
     }
 }
