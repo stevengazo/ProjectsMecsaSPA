@@ -1,6 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectsMecsaSPA.Model
 {
@@ -14,6 +15,7 @@ namespace ProjectsMecsaSPA.Model
         public string Title { get; set; }
 
         [StringLength(500, ErrorMessage = "La descripción no puede exceder los 500 caracteres.")]
+        [Required]
         public string Description { get; set; }
 
         [Required(ErrorMessage = "El número de tarea es obligatorio.")]
@@ -30,6 +32,7 @@ namespace ProjectsMecsaSPA.Model
         public int CustomerId { get; set; }
 
         [StringLength(200, ErrorMessage = "La ubicación no puede exceder los 200 caracteres.")]
+        [Required(ErrorMessage = "El dato es obligatorio.")]
         public string Ubication { get; set; }
 
         [Required(ErrorMessage = "El monto es obligatorio.")]
@@ -38,11 +41,13 @@ namespace ProjectsMecsaSPA.Model
         public decimal Amount { get; set; }
 
         [StringLength(50, ErrorMessage = "El OC no puede exceder los 50 caracteres.")]
+        [Required(ErrorMessage = "La orden de compra es requerido.")]
         public string OC { get; set; }
 
         [Required(ErrorMessage = "La fecha de OC es obligatoria.")]
         public DateTime OCDate { get; set; }
         [MaxLength(100,ErrorMessage ="El tamaño no puede ser mayor a 100 caracteres")]
+        [Required(ErrorMessage = "El campo no puede estar vacio")]
         public string OfferId { get; set; }
         public bool IsDeleted { get; set; }
         public bool IsCompleted { get; set; }

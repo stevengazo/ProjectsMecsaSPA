@@ -55,15 +55,12 @@
                       PropertyName="Name"
                       Placeholder="Search a customer..."
                       OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
-
-
         <ValidationMessage For="@(() => project.CustomerId)" />
     </div>
     <div>
         <label>Oferta</label>
         <InputTextArea id="Offer" class="form-control" @bind-Value="project.OfferId" />
         <ValidationMessage For="@(() => project.OfferId)" />
-
     </div>
 
     <div class="form-group">
@@ -144,8 +141,9 @@
         </InputSelect>
         <ValidationMessage For="@(() => project.Province)" />
     </div>
-    <div class="form-group">
+    <div class="form-group mb-5">
         <button type="submit" class="btn btn-success btn-sm my-1 w-100">Crear Proyecto</button>
+        <label class="text-danger">@ErrorMessage</label>
     </div>
 </EditForm>
 
@@ -158,6 +156,8 @@
     private List<Customer> customers = new List<Customer>();
     private List<Seller> sellers = new List<Seller>();
     private List<State> states = new List<State>();
+
+    private string ErrorMessage = "";
 
     private string? customerName;
 
@@ -174,11 +174,13 @@
         project.OCDate = DateTime.Now;
 
     }
+
     private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
     {
         var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
         return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
     }
+
     private void OnAutoCompleteChanged(Customer customer)
     {
         if (customer != null)
@@ -188,7 +190,6 @@
             project.CustomerId = customer.CustomerId;
         }
     }
-
 
     private void ResetProjectsIdentity(DbContext r)
     {
@@ -212,6 +213,19 @@
         }
     }
 
+    private void ClearFormFields()
+    {
+        project = new Project
+            {
+                CreationDate = DateTime.Now,
+                OCDate = DateTime.Now
+            };
+
+        customerName = string.Empty;
+
+        // Resetear cualquier campo adicional si es necesario
+    }
+
     private async Task HandleValidSubmit()
     {
 
@@ -225,21 +239,20 @@
                     project.Isfactured = false;
                     db.Projects.Add(project);
                     await db.SaveChangesAsync();
-
                     transaction.Commit();
-
+                    ClearFormFields();
                     if (OnAdded.HasDelegate)
                     {
                         await OnAdded.InvokeAsync();
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     transaction.Rollback();
+                    ErrorMessage = "Error, Verifique los datos";
                 }
                 finally
                 {
-                    project = new();
                     ResetProjectsIdentity(db);
                 }
             }
