@@ -1,6 +1,7 @@
 ﻿@using ProjectsMecsaSPA.Model
 @using ProjectsMecsaSPA.Utilities
 @inject ProjectsDBContext DbContext
+@inject IDbContextFactory<ProjectsDBContext> dbContextFactory
 @inject IJSRuntime JS
 
 <h3>Buscar Ofertas</h3>
@@ -8,44 +9,115 @@
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 
-<div class="row mb-3">
-    <div class="col-md-2">
-        <label for="offerId" class="form-label">ID de Oferta:</label>
-        <input type="number" class="form-control" id="offerId" @bind="SearchCriteria.OfferId" />
+<div class="row mb-3 d-flex  flex-row">
+    <div class="col-md-2 mb-2 d-flex align-items-center">
+        <div class=" form-floating">
+            <input type="number" class="form-control" id="offerId" @bind="SearchCriteria.OfferId" />
+            <label for="offerId" class="form-label">Numero</label>
+        </div>
     </div>
-    <div class="col-md-2">
-        <label for="customer" class="form-label">Nombre del Cliente:</label>
-        <input type="text" class="form-control" id="customer" @bind="SearchCriteria.Customer" />
+    <div class="col-md-2 mb-2 d-flex align-items-center">
+        <div class=" form-floating">
+            <input type="text" class="form-control" id="customer" @bind="SearchCriteria.Customer" />
+            <label for="customer" class="form-label">Nombre del Cliente:</label>
+        </div>
         @if (!IsCustomerNameValid)
         {
             <div class="text-danger">El nombre del cliente debe tener al menos 5 caracteres.</div>
         }
     </div>
-    <div class="col-md-2">
-        <label for="creationDate" class="form-label">Fecha de Creación:</label>
-        <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
+    @if (ValidInputs.EnableCreation)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <div class=" form-floating">
+                <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
+                <label for="creationDate" class="form-label">Fecha de Creación</label>  
+            </div>
+           <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableCreation = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
+
+    @if (ValidInputs.EnableType)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <div class=" form-floating">
+                <select class="form-select" id="type" @bind="SearchCriteria.Type">
+                    <option value="">Seleccionar...</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                    <option value="Instalacion">Instalación</option>
+                    <option value="Mejoras">Mejoras</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <label for="type" class="form-label">Tipo de Oferta</label>
+            </div>
+            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
+
+    @if (ValidInputs.EnableState)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <div class=" form-floating">
+                <select class="form-select" id="state" @bind="SearchCriteria.State">
+                    <option value="">Seleccionar...</option>
+                    <option value="Enviado">Enviado</option>
+                    <option value="Negociación">Negociación</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Vendido">Vendido</option>
+                    <option value="Cobro">Cobro</option>
+                </select>
+                <label for="state" class="form-label">Estado</label>
+               
+            </div>
+            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
+    @if (ValidInputs.EnableResponsible)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <div class=" form-floating">
+                <select class="form-select" id="state" @bind="SearchCriteria.Seller">
+                  
+                    @foreach(var i in Sellers)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                <label for="state" class="form-label">Responsable</label>
+
+            </div>
+            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableResponsible = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
+
+    <div class="col mb-2 d-flex flex-row gap-1">
+        @if (!ValidInputs.EnableCreation)
+        {
+            <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-success ">
+                Mes <Icon Name="IconName.Calendar2Date" />
+            </button>
+        }
+        @if (!ValidInputs.EnableState)
+        {
+            <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success ">
+                Estado <Icon Name="IconName.Check" />
+            </button>
+        }
+        @if (!ValidInputs.EnableType)
+        {
+            <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
+                Tipo <Icon Name="IconName.Type" />
+            </button>
+        }
+        @if (!ValidInputs.EnableResponsible)
+        {
+            <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-success">
+                Responsable <Icon Name="IconName.People" />
+            </button>
+        }
     </div>
-    <div class="col-md-2">
-        <label for="type" class="form-label">Tipo de Oferta:</label>
-        <select class="form-select" id="type" @bind="SearchCriteria.Type">
-            <option value="">Seleccionar...</option>
-            <option value="Mantenimiento">Mantenimiento</option>
-            <option value="Instalacion">Instalación</option>
-            <option value="Mejoras">Mejoras</option>
-            <option value="Otro">Otro</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <label for="state" class="form-label">Estado:</label>
-        <select class="form-select" id="state" @bind="SearchCriteria.State">
-            <option value="">Seleccionar...</option>
-            <option value="Enviado">Enviado</option>
-            <option value="Negociación">Negociación</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Vendido">Vendido</option>
-            <option value="Cobro">Cobro</option>
-        </select>
-    </div>
+
+
 </div>
 
 <div class="d-flex gap-2 mb-3">
@@ -106,6 +178,9 @@ else
     private bool IsSearchPerformed { get; set; } = false;
     private bool IsSearching { get; set; } = false;
     private string ErrorMessage { get; set; }
+    private SearchInputs ValidInputs = new();
+
+    private List<string> Sellers = new();
 
     private string? message;
     List<ToastMessage> messages = new List<ToastMessage>();
@@ -131,15 +206,18 @@ else
             if (!string.IsNullOrEmpty(SearchCriteria.Customer))
                 query = query.Where(o => o.Customer.Contains(SearchCriteria.Customer));
 
-            if (SearchCriteria.Creation.HasValue)
+            if (SearchCriteria.Creation.HasValue && ValidInputs.EnableCreation)
                 query = query.Where(o => o.Creation.Year == SearchCriteria.Creation.Value.Year  
                     && o.Creation.Month == SearchCriteria.Creation.Value.Month);
 
-            if (!string.IsNullOrEmpty(SearchCriteria.Type))
+            if (!string.IsNullOrEmpty(SearchCriteria.Type) && ValidInputs.EnableType)
                 query = query.Where(o => o.Type == SearchCriteria.Type);
 
-            if (!string.IsNullOrEmpty(SearchCriteria.State))
+            if (!string.IsNullOrEmpty(SearchCriteria.State) && ValidInputs.EnableState)
                 query = query.Where(o => o.State.Contains(SearchCriteria.State));
+
+            if (!string.IsNullOrEmpty(SearchCriteria.Seller) && ValidInputs.EnableResponsible)
+                query = query.Where(o => o.Responsible == SearchCriteria.Seller);
 
             Offers = await query.Take(MaxResults).ToListAsync();
             if(Offers.Count == MaxResults)
@@ -168,6 +246,20 @@ else
         }
     }
 
+    private async Task LoadSellers()
+    {
+        using(var dbTemp = dbContextFactory.CreateDbContext())
+        {
+            Sellers = dbTemp.Seller.Select(e => e.SellerName).ToList();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadSellers();
+        base.OnInitializedAsync();   
+    }
+
     private void ValidateCustomerName()
     {
         IsCustomerNameValid = string.IsNullOrEmpty(SearchCriteria.Customer) || SearchCriteria.Customer.Length >= 5;
@@ -182,6 +274,7 @@ else
         SearchCriteria = new OfferSearchCriteria();
         Offers.Clear();
         IsSearchPerformed = false;
+        ValidInputs = new();
         ErrorMessage = string.Empty;
     }
 
@@ -191,6 +284,7 @@ else
         public string Customer { get; set; }
         public DateTime? Creation { get; set; }
         public string Type { get; set; }
+        public string Seller { set; get; }
         public string State { get; set; }
     }
 
@@ -198,8 +292,14 @@ else
     {
         var data = await XmlsGenerate.GenerateFileOffers(Offers);
         var pdfBase64 = Convert.ToBase64String(data);
-
-        // Invocar una función JavaScript para iniciar la descarga del PDF
         await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Ofertas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+    }
+
+    private class SearchInputs
+    {
+        public bool EnableCreation { get; set; }
+        public bool EnableType { get; set; }
+        public bool EnableState { set; get; }
+        public bool EnableResponsible { get; set; }
     }
 }

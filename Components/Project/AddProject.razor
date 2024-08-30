@@ -11,134 +11,170 @@
     <ValidationSummary />
 
     <div class="form-group">
-        <label for="Title">Titulo</label>
-        <InputText id="Title" class="form-control" @bind-Value="project.Title" />
+        <div class=" form-floating mt-1 ">
+            <InputText id="Title" class="form-control" @bind-Value="project.Title" />
+            <label class="form-label" for="Title">Titulo</label>
+        </div>
         <ValidationMessage For="@(() => project.Title)" />
     </div>
 
     <div class="form-group">
-        <label for="Description">Descripción</label>
-        <InputTextArea id="Description" class="form-control" @bind-Value="project.Description" />
+
+        <div class=" form-floating mt-1 mb-1">
+            <InputTextArea id="Description" class="form-control" @bind-Value="project.Description" />
+            <label for="Description">Descripción</label>
+        </div>
         <ValidationMessage For="@(() => project.Description)" />
     </div>
 
     <div class="form-group">
-        <label for="TaskNumber">Número Tarea</label>
-        <InputText id="TaskNumber" class="form-control" @bind-Value="project.TaskNumber" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputText id="TaskNumber" class="form-control" @bind-Value="project.TaskNumber" />
+            <label class="form-label" for="TaskNumber">Número Tarea</label>
+        </div>
         <ValidationMessage For="@(() => project.TaskNumber)" />
     </div>
 
     <div class="form-group">
-        <label for="CreationDate">Fecha Registro</label>
-        <InputDate id="CreationDate" class="form-control" @bind-Value="project.CreationDate" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputDate id="CreationDate" class="form-control" @bind-Value="project.CreationDate" />
+            <label class="form-label" for="CreationDate">Fecha Registro</label>
+        </div>
         <ValidationMessage For="@(() => project.CreationDate)" />
     </div>
 
     <div class="form-group">
-        <label for="TypeId">Tipo</label>
-        <InputSelect id="TypeId" class="form-control" @bind-Value="project.TypeId">
-            <option value="">Select Type</option>
-            @foreach (var type in types)
-            {
-                <option value="@type.TypeId">@type.Name</option>
-            }
-        </InputSelect>
+        <div class=" form-floating mt-1 mb-1">
+            <InputSelect id="TypeId" class="form-control" @bind-Value="project.TypeId">
+                <option value="">Select Type</option>
+                @foreach (var type in types)
+                {
+                    <option value="@type.TypeId">@type.Name</option>
+                }
+            </InputSelect>
+            <label class="form-label" for="TypeId">Tipo</label>
+        </div>
         <ValidationMessage For="@(() => project.TypeId)" />
     </div>
 
     <div class="form-group">
-        <label for="CustomerId">Cliente</label>
-        <AutoComplete @bind-Value="customerName"
-                      TItem="Customer"
-                      class="text-danger"
-                      DataProvider="CustomersDataProvider"
-                      PropertyName="Name"
-                      Placeholder="Search a customer..."
-                      OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+        <div class="mt-1 mb-1">
+            <label class="form-label" for="CustomerId">Cliente</label>
+
+            <AutoComplete @bind-Value="customerName"
+                          TItem="Customer"
+                          class="form-control"
+                          DataProvider="CustomersDataProvider"
+                          PropertyName="Name"
+                          Placeholder="Search a customer..."
+                          OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+
+        </div>
         <ValidationMessage For="@(() => project.CustomerId)" />
     </div>
     <div>
-        <label>Oferta</label>
-        <InputTextArea id="Offer" class="form-control" @bind-Value="project.OfferId" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputTextArea id="Offer" class="form-control" @bind-Value="project.OfferId" />
+            <label class="form-label">Oferta</label>
+        </div>
         <ValidationMessage For="@(() => project.OfferId)" />
     </div>
-
     <div class="form-group">
-        <label for="SellerId">Vendedor</label>
-        <InputSelect id="SellerId" class="form-control" @bind-Value="project.SellerId">
-            @foreach (var seller in sellers)
-            {
-                <option value="@seller.SellerId">@seller.SellerName</option>
-            }
-        </InputSelect>
+        <div class=" form-floating mt-1 mb-1">
+            <InputSelect id="SellerId" class="form-control" @bind-Value="project.SellerId">
+                @foreach (var seller in sellers)
+                {
+                    <option value="@seller.SellerId">@seller.SellerName</option>
+                }
+            </InputSelect>
+            <label class="form-label" for="SellerId">Vendedor</label>
+        </div>
         <ValidationMessage For="@(() => project.SellerId)" />
     </div>
 
     <div class="form-group">
-        <label for="StateId">Estado</label>
-        <InputSelect id="StateId" class="form-control" @bind-Value="project.StateId">
-            @foreach (var state in states)
-            {
-                <option value="@state.StateId">@state.StateName</option>
-            }
-        </InputSelect>
+        <div class=" form-floating mt-1 mb-1">
+            <InputSelect id="StateId" class="form-control" @bind-Value="project.StateId">
+                @foreach (var state in states)
+                {
+                    <option value="@state.StateId">@state.StateName</option>
+                }
+            </InputSelect>
+            <label class="form-label" for="StateId">Estado</label>
+
+        </div>
         <ValidationMessage For="@(() => project.StateId)" />
     </div>
 
     <div class="form-group">
-        <label for="Amount">Monto</label>
-        <InputNumber id="Amount" class="form-control" @bind-Value="project.Amount" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputNumber id="Amount" class="form-control" @bind-Value="project.Amount" />
+            <label class="form-label" for="Amount">Monto</label>
+        </div>
         <ValidationMessage For="@(() => project.Amount)" />
     </div>
 
     <div class="form-group">
-        <label for="TypeOfChange">Tipo Cambio</label>
-        <InputNumber id="TypeOfChange" class="form-control" @bind-Value="project.TypeOfChange" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputNumber id="TypeOfChange" class="form-control" @bind-Value="project.TypeOfChange" />
+            <label class="form-label" for="TypeOfChange">Tipo Cambio</label>
+        </div>
         <ValidationMessage For="@(() => project.TypeOfChange)" />
     </div>
 
     <div class="form-group">
-        <label for="IsCompleted">Moneda</label>
-        <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
-            <option value="en-US">Dolar</option>
-            <option value="es-CR">Colon</option>
-            <option value="Euro">Euro</option>
-        </InputSelect>
+        <div class=" form-floating mt-1 mb-1">
+            <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
+                <option value="en-US">Dolar</option>
+                <option value="es-CR">Colon</option>
+                <option value="Euro">Euro</option>
+            </InputSelect>
+            <label class="form-label" for="IsCompleted">Moneda</label>
+        </div>
         <ValidationMessage For="@(() => project.CurrencyType)" />
     </div>
 
 
     <div class="form-group">
-        <label for="OC">Orden Compra</label>
-        <InputText id="OC" class="form-control" @bind-Value="project.OC" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputText id="OC" class="form-control" @bind-Value="project.OC" />
+            <label class="form-label" for="OC">Orden Compra</label>
+        </div>
         <ValidationMessage For="@(() => project.OC)" />
     </div>
 
     <div class="form-group">
-        <label for="OCDate">Fecha Orden Compra</label>
-        <InputDate id="OCDate" class="form-control" @bind-Value="project.OCDate" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputDate id="OCDate" class="form-control" @bind-Value="project.OCDate" />
+            <label class="form-label" for="OCDate">Fecha Orden Compra</label>
+        </div>
         <ValidationMessage For="@(() => project.OCDate)" />
     </div>
 
 
     <div class="form-group">
-        <label for="Ubication">Ubicación</label>
-        <InputText id="IsDeleted" class="form-control" @bind-Value="project.Ubication" />
+        <div class=" form-floating mt-1 mb-1">
+            <InputText id="IsDeleted" class="form-control" @bind-Value="project.Ubication" />
+            <label class="form-label" for="Ubication">Ubicación</label>
+        </div>
         <ValidationMessage For="@(() => project.Ubication)" />
     </div>
 
     <div class="form-group">
-        <label for="Province">Provincia</label>
-        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
-            <option value="">Seleccione</option>
-            <option value="San José">San Jose</option>
-            <option value="Heredia">Heredia</option>
-            <option value="Alajuela">Alajuela</option>
-            <option value="Cartago">Cartago</option>
-            <option value="Puntarenas">Puntarenas</option>
-            <option value="Guanacaste">Guanacaste</option>
-            <option value="Limón">Limón</option>
-        </InputSelect>
+        <div class=" form-floating mt-1 mb-1">
+
+            <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+                <option value="">Seleccione</option>
+                <option value="San José">San Jose</option>
+                <option value="Heredia">Heredia</option>
+                <option value="Alajuela">Alajuela</option>
+                <option value="Cartago">Cartago</option>
+                <option value="Puntarenas">Puntarenas</option>
+                <option value="Guanacaste">Guanacaste</option>
+                <option value="Limón">Limón</option>
+            </InputSelect>
+            <label class="form-label" for="Province">Provincia</label>
+        </div>
         <ValidationMessage For="@(() => project.Province)" />
     </div>
     <div class="form-group mb-5">

@@ -49,31 +49,31 @@
     }
 
 
-  <div class="col mb-2 d-flex flex-row">
-    @if (!ValidInputs.EnableState)
-    {
-        <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success me-2">
-            Estado <Icon Name="IconName.Check" />
-        </button>
-    }
-    
-    @if (!ValidInputs.EnableDate)
-    {
-        <button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-success me-2">
-            Mes <Icon Name="IconName.Calendar2Date" />
-        </button>
-    }
-    
-    @if (!ValidInputs.EnableType)
-    {
-        <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
-            Tipo <Icon Name="IconName.Type" />
-        </button>
-    }
-</div>
+    <div class="col mb-2 d-flex flex-row">
+        @if (!ValidInputs.EnableState)
+        {
+            <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success me-2">
+                Estado <Icon Name="IconName.Check" />
+            </button>
+        }
+
+        @if (!ValidInputs.EnableDate)
+        {
+            <button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-success me-2">
+                Mes <Icon Name="IconName.Calendar2Date" />
+            </button>
+        }
+
+        @if (!ValidInputs.EnableType)
+        {
+            <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
+                Tipo <Icon Name="IconName.Type" />
+            </button>
+        }
+    </div>
 
 
-  
+
 </div>
 
 <div class="row mb-3">
