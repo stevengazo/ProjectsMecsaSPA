@@ -1,0 +1,132 @@
+﻿@inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
+
+
+<select @onchange="OnYearChanged" class="form-select">
+    @foreach (var year in availableYears)
+    {
+        <option value="@year">@year</option>
+    }
+</select>
+
+
+<div class="container-fluid overflow-x-auto">
+    <LineChart @ref="lineChart" Width="800" />
+</div>
+
+
+
+@code {
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    private int SelectedYear = DateTime.Now.Year;
+    private List<int> availableYears = new List<int>();
+
+
+
+
+
+    protected override void OnInitialized()
+    {
+        LoadYears();
+        UpdateLineChart();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task UpdateLineChart()
+    {
+        var colors = ColorUtility.CategoricalTwelveColors;
+
+        var labels = new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+        var datasets = new List<IChartDataset>();
+
+        var dataset1 = new LineChartDataset
+            {
+                Label = "Windows",
+                Data = await GetData(),
+                BackgroundColor = colors[0],
+                BorderColor = colors[0],
+                BorderWidth = 2,
+                HoverBorderWidth = 4,
+                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+            
+                // PointBackgroundColor = colors[0],
+                // PointRadius = 0, // hide points
+                // PointHoverRadius = 4,
+            };
+        datasets.Add(dataset1);
+
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        lineChartOptions = new();
+        lineChartOptions.Responsive = true;
+        lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+
+        lineChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = $"Meses {SelectedYear}", Display = true };
+        lineChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Monto", Display = true };
+
+        lineChartOptions.Plugins.Title!.Text = $"Proyectos {SelectedYear}";
+        lineChartOptions.Plugins.Title.Display = true;
+        lineChartOptions.Plugins.Datalabels.Color = "white";
+
+        if (lineChart != null)
+        {
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+
+    }
+
+    private async Task<List<double?>> GetData()
+    {
+        using (var dbTemp = DbContextFactory.CreateDbContext())
+        {
+            List<double?> listOfAmountsByMonth = dbTemp.Projects
+                                                        .Where(p => p.CreationDate.Year == SelectedYear)
+                                                        .OrderBy(x => x.CreationDate.Month)
+                                                        .GroupBy(p => p.CreationDate.Month)
+                                                        .Select(g => (double?)g.Sum(p => p.Amount))
+                                                        .ToList();
+            return listOfAmountsByMonth;
+        }
+    }
+
+
+
+    private async Task OnYearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var year))
+        {
+            SelectedYear = year;
+            await UpdateLineChart();
+            StateHasChanged();
+        }
+    }
+    private async Task LoadYears()
+    {
+        using (var dbtmp = DbContextFactory.CreateDbContext())
+        {
+            availableYears = dbtmp.Projects.AsNoTracking()
+                                .Select(e => e.CreationDate.Year)
+                                .Distinct()
+                                .OrderByDescending(year => year)
+                                .ToList();
+
+        }
+    }
+
+
+}

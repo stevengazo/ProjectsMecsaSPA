@@ -3,21 +3,29 @@
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<select @onchange="OnYearChanged" class="form-control-sm">
+
+
+
+<select @onchange="OnYearChanged" class="form-select">
     @foreach (var year in availableYears)
     {
         <option value="@year">@year</option>
     }
 </select>
 
-
-
-<PieChart @ref="pieChart" Width="500" />
+@if (Loading)
+{
+    <Spinner Color="SpinnerColor.Success" />
+}
+else
+{
+    <PieChart @ref="pieChart" Width="500" />
+}
 
 
 
 @code {
-
+    private bool Loading = false;
     private PieChart pieChart = default!; // Referencia al componente PieChart para poder inicializarlo más tarde
     private PieChartOptions pieChartOptions = default!; // Opciones para configurar el gráfico de pastel
     private ChartData chartData = default!; // Datos para el gráfico de pastel
@@ -61,6 +69,7 @@
 
     private async Task UpdateChartAsync()
     {
+        Loading = true;
         var datasets = new List<IChartDataset>();
 
         Dictionary<string, double?> dic = await GetData();
@@ -76,33 +85,26 @@
 
         datasets.Add(dataset);
         chartData = new() { Datasets = datasets, Labels = labels };
-
         // Inicializa los colores de fondo con una paleta predeterminada
         backgroundColors = ColorUtility.CategoricalTwelveColors;
-
         // Configura las opciones del gráfico de pastel
         pieChartOptions = new();
         pieChartOptions.Responsive = true;
         pieChartOptions.Plugins.Title!.Text = $"Categorias {SelectedYear}";
         pieChartOptions.Plugins.Title.Display = true;
-
-
+        Loading = false;
         if(pieChart != null)
         {
+
             await pieChart.UpdateAsync(chartData, pieChartOptions);   
         }
-     
-
-     //   pieChart.UpdateAsync(chartData, pieChartOptions);
-
-
+        
     }
 
     private async Task<List<string>> GetLabels(Dictionary<string,double?> dic)
     {
         return dic.Keys.ToList();
     }
-
 
     private List<string?> GenerateColors(int count)
     {
@@ -142,11 +144,12 @@
             foreach (var item in Labels)
             {
                 var count = (double)db.Offers.Where(d => d.Responsible == item && d.Creation.Year == SelectedYear).Count();
-                dicOffers.Add(item, count);
+                if(count > 0)
+                {
+                    dicOffers.Add(item, count);
+                }
             }
-
             return dicOffers;
         }
-
     }
 }
