@@ -1,0 +1,144 @@
+﻿@inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
+<select @onchange="OnYearChanged" class="form-select">
+    @foreach (var year in availableYears)
+    {
+        <option value="@year">@year</option>
+    }
+</select>
+
+
+<BarChart @ref="barChart" Width="500" Height="300" />
+
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+    private static readonly Random random = new Random();
+    private int datasetsCount = 0;
+    private int labelsCount = 0;
+    private string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+
+    private int SelectedYear = DateTime.Now.Year;
+    private List<int> availableYears = new List<int>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  LoadYears();
+        await UpdateChartAsync();
+        base.OnInitializedAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+
+    }
+
+    private async Task UpdateChartAsync()
+    {
+        Dictionary<string, double?> keyValues = await GetValues();
+        var datasets = new List<IChartDataset>();
+
+        var dataset1 = new BarChartDataset()
+            {
+                Data = keyValues.Values.ToList(),
+                BackgroundColor = GenerateColors(keyValues.Values.Count),
+                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderWidth = new List<double> { 0 },
+            };
+        datasets.Add(dataset1);
+
+        chartData = new ChartData { Labels = keyValues.Keys.ToList(), Datasets = datasets };
+
+
+        barChartOptions = new BarChartOptions
+        {
+            Responsive = true,
+            IndexAxis = "x",
+            Interaction =  new Interaction { Mode = InteractionMode.Index },
+        };
+  
+        if (barChart != null)
+        {
+            barChart.UpdateAsync(chartData, barChartOptions);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (chartData != null && barChartOptions != null)
+            {
+                await barChart.InitializeAsync(chartData, barChartOptions);
+            }
+            else
+            {
+                barChart.UpdateAsync(chartData, barChartOptions);
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task LoadYears()
+    {
+        using (var dbtmp = DbContextFactory.CreateDbContext())
+        {
+            availableYears = dbtmp.Offers.AsNoTracking()
+                                .Select(e => e.Creation.Year)
+                                .Distinct()
+                                .OrderBy(year => year)
+                                .ToList();
+        }
+    }
+
+
+    private List<string?> GenerateColors(int count)
+    {
+        List<string?> colors = new List<string?>();
+        for (int i = 0; i < count; i++)
+        {
+            colors.Add(GenerateRandomColor());
+        }
+        return colors;
+    }
+
+    private string GenerateRandomColor()
+    {
+        return $"#{random.Next(0x1000000):X6}";
+    }
+
+
+    private async Task OnYearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var year))
+        {
+            SelectedYear = year;
+            await UpdateChartAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task<Dictionary<string, double?>> GetValues()
+    {
+        using (var dbTemp = DbContextFactory.CreateDbContext())
+        {
+            var values = new Dictionary<string, double?>();
+
+            for (int i = 0; i <= 11; i++)
+            {
+                var count = await dbTemp.Offers
+                                        .Where(o => o.Creation.Year == SelectedYear && o.Creation.Month == i)
+                                        .CountAsync();
+
+                values.Add(months[i], count);
+            }
+
+            return values;
+        }
+    }
+}
