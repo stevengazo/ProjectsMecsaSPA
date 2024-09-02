@@ -1,5 +1,8 @@
-﻿@inject ProjectsDBContext db
+﻿
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h6>Proyectos Por Mes</h6>
+
 
 <div class="row">
     <div class="col-auto">
@@ -23,10 +26,11 @@
 </div>
 
 
-
 <div class="container-fluid overflow-x-auto">
-    <LineChart @ref="lineChart" Width="800" Height="500" />
+    <LineChart @ref="lineChart" Width="900" Height="500" />
 </div>
+
+
 
 @code {
     private LineChart lineChart = default!;
@@ -36,11 +40,15 @@
     private int SelectedYear = DateTime.Now.Year;
     private List<int> availableYears = new List<int>();
 
-    private List<string> labels = new List<string>();
-    private List<IChartDataset> datasets = new List<IChartDataset>();
+    List<string> labels = new List<string>();
+    List<IChartDataset> datasets = new List<IChartDataset>();
+
+    ProjectsDBContext db;
+
 
     protected override void OnInitialized()
     {
+        db =  DbContextFactory.CreateDbContext();
         LoadYears();
         UpdateLineChart();
     }
@@ -54,49 +62,53 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+
+    private async Task RemoveDataSet()
+    {
+        if (lineChart != null && datasets.Count >= 2)
+        {
+            //    datasets.RemoveAt(datasets.Count - 1);
+            chartData.Datasets.Clear();
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+
+
+    }
+
     private async Task AddDataSet()
     {
+        Random e = new Random();
         var colors = ColorUtility.CategoricalTwelveColors;
-        var random = new Random();
-        var color = colors[random.Next(colors.Length)];
-
-        var dataset = new LineChartDataset
+        var colorI = e.NextInt64(colors.Length - 1);
+        var dataset1 = new LineChartDataset
             {
-                Label = $"Ofertas {SelectedYear}",
+
+                Label = $"{SelectedYear}",
                 Data = await GetData(),
-                BackgroundColor = color,
-                BorderColor = color,
+                BackgroundColor = colors[colorI],
+                BorderColor = colors[colorI],
                 BorderWidth = 2,
                 HoverBorderWidth = 4,
+                // datalabels
                 Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+
             };
-
-        chartData.Datasets.Add(dataset);
-
+        chartData.Datasets.Add(dataset1);
         if (lineChart != null)
         {
             await lineChart.UpdateAsync(chartData, lineChartOptions);
         }
     }
 
-    private async Task RemoveDataSet()
-    {
-        if (chartData.Datasets.Count > 0)
-        {
-            chartData.Datasets.Clear(); // Elimina todos los conjuntos de datos
-            await lineChart.UpdateAsync(chartData, lineChartOptions);
-        }
-    }
 
     private async Task UpdateLineChart()
     {
         var colors = ColorUtility.CategoricalTwelveColors;
 
         labels = new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+        datasets = new List<IChartDataset>();
 
-        datasets.Clear(); // Limpia los conjuntos de datos existentes
-
-        var dataset = new LineChartDataset
+        var dataset1 = new LineChartDataset
             {
                 Label = $"{SelectedYear}",
                 Data = await GetData(),
@@ -104,47 +116,51 @@
                 BorderColor = colors[0],
                 BorderWidth = 2,
                 HoverBorderWidth = 4,
-                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+                Datalabels = new() { Alignment = Alignment.Center, Anchor = Anchor.Center }
+
+                // PointBackgroundColor = colors[0],
+                // PointRadius = 0, // hide points
+                // PointHoverRadius = 4,
             };
-        datasets.Add(dataset);
+        datasets.Add(dataset1);
+
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
-        lineChartOptions = new()
-            {
-                Responsive = true,
-                Interaction = new Interaction { Mode = InteractionMode.Index },
-                Scales = new Scales
-                {
-                    X = new () { Title = new ChartAxesTitle { Text = $"Meses {SelectedYear}", Display = true } },
-                    Y = new () { Title = new ChartAxesTitle { Text = "Cantidades", Display = true } }
-                },
-                Plugins = new ()
-                {
-                    Title = new () { Text = $"Ofertas {SelectedYear}", Display = true },
-                    Datalabels = new () { Color = "white" }
-                }
-            };
+        lineChartOptions = new();
+        lineChartOptions.Responsive = true;
+        lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
+
+        lineChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = $"Meses", Display = true };
+        lineChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Cantidad", Display = true };
+
+        lineChartOptions.Plugins.Title!.Text = $"Cantidad de Proyectos Por Mes";
+        lineChartOptions.Plugins.Title.Display = true;
+        lineChartOptions.Plugins.Datalabels.BorderRadius = 2;
+
+        lineChartOptions.Plugins.Datalabels.Color = "red";
 
         if (lineChart != null)
         {
             await lineChart.UpdateAsync(chartData, lineChartOptions);
         }
+
     }
 
     private async Task<List<double?>> GetData()
     {
-        using (var dbTemp = DbContextFactory.CreateDbContext())
-        {
-            List<double?> listOfAmountsByMonth = dbTemp.Offers
-                                                        .Where(p => p.Creation.Year == SelectedYear)
-                                                        .OrderBy(x => x.Creation.Month)
-                                                        .GroupBy(p => p.Creation.Month)
+
+            List<double?> CountsByMonth = db.Projects
+                                                        .Where(p => p.CreationDate.Year == SelectedYear)
+                                                        .OrderBy(x => x.CreationDate.Month)
+                                                        .GroupBy(p => p.CreationDate.Month)
                                                         .Select(g => (double?)g.Count())
                                                         .ToList();
-            return listOfAmountsByMonth;
-        }
+            return CountsByMonth;
+
     }
+
+
 
     private async Task OnYearChanged(ChangeEventArgs e)
     {
@@ -155,16 +171,15 @@
             StateHasChanged();
         }
     }
-
     private async Task LoadYears()
     {
-        using (var dbtmp = DbContextFactory.CreateDbContext())
-        {
-            availableYears = dbtmp.Offers.AsNoTracking()
-                                .Select(e => e.Creation.Year)
+        
+            availableYears = db.Projects.AsNoTracking()
+                                .Select(e => e.CreationDate.Year)
                                 .Distinct()
                                 .OrderByDescending(year => year)
                                 .ToList();
-        }
+
+        
     }
 }

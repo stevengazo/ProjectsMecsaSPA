@@ -3,16 +3,31 @@
 
 <h6>Monto de Proyectos Por Mes</h6>
 
-<select @onchange="OnYearChanged" class="form-select">
-    @foreach (var year in availableYears)
-    {
-        <option value="@year">@year</option>
-    }
-</select>
+
+<div class="row">
+    <div class="col-auto">
+        <select @bind="SelectedYear" class="form-select">
+            @foreach (var year in availableYears)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-info" @onclick="AddDataSet">
+            Añadir Datos
+        </button>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-danger" @onclick="RemoveDataSet">
+            Limpiar
+        </button>
+    </div>
+</div>
 
 
 <div class="container-fluid overflow-x-auto">
-    <LineChart @ref="lineChart" Width="800" />
+    <LineChart @ref="lineChart" Width="900" Height="500" />
 </div>
 
 
@@ -25,10 +40,8 @@
     private int SelectedYear = DateTime.Now.Year;
     private List<int> availableYears = new List<int>();
 
-
-
-
-
+    List<string>  labels = new List<string>();
+    List<IChartDataset>  datasets = new List<IChartDataset>();
     protected override void OnInitialized()
     {
         LoadYears();
@@ -44,16 +57,55 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
+
+    private async Task RemoveDataSet()
+    {
+        if (lineChart != null && datasets.Count>=2)
+        {
+        //    datasets.RemoveAt(datasets.Count - 1);
+            chartData.Datasets.Clear();
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+        
+
+    }
+
+    private async Task AddDataSet()
+    {
+        Random e = new Random();
+        var colors = ColorUtility.CategoricalTwelveColors;
+        var colorI = e.NextInt64(colors.Length - 1);
+        var dataset1 = new LineChartDataset
+            {
+
+                Label = $"{SelectedYear}",
+                Data = await GetData(),
+                BackgroundColor = colors[colorI],
+                BorderColor = colors[colorI],
+                BorderWidth = 2,
+                HoverBorderWidth = 4,
+                // datalabels
+                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+
+            };
+        chartData.Datasets.Add(dataset1);
+        if (lineChart != null)
+        {
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+    }
+
+
     private async Task UpdateLineChart()
     {
         var colors = ColorUtility.CategoricalTwelveColors;
 
-        var labels = new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
-        var datasets = new List<IChartDataset>();
+        labels = new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+        datasets = new List<IChartDataset>();
 
         var dataset1 = new LineChartDataset
             {
-                Label = "Proyectos",
+                Label = $"{SelectedYear}",
                 Data = await GetData(),
                 BackgroundColor = colors[0],
                 BorderColor = colors[0],
@@ -74,13 +126,14 @@
         lineChartOptions.Responsive = true;
         lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
 
-        lineChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = $"Meses {SelectedYear}", Display = true };
+        lineChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = $"Meses", Display = true };
         lineChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Monto", Display = true };
 
-        lineChartOptions.Plugins.Title!.Text = $"Proyectos {SelectedYear}";
+        lineChartOptions.Plugins.Title!.Text = $"Proyectos Por Monto";
         lineChartOptions.Plugins.Title.Display = true;
         lineChartOptions.Plugins.Datalabels.BorderRadius = 2;
-        lineChartOptions.Plugins.Datalabels.Color = "red";
+        
+        lineChartOptions.Plugins.Datalabels.Color = "Red";
 
         if (lineChart != null)
         {
@@ -126,6 +179,4 @@
 
         }
     }
-
-
 }
