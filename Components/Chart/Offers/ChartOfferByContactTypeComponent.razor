@@ -51,7 +51,7 @@ else
             availableYears = dbtmp.Offers.AsNoTracking()
                                 .Select(e => e.Creation.Year)
                                 .Distinct()
-                                .OrderBy(year=>year)
+                                .OrderByDescending(year=>year)
                                 .ToList();
 
         }
