@@ -1,6 +1,5 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-
 <h6>Monto Por Vendedor</h6>
 
 <select @onchange="OnYearChanged" class="form-select">
@@ -9,7 +8,6 @@
         <option value="@year">@year</option>
     }
 </select>
-
 
 <BarChart @ref="barChart" />
 
@@ -24,11 +22,10 @@
     protected override async Task OnInitializedAsync()
     {
         db = DbContextFactory.CreateDbContext();
-        // Obtener los años disponibles desde los proyectos
         availableYears = await GetAvailableYearsAsync();
         if (availableYears.Any())
         {
-            selectedYear = availableYears.First(); // Seleccionar el primer año por defecto
+            selectedYear = availableYears.First();
             await UpdateChartAsync();
         }
     }
@@ -42,63 +39,57 @@
             .ToListAsync();
     }
 
-    private List<string> GetLabelsSellers()
+    private async Task<List<string>> GetLabelsSellersAsync()
     {
-        return db.Seller.Select(s => s.SellerName).ToList();
+        return await db.Seller
+            .Select(s => s.SellerName)
+            .ToListAsync();
     }
 
-    private List<double?> GetAmountsBySeller(List<string> sellers)
+    private async Task<List<double?>> GetAmountsBySellerAsync(List<string> sellers)
     {
-        // Obtener todos los proyectos filtrados por el año seleccionado
-        var projects = db.Projects
-            .Where(p => p.CreationDate.Year == selectedYear) // Filtrar por el año seleccionado
-            .ToList();
+        var projects = await db.Projects
+            .Where(p => p.CreationDate.Year == selectedYear)
+            .ToListAsync();
 
-        // Obtener todos los vendedores y convertir a una lista en memoria
-        var sellerList = db.Seller.ToList();
+        var sellerList = await db.Seller.ToListAsync();
 
-        // Crear un diccionario que mapea SellerId a la suma de Amount de los proyectos
         var projectAmountsBySeller = projects
-            .GroupBy(p => p.SellerId) // Agrupar proyectos por SellerId
+            .GroupBy(p => p.SellerId)
             .ToDictionary(
-                g => g.Key, // La clave es SellerId
-                g => (double?)g.Sum(p => p.Amount) // El valor es la suma de Amount como double?
+                g => g.Key,
+                g => (double?)g.Sum(p => p.Amount)
             );
 
-        // Crear un diccionario que mapea el nombre del vendedor a SellerId
         var sellerIds = sellerList
-            .Where(s => sellers.Contains(s.SellerName)) // Filtrar vendedores que están en la lista de vendedores
+            .Where(s => sellers.Contains(s.SellerName))
             .ToDictionary(
-                s => s.SellerName, // La clave es el nombre del vendedor
-                s => s.SellerId // El valor es el SellerId
+                s => s.SellerName,
+                s => s.SellerId
             );
 
-        // Crear la lista de sumas de Amount basada en los SellerIds
         var values = sellers
             .Select(seller =>
             {
-                // Obtener el SellerId para el nombre del vendedor
                 if (sellerIds.TryGetValue(seller, out var sellerId))
                 {
-                    // Obtener la suma de Amount de los proyectos para el SellerId
                     return projectAmountsBySeller.TryGetValue(sellerId, out var totalAmount) ? totalAmount : (double?)null;
                 }
-                return (double?)null; // Si no se encuentra el SellerId, devolver null
+                return (double?)null;
             })
             .ToList();
 
         return values;
     }
 
-
     private async Task UpdateChartAsync()
     {
-        var labels = GetLabelsSellers();
+        var labels = await GetLabelsSellersAsync();
         var datasets = new List<IChartDataset>();
 
         var dataset1 = new BarChartDataset()
             {
-                Data = GetAmountsBySeller(labels),
+                Data = await GetAmountsBySellerAsync(labels),
                 BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
                 BorderWidth = new List<double> { 0 },
@@ -120,9 +111,8 @@
         if (barChart != null)
         {
             await barChart.InitializeAsync(chartData, barChartOptions);
+            await barChart.UpdateAsync(chartData, barChartOptions);
         }
-
-        barChart.UpdateAsync(chartData, barChartOptions);
     }
 
     private async Task OnYearChanged(ChangeEventArgs e)
