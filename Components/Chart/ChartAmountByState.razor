@@ -1,4 +1,4 @@
-﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+﻿@inject ProjectsDBContext db
 
 <h6>
     Monto Por Etapa @DateTime.Now.Year
@@ -10,50 +10,66 @@
     private BarChartOptions barChartOptions = default!;
     private ChartData chartData = default!;
 
-    private async Task<List<string>> GetLabelsStatesAsync()
+    private List<string> GetLabelsStates()
     {
-        await using var db = await DbContextFactory.CreateDbContextAsync();
         // Obtener nombres de estados
-        return await db.States.Select(w => w.StateName).ToListAsync();
+        return db.States.Select(w => w.StateName).ToList();
     }
 
-    private async Task<List<double?>> GetAmountsByStateAsync(List<string> states)
+    private List<double?> GetAmountsByState(List<string> states)
     {
-        await using var db = await DbContextFactory.CreateDbContextAsync();
+        // Obtener todos los proyectos y convertir a una lista en memoria
+        var projects = db.Projects.Where(e => e.CreationDate.Year == DateTime.Now.Year).ToList();
 
-        // Obtener las sumas de amounts por estado directamente desde la base de datos
-        var projectAmountsByState = await db.Projects
-            .AsNoTracking()
-            .Where(e => e.CreationDate.Year == DateTime.Now.Year && e.State != null)
-            .GroupBy(p => p.State.StateName)
-            .Select(g => new { StateName = g.Key, Amount = (double?)g.Sum(p => p.Amount) })
-            .ToListAsync();
+        // Obtener todos los estados y convertir a una lista en memoria
+        var stateList = db.States.ToList();
 
-        // Crear un diccionario para facilitar la búsqueda de amounts por nombre de estado
-        var projectAmountsDict = projectAmountsByState.ToDictionary(x => x.StateName, x => x.Amount);
+        // Crear un diccionario que mapea StateId a la suma de amounts
+        var projectAmountsByState = projects
+            .GroupBy(p => p.StateId) // Agrupar proyectos por StateId
+            .ToDictionary(
+                g => g.Key, // La clave es StateId
+                g => (double?)g.Sum(p => p.Amount) // La suma de amounts como double?
+            );
 
-        // Crear la lista de amounts basada en los nombres de estados
-        var values = states.Select(state =>
-            projectAmountsDict.TryGetValue(state, out var amount) ? amount : (double?)null
-        ).ToList();
+        // Crear un diccionario que mapea el nombre del estado a StateId
+        var stateIds = stateList
+            .Where(s => states.Contains(s.StateName)) // Filtrar estados que están en la lista de estados
+            .ToDictionary(
+                s => s.StateName, // La clave es el nombre del estado
+                s => s.StateId // El valor es el StateId
+            );
+
+        // Crear la lista de amounts basada en los StateIds
+        var values = states
+            .Select(state =>
+            {
+                // Obtener el StateId para el nombre del estado
+                if (stateIds.TryGetValue(state, out var stateId))
+                {
+                    // Obtener el amount total para el StateId
+                    return projectAmountsByState.TryGetValue(stateId, out var amount) ? amount : (double?)null;
+                }
+                return (double?)null; // Si no se encuentra el StateId, devolver null
+            })
+            .ToList();
 
         return values;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var labels = await GetLabelsStatesAsync();
+        var labels = GetLabelsStates();
         var datasets = new List<IChartDataset>();
 
-        datasets.Add(
-         new BarChartDataset()
-             {
-                 Data = await GetAmountsByStateAsync(labels), // Usar el método optimizado
-                 BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                 BorderWidth = new List<double> { 0 },
-             }
-        );
+        var dataset1 = new BarChartDataset()
+            {
+                Data = GetAmountsByState(labels), // Usar el método actualizado
+                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                BorderWidth = new List<double> { 0 },
+            };
+        datasets.Add(dataset1);
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
@@ -66,11 +82,11 @@
                 {
                     X = new ChartAxes
                     {
-                        Title = new () { Text = "Monto", Display = true }
+                        Title = new ChartAxesTitle { Text = "Amount", Display = true }
                     },
                     Y = new ChartAxes
                     {
-                        Title = new () { Text = "Etapa", Display = true }
+                        Title = new ChartAxesTitle { Text = "Etapa", Display = true }
                     }
                 }
             };
@@ -78,6 +94,7 @@
         barChartOptions.Scales.Y.Stacked = true;
         barChartOptions.Plugins.Title!.Text = "";
         barChartOptions.Plugins.Title.Display = true;
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
