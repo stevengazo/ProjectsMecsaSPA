@@ -12,9 +12,7 @@
     <ValidationSummary />
     <div class="row mb-2">
         <label>Autor</label>
-
         <InputText @bind-Value="offer.Author" readonly />
-
     </div>
     <div class="row mb-2">
         <label>Fecha Registro</label>
@@ -124,10 +122,10 @@
     </div>
     <div class="row mb-2">
         <label>Responsable</label>
-        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm" >
+        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm">
             @foreach (var item in sellers)
             {
-                <option  value="@item.SellerId">@item.SellerName</option>
+                <option value="@item.SellerId">@item.SellerName</option>
             }
         </InputSelect>
         <ValidationMessage For="@(() => offer.Responsible)" />
@@ -165,7 +163,7 @@
     {
 
         using var context = DbContextFactory.CreateDbContext();
-        sellers = context.Seller.Where(e => e.IsActive).OrderBy(e=>e.SellerName).ToList();
+        sellers = context.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
         // Obtén el estado de autenticación
         var s = asp.GetAuthenticationStateAsync();
         var user = s.Result.User;
@@ -182,7 +180,7 @@
         {
             offer.Author = "Usuario no autenticado";
         }
-        base.OnInitializedAsync();   
+        base.OnInitializedAsync();
     }
     private async Task Add()
     {
@@ -191,8 +189,8 @@
         context.Offers.Add(offer);
         await context.SaveChangesAsync();
         NAV.NavigateTo($"/offers/{offer.OfferId}");
-        
-   
-   
+
+
+
     }
 }

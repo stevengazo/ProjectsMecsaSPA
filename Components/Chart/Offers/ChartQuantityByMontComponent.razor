@@ -2,9 +2,6 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 
-
-
-
 <select @onchange="OnYearChanged" class="form-select">
     @foreach (var year in availableYears)
     {
@@ -12,11 +9,9 @@
     }
 </select>
 
-
 <div class="container-fluid overflow-x-auto">
     <LineChart @ref="lineChart" Width="800" />
 </div>
-
 
 
 @code {
@@ -26,10 +21,6 @@
 
     private int SelectedYear = DateTime.Now.Year;
     private List<int> availableYears = new List<int>();
-
-
-
-
 
     protected override void OnInitialized()
     {
@@ -55,7 +46,7 @@
 
         var dataset1 = new LineChartDataset
             {
-                Label = "Proyectos",
+                Label = "Ofertas",
                 Data = await GetData(),
                 BackgroundColor = colors[0],
                 BorderColor = colors[0],
@@ -77,35 +68,31 @@
         lineChartOptions.Interaction = new Interaction { Mode = InteractionMode.Index };
 
         lineChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = $"Meses {SelectedYear}", Display = true };
-        lineChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Monto", Display = true };
+        lineChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Cantidades", Display = true };
 
-        lineChartOptions.Plugins.Title!.Text = $"Proyectos {SelectedYear}";
+        lineChartOptions.Plugins.Title!.Text = $"Ofertas {SelectedYear}";
         lineChartOptions.Plugins.Title.Display = true;
-        lineChartOptions.Plugins.Datalabels.BorderRadius = 2;
-        lineChartOptions.Plugins.Datalabels.Color = "red";
+        lineChartOptions.Plugins.Datalabels.Color = "white";
 
         if (lineChart != null)
         {
             await lineChart.UpdateAsync(chartData, lineChartOptions);
         }
-
     }
 
     private async Task<List<double?>> GetData()
     {
         using (var dbTemp = DbContextFactory.CreateDbContext())
         {
-            List<double?> listOfAmountsByMonth = dbTemp.Projects
-                                                        .Where(p => p.CreationDate.Year == SelectedYear)
-                                                        .OrderBy(x => x.CreationDate.Month)
-                                                        .GroupBy(p => p.CreationDate.Month)
-                                                        .Select(g => (double?)g.Sum(p => p.Amount))
+            List<double?> listOfAmountsByMonth = dbTemp.Offers
+                                                        .Where(p => p.Creation.Year == SelectedYear)
+                                                        .OrderBy(x => x.Creation.Month)
+                                                        .GroupBy(p => p.Creation.Month)
+                                                        .Select(g => (double?)g.Count())
                                                         .ToList();
             return listOfAmountsByMonth;
         }
     }
-
-
 
     private async Task OnYearChanged(ChangeEventArgs e)
     {
@@ -120,14 +107,12 @@
     {
         using (var dbtmp = DbContextFactory.CreateDbContext())
         {
-            availableYears = dbtmp.Projects.AsNoTracking()
-                                .Select(e => e.CreationDate.Year)
+            availableYears = dbtmp.Offers.AsNoTracking()
+                                .Select(e => e.Creation.Year)
                                 .Distinct()
                                 .OrderByDescending(year => year)
                                 .ToList();
 
         }
     }
-
-
 }
