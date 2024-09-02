@@ -16,10 +16,13 @@
     private List<double?> GetCountByState(List<string> states)
     {
         // Obtener todos los proyectos y convertir a una lista en memoria
-        var projects = db.Projects.Where(e=> e.CreationDate.Year == DateTime.Today.Year).ToList();
+        var projects = db.Projects.AsNoTracking()
+                                  .Where(e => e.CreationDate.Year == DateTime.Today.Year)
+                                  .Select(R => new {R.ProjectId,R.StateId})
+                                  .ToList();
 
         // Obtener todos los estados y convertir a una lista en memoria
-        var stateList = db.States.ToList();
+        var stateList = db.States.AsNoTracking().Select(S => new{S.StateId,S.StateName}).ToList();
 
         // Crear un diccionario que mapea StateId a la cantidad de proyectos
         var projectCountsByState = projects
@@ -60,14 +63,15 @@
         var labels = GetLabelsStates();
         var datasets = new List<IChartDataset>();
 
-        var dataset1 = new BarChartDataset()
-            {
-                Data = GetCountByState(labels),
-                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderWidth = new List<double> { 0 },
-            };
-        datasets.Add(dataset1);
+        datasets.Add(
+            new BarChartDataset()
+                {
+                    Data = GetCountByState(labels),
+                    BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                    BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                    BorderWidth = new List<double> { 0 },
+                }
+        );
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
@@ -79,7 +83,7 @@
         barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Cantidad de Proyectos", Display = true };
         barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Etapas", Display = true };
 
-        barChartOptions.Plugins.Legend.Display = false;
+        barChartOptions.Plugins.Legend.Display = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

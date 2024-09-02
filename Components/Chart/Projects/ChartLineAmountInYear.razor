@@ -1,9 +1,7 @@
 ﻿@inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-
-
-
+<h6>Monto de Proyectos Por Mes</h6>
 
 <select @onchange="OnYearChanged" class="form-select">
     @foreach (var year in availableYears)
@@ -61,7 +59,7 @@
                 BorderColor = colors[0],
                 BorderWidth = 2,
                 HoverBorderWidth = 4,
-                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+                Datalabels = new() { Alignment = Alignment.Center, Anchor = Anchor.Center }
 
                 // PointBackgroundColor = colors[0],
                 // PointRadius = 0, // hide points

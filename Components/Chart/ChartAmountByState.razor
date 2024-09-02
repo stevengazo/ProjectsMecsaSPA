@@ -45,14 +45,15 @@
         var labels = await GetLabelsStatesAsync();
         var datasets = new List<IChartDataset>();
 
-        var dataset1 = new BarChartDataset()
-            {
-                Data = await GetAmountsByStateAsync(labels), // Usar el método optimizado
-                BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
-                BorderWidth = new List<double> { 0 },
-            };
-        datasets.Add(dataset1);
+        datasets.Add(
+         new BarChartDataset()
+             {
+                 Data = await GetAmountsByStateAsync(labels), // Usar el método optimizado
+                 BackgroundColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                 BorderColor = new List<string> { ColorUtility.CategoricalTwelveColors[0] },
+                 BorderWidth = new List<double> { 0 },
+             }
+        );
 
         chartData = new ChartData { Labels = labels, Datasets = datasets };
 
@@ -65,11 +66,11 @@
                 {
                     X = new ChartAxes
                     {
-                        Title = new ChartAxesTitle { Text = "Amount", Display = true }
+                        Title = new () { Text = "Monto", Display = true }
                     },
                     Y = new ChartAxes
                     {
-                        Title = new ChartAxesTitle { Text = "Etapa", Display = true }
+                        Title = new () { Text = "Etapa", Display = true }
                     }
                 }
             };
