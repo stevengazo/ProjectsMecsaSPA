@@ -33,17 +33,17 @@ else
         <td>@offer.OfferId</td>
         <td>
             <EditForm Model="offer">
-                <InputDate @bind-Value="offer.Creation"> </InputDate>
+                <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm"> </InputDate>
             </EditForm>
         </td>
         <td>
             <EditForm Model="offer">
-                <InputText @bind-Value="offer.Customer"></InputText>
+                <InputText @bind-Value="offer.Customer" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
             <EditForm Model="offer">
-                <InputSelect @bind-Value="offer.State">
+                <InputSelect @bind-Value="offer.State" class="form-select form-select-sm">
                     <option value="Enviado">Enviado</option>
                     <option value="Negociación">Negociación</option>
                     <option value="Pendiente">Pendiente</option>
@@ -55,13 +55,13 @@ else
         <td>@offer.Author</td>
         <td>
             <EditForm Model="offer">
-                <InputText @bind-Value="offer.Description"></InputText>
+                <InputText @bind-Value="offer.Description" class="form-control form-control-sm"></InputText>
             </EditForm>
 
         </td>
         <td>
             <EditForm Model="offer">
-                <InputNumber @bind-Value="offer.Amount"></InputNumber>
+                <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm"></InputNumber>
             </EditForm>
         </td>
         <td>

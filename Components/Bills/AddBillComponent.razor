@@ -60,6 +60,7 @@
     {
         bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
         bill.AuthorId = "";
+        bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
         bill.Currency = CurrencyType;
         bill.ProjectId = ProjectId;
         using var context = db;

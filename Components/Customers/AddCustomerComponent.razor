@@ -7,7 +7,7 @@
 
     <div class="mb-3">
         <label for="name">
-            @nameof(customer.Name)
+            Nombre
         </label>
         <InputText id="name" @bind-Value="customer.Name" class="form-control" />
         <ValidationMessage For="@(() => customer.Name)" />
@@ -15,7 +15,7 @@
 
     <div class="mb-3">
         <label for="dni">
-            @nameof(customer.DNI)
+            Cédula
         </label>
         <InputNumber id="dni" @bind-Value="customer.DNI" class="form-control" />
         <ValidationMessage For="@(() => customer.DNI)" />
@@ -23,7 +23,7 @@
 
     <div class="mb-3">
         <label for="type">
-            @nameof(customer.Type)
+            Tipo de Cliente
         </label>
         <InputSelect id="type" @bind-Value="customer.Type" class="form-select">
             <option value="">Seleccione un tipo</option>
