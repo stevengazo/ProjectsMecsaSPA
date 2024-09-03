@@ -184,13 +184,52 @@
     }
     private async Task Add()
     {
-        using var context = DbContextFactory.CreateDbContext();
-        offer.Responsible = sellers.FirstOrDefault(i => i.SellerId == i.SellerId).SellerName;
-        context.Offers.Add(offer);
-        await context.SaveChangesAsync();
-        NAV.NavigateTo($"/offers/{offer.OfferId}");
+        var context = DbContextFactory.CreateDbContext();
+
+        using (var transaction = await context.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                offer.Responsible = sellers.FirstOrDefault(i => i.SellerId == i.SellerId).SellerName;
+                context.Offers.Add(offer);
+                await context.SaveChangesAsync();
+                NAV.NavigateTo($"/offers/{offer.OfferId}");
+                transaction.Commit();
+            }
+            catch (Exception ef)
+            {
+                transaction.Rollback();
+            }
+            finally
+            {
+                ResetOffersIdentity(context);
+            }
+        }
+
+        
 
 
+    }
 
+    private void ResetOffersIdentity(ProjectsDBContext r)
+    {
+        try
+        {
+            var lastOffer = r.Offers.OrderByDescending(p => p.OfferId).FirstOrDefault();
+            using (var connection = r.Database.GetDbConnection())
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"DBCC CHECKIDENT ('dbo.Offers', RESEED, {lastOffer.OfferId});";
+                    command.ExecuteNonQuery();
+                }
+            }
+            Console.WriteLine("El contador de identidad se ha reseteado correctamente.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al resetear el contador de identidad: {ex.Message}");
+        }
     }
 }

@@ -19,6 +19,20 @@
     private List<int> availableYears = new List<int>();
     private ProjectsDBContext db;
 
+    private bool _isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_isInitialized)
+        {
+            _isInitialized = true;
+
+            // Aquí es donde realizas las llamadas de interop a JavaScript
+            await UpdateChartAsync();
+        }
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
         db = DbContextFactory.CreateDbContext();
@@ -26,7 +40,7 @@
         if (availableYears.Any())
         {
             selectedYear = availableYears.First();
-            await UpdateChartAsync();
+          //  await UpdateChartAsync();
         }
     }
 

@@ -12,12 +12,18 @@
         <td>@offer.Description</td>
         <td>$@offer.Amount</td>
         <td>
-            <a href="/offers/@offer.OfferId" class="btn btn-outline-info btn-sm" target="_blank">
-                <Icon Name="IconName.EyeFill" />
-            </a>
-            <a class="btn btn-outline-success btn-sm" @onclick="()=> IsEditing = true">
-                <Icon Name="IconName.PencilFill" />
-            </a>
+            <Tooltip Class="d-inline-block" Title="Ver Oferta" role="button">
+                <a href="/offers/@offer.OfferId" class="btn btn-outline-info btn-sm" target="_blank">
+                    <Icon Name="IconName.EyeFill" />
+                </a>
+            </Tooltip>
+            <Tooltip Class="d-inline-block" Title="Edición monto y estado" role="button">
+                <a class="btn btn-outline-success btn-sm" @onclick="()=> IsEditing = true">
+                    <Icon Name="IconName.PencilFill" />
+                </a>
+            </Tooltip>
+
+
         </td>
     </tr>
 }
@@ -59,12 +65,18 @@ else
             </EditForm>
         </td>
         <td>
-            <button class="btn btn-outline-danger btn-sm" @onclick="()=> IsEditing=false">
-                <Icon Name="IconName.XCircleFill" />
-            </button>
-            <button class="btn btn-outline-success btn-sm" @onclick="Update">
-                <Icon Name="IconName.CheckCircleFill" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Cancelar Cambios" role="button">
+                <button class="btn btn-outline-danger btn-sm" @onclick="()=> IsEditing=false">
+                    <Icon Name="IconName.XCircleFill" />
+                </button>
+            </Tooltip>
+            <Tooltip Class="d-inline-block" Title="Guardar Cambios" role="button">
+                <button class="btn btn-outline-success btn-sm" @onclick="Update">
+                    <Icon Name="IconName.CheckCircleFill" />
+                </button>
+            </Tooltip>
+
+
         </td>
     </tr>
 }

@@ -41,6 +41,7 @@
         <td>@ProjectObj.CreationDate.ToShortDateString()</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
+
             <button class="btn btn-sm btn-success" @onclick="Update">
                 Guardar
             </button>
@@ -69,14 +70,20 @@ else
         <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
-            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info" target="_blank">
-                <Icon Name="IconName.Eye"></Icon>
-            </a>
+            <Tooltip Class="d-inline-block" Title="Ver Proyecto" role="button">
+                <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info" target="_blank">
+                    <Icon Name="IconName.Eye"></Icon>
+                </a>
+            </Tooltip>
+           
             <AuthorizeView Roles="administrador,ingeniero">
                 <Authorized>
-                    <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
-                        <Icon Name="IconName.PencilFill"></Icon>
-                    </button>
+                    <Tooltip Class="d-inline-block" Title="Editar Proyecto" role="button">
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
+                            <Icon Name="IconName.PencilFill"></Icon>
+                        </button>
+                    </Tooltip>
+ 
                 </Authorized>
             </AuthorizeView>
 
