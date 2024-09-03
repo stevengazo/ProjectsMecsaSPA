@@ -1,7 +1,9 @@
 ﻿@page "/users"
 
 
-<AuthorizeView>
+
+<AuthorizeView Roles="administrador">
+  
     <Authorized>
         <h3>Usuarios del Sistema</h3>
         <UsersTableComponent />

@@ -3,7 +3,7 @@
 @inject ApplicationDbContext dbContext;
 @inject ProjectsDBContext db
 
-<AuthorizeView>
+<AuthorizeView Roles="administrador">
     <Authorized>
         <h3>Detalles del Usuario</h3>
         <UserDetailsComponent user="user" />
