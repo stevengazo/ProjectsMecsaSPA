@@ -1,5 +1,8 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> dbFactory;
 
+    <h6>
+        Ofertas - Pararrayos
+    </h6>
 <BarChart @ref="barChart" Width="600" Height="600" />
 
 @code {
@@ -60,7 +63,7 @@
         barChartOptions.Scales.X.Stacked = true;
         barChartOptions.Scales.Y.Stacked = true;
 
-        barChartOptions.Plugins.Title!.Text = "Tipos de Ofertas Realizadas";
+        barChartOptions.Plugins.Title!.Text = "Ofertas con Pararrayos";
         barChartOptions.Plugins.Title.Display = true;
     }
 
@@ -71,7 +74,7 @@
         var months = await GetMonths();
         for (int i = 1; i <= months.Count - 1; i++)
         {
-            var d = db.Offers.Where(e => e.Creation.Month == i && e.Creation.Year == SelectedYear && e.ContactType == category).Count();
+            var d = db.Offers.Where(e => e.Creation.Month == i && e.Creation.Year == SelectedYear && e.Type == category && e.RequiredLightningStrike ).Count();
             values.Add(d);
         }
         return values;
@@ -91,11 +94,9 @@
     private async Task<List<string>> GetCategories()
     {
         return new List<string>{
-            "Vendedor",
-            "Reactivación",
-            "Whatsapp",
-            "Correo",
-            "Llamada",
+            "Mantenimiento",
+            "Instalación",
+            "Mejoras",
             "Otro"
         };
     }
