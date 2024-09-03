@@ -49,6 +49,21 @@
     }
 
 
+    @if (ValidInputs.EnableSeller)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+
+            <select @bind="searchSellerId" class="form-control">
+                <option value="">Seleccionar tipo</option>
+                @foreach (var type in Sellers)
+                {
+                    <option value="@type.Key">@type.Value</option>
+                }
+            </select>
+            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableSeller = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
+
     <div class="col mb-2 d-flex flex-row">
         @if (!ValidInputs.EnableState)
         {
@@ -66,8 +81,14 @@
 
         @if (!ValidInputs.EnableType)
         {
-            <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
+            <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success me-2">
                 Tipo <Icon Name="IconName.Type" />
+            </button>
+        }
+        @if (!ValidInputs.EnableSeller)
+        {
+            <button @onclick="() => ValidInputs.EnableSeller = true" class="btn btn-sm btn-success me-2">
+                Tipo <Icon Name="IconName.People" />
             </button>
         }
     </div>
@@ -131,6 +152,7 @@
     private DateTime searchMonth = DateTime.Today;
     private int? searchStateId;
     private int? searchTypeId;
+    private int? searchSellerId;
 
     private Dictionary<int, string> TypesOfProjects = new();
     private Dictionary<int, string> StatesOfProjects = new();
@@ -139,9 +161,24 @@
     private string? message;
     List<ToastMessage> messages = new List<ToastMessage>();
 
+    Dictionary<int, string> Sellers = new();
+
+    private async Task LoadSellers()
+    {
+        using (var d = DbContextFactory.CreateDbContext())
+        {
+            Sellers = d.Seller
+            .AsNoTracking()
+            .Where(e => e.IsActive)
+            .OrderBy(d=>d.SellerName)
+            .ToDictionary(d => d.SellerId, d => d.SellerName);
+        }
+    }
+
     // Cargar los proyectos iniciales
     protected override async Task OnInitializedAsync()
     {
+        LoadSellers();
         using (var d = DbContextFactory.CreateDbContext())
         {
             TypesOfProjects = d.Types
@@ -168,10 +205,12 @@
         searchMonth = DateTime.Today;
         searchStateId = null;
         searchTypeId = null;
+        searchSellerId = null;
 
         ValidInputs.EnableDate = false;
         ValidInputs.EnableState = false;
         ValidInputs.EnableType = false;
+        ValidInputs.EnableSeller = false;
 
         projects.Clear();
         StateHasChanged();
@@ -215,6 +254,12 @@
             if (searchTypeId.HasValue && ValidInputs.EnableType)
             {
                 query = query.Where(p => p.TypeId == searchTypeId);
+                canSearch = true;
+            }
+
+            if (searchSellerId.HasValue && ValidInputs.EnableSeller)
+            {
+                query = query.Where(p => p.SellerId == searchSellerId);
                 canSearch = true;
             }
 
@@ -273,5 +318,6 @@
         public bool EnableDate { get; set; }
         public bool EnableState { get; set; }
         public bool EnableType { get; set; }
+        public bool EnableSeller { get; set; }
     }
 }
