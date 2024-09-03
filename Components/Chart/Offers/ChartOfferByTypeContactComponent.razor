@@ -1,0 +1,108 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> dbFactory;
+
+<BarChart @ref="barChart" Width="600" Height="600" />
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+
+    private ProjectsDBContext db;
+
+    private int SelectedYear = DateTime.Now.Year;
+
+    protected override void OnInitialized()
+    {
+        db = dbFactory.CreateDbContext();
+
+        var colors = ColorUtility.CategoricalTwelveColors;
+
+        var Categories = GetCategories().Result;
+        Random random = new();
+
+        //var labels = new List<string> { "Chrome", "Firefox", "Safari", "Edge" };
+
+        var labels = GetMonths().Result ;
+        var datasets = new List<IChartDataset>();
+
+
+        foreach (var item in Categories)
+        {
+
+            var color = colors[random.Next(colors.Length - 1)];
+            BarChartDataset dataset = new BarChartDataset()
+                {
+                    Label = item,
+                    Data =  GetValuesByCategory(item).Result,
+                    BackgroundColor = new List<string> { color },
+                    BorderColor = new List<string> { color },
+                    BorderWidth = new List<double> { 0 },
+                };
+            datasets.Add(dataset);
+        }
+
+
+        chartData = new ChartData
+            {
+                Labels = labels,
+                Datasets = datasets
+            };
+
+        barChartOptions = new();
+        barChartOptions.Responsive = true;
+        barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
+        barChartOptions.IndexAxis = "y";
+ 
+
+        barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Cantidades", Display = true };
+        barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Meses", Display = true };
+
+        barChartOptions.Scales.X.Stacked = true;
+        barChartOptions.Scales.Y.Stacked = true;
+
+        barChartOptions.Plugins.Title!.Text = "Tipos de Ofertas Realizadas";
+        barChartOptions.Plugins.Title.Display = true;
+    }
+
+
+    async Task<List<double?>> GetValuesByCategory(string category)
+    {
+        List<double?>? values = new();
+        var months = await GetMonths();
+        for (int i = 1; i <= months.Count - 1; i++)
+        {
+            var d = db.Offers.Where(e => e.Creation.Month == i && e.Creation.Year == SelectedYear && e.ContactType == category).Count();
+            values.Add(d);
+        }
+        return values;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // pass the plugin name to enable the data labels
+            await barChart.InitializeAsync(chartData: chartData, chartOptions: barChartOptions, plugins: new string[] { "ChartDataLabels" });
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+    private async Task<List<string>> GetCategories()
+    {
+        return new List<string>{
+            "Vendedor",
+            "Reactivación",
+            "Whatsapp",
+            "Correo",
+            "Llamada",
+            "Otro"
+        };
+    }
+
+    private async Task<List<string>> GetMonths()
+    {
+        return new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+    }
+
+}

@@ -2,11 +2,18 @@
 
 
 
-<h3>Usuarios del Sistema</h3>
+<AuthorizeView Roles="administrador">
+  
+    <Authorized>
+        <h3>Usuarios del Sistema</h3>
+        <UsersTableComponent />
 
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent></ErrorViewComponent>
+    </NotAuthorized>
+</AuthorizeView>
 
-
-<UsersTableComponent />
 
 
 

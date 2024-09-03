@@ -6,22 +6,22 @@
     <tr>
         <td>
             <EditForm Model="item">
-                <InputText @bind-Value="item.BillNumber" ></InputText>
+                <InputText @bind-Value="item.BillNumber" class="form-control form-control-sm" ></InputText>
             </EditForm>
         </td>
         <td>
             <EditForm Model="item">
-                <InputDate @bind-Value="item.BillDate"></InputDate>
+                <InputDate @bind-Value="item.BillDate" class="form-control form-control-sm"></InputDate>
             </EditForm>
         </td>
         <td>
             <EditForm Model="item">
-                <InputText @bind-Value="item.Author"></InputText>
+                <InputText @bind-Value="item.Author" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
             <EditForm Model="item">
-                <InputNumber @bind-Value="item.Amount"></InputNumber>
+                <InputNumber @bind-Value="item.Amount" class="form-control form-control-sm"></InputNumber>
             </EditForm>
         </td>
         <td>
@@ -29,7 +29,7 @@
         </td>
         <td>
             <EditForm Model="item">
-                <InputText @bind-Value="item.Note"></InputText>
+                <InputText @bind-Value="item.Note" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
@@ -40,35 +40,68 @@
                 Guardar
             </button>
         </td>
-    </tr>    
+    </tr>
 }
 else
 {
-    <tr>
-        <td>
-            @item.BillNumber
-        </td>
-        <td>
-            @item.BillDate.ToShortDateString()
-        </td>
-        <td>
-            @item.Author
-        </td>
-        <td>
-            @item.Amount.ToString("C", AmountCulture)
-        </td>
-        <td>
-            @AmountCulture.NumberFormat.CurrencySymbol
-        </td>
-        <td>
-            @item.Note
-        </td>
-        <td>
-            <button class="btn btn-outline-info" @onclick="()=>IsEditing=true" >
-                Editar
-            </button>
-        </td>
-    </tr>
+    if(AmountCulture!= null)
+    {
+        <tr>
+            <td>
+                @item.BillNumber
+            </td>
+            <td>
+                @item.BillDate.ToShortDateString()
+            </td>
+            <td>
+                @item.Author
+            </td>
+            <td>
+                @item.Amount.ToString("C", AmountCulture)
+            </td>
+            <td>
+                @AmountCulture.NumberFormat.CurrencySymbol
+            </td>
+            <td>
+                @item.Note
+            </td>
+            <td>
+                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
+                    Editar
+                </button>
+            </td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td>
+                @item.BillNumber
+            </td>
+            <td>
+                @item.BillDate.ToShortDateString()
+            </td>
+            <td>
+                @item.Author
+            </td>
+            <td>
+                @item.Amount.ToString("C")
+            </td>
+            <td>
+            
+            </td>
+            <td>
+                @item.Note
+            </td>
+            <td>
+                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
+                    Editar
+                </button>
+            </td>
+        </tr>
+    }
+
+  
 
 }
 
@@ -86,6 +119,8 @@ else
     {
         try
         {
+            item.Note = string.IsNullOrEmpty(item.Note) ? "" : item.Note;
+            item.Author = string.IsNullOrEmpty(item.Author) ? "" : item.Author;
             db.Bill.Update(item);
             db.SaveChanges();
             IsEditing = false;

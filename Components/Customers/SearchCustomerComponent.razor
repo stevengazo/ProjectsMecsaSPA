@@ -30,13 +30,13 @@
         <thead>
             <tr>
                 <th>
-                    <button @onclick="() => SortByColumn(nameof(Customer.Name))" >Nombre</button>
+                    <label @onclick="() => SortByColumn(nameof(Customer.Name))" >Nombre</label>
                 </th>
                 <th>
-                    <button @onclick="() => SortByColumn(nameof(Customer.Type))" >Tipo</button>
+                    <label @onclick="() => SortByColumn(nameof(Customer.Type))" >Tipo</label>
                 </th>
                 <th>
-                    <button @onclick="() => SortByColumn(nameof(Customer.DNI))" >DNI</button>
+                    <label @onclick="() => SortByColumn(nameof(Customer.DNI))" >DNI</label>
                 </th>
                 <th>Acciones</th>
             </tr>

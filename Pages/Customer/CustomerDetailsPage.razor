@@ -2,32 +2,43 @@
 
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<h3>Información del Cliente</h3>
-<DetailsCustomerComponent  customer="customer" />
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>N</th>
-            <th>Titulo</th>
-            <th>Cliente</th>
-            <th></th>
-            <th>Estado</th>
-            <th>OC</th>
-            <th>Tipo Proyecto</th>
+    <AuthorizeView>
+        <Authorized>
 
-            <th>Fecha Registro</th>
-            <th>Monto</th>
-            <th colspan="3">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var project in customer.Projects)
-        {
-            <RowTableComponent ProjectObj="project" />
-        }
-    </tbody>
-</table>
+        <h3>Información del Cliente</h3>
+        <DetailsCustomerComponent customer="customer" />
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Titulo</th>
+                    <th>Cliente</th>
+                    <th></th>
+                    <th>Estado</th>
+                    <th>OC</th>
+                    <th>Tipo Proyecto</th>
+
+                    <th>Fecha Registro</th>
+                    <th>Monto</th>
+                    <th colspan="3">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in customer?.Projects)
+                {
+                    <RowTableComponent ProjectObj="project" />
+                }
+            </tbody>
+        </table>
+
+        </Authorized>
+        <NotAuthorized>
+            <ErrorViewComponent />
+        </NotAuthorized>
+    </AuthorizeView>
+
 
 @code {
     [Parameter]

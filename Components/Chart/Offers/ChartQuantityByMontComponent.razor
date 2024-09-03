@@ -1,0 +1,170 @@
+﻿@inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<div class="row">
+    <div class="col-auto">
+        <select @bind="SelectedYear" class="form-select">
+            @foreach (var year in availableYears)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-info" @onclick="AddDataSet">
+            Añadir Datos
+        </button>
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-outline-danger" @onclick="RemoveDataSet">
+            Limpiar
+        </button>
+    </div>
+</div>
+
+
+
+<div class="container-fluid overflow-x-auto">
+    <LineChart @ref="lineChart" Width="800" Height="500" />
+</div>
+
+@code {
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    private int SelectedYear = DateTime.Now.Year;
+    private List<int> availableYears = new List<int>();
+
+    private List<string> labels = new List<string>();
+    private List<IChartDataset> datasets = new List<IChartDataset>();
+
+    protected override void OnInitialized()
+    {
+        LoadYears();
+        UpdateLineChart();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task AddDataSet()
+    {
+        var colors = ColorUtility.CategoricalTwelveColors;
+        var random = new Random();
+        var color = colors[random.Next(colors.Length)];
+
+        var dataset = new LineChartDataset
+            {
+                Label = $"Ofertas {SelectedYear}",
+                Data = await GetData(),
+                BackgroundColor = color,
+                BorderColor = color,
+                BorderWidth = 2,
+                HoverBorderWidth = 4,
+                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+            };
+
+        chartData.Datasets.Add(dataset);
+
+        if (lineChart != null)
+        {
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+    }
+
+    private async Task RemoveDataSet()
+    {
+        if (chartData.Datasets.Count > 0)
+        {
+            chartData.Datasets.Clear(); // Elimina todos los conjuntos de datos
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+    }
+
+    private async Task UpdateLineChart()
+    {
+        var colors = ColorUtility.CategoricalTwelveColors;
+
+        labels = new List<string> { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+
+        datasets.Clear(); // Limpia los conjuntos de datos existentes
+
+        var dataset = new LineChartDataset
+            {
+                Label = $"{SelectedYear}",
+                Data = await GetData(),
+                BackgroundColor = colors[0],
+                BorderColor = colors[0],
+                BorderWidth = 2,
+                HoverBorderWidth = 4,
+                Datalabels = new() { Alignment = Alignment.End, Anchor = Anchor.End }
+            };
+        datasets.Add(dataset);
+
+        chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        lineChartOptions = new()
+            {
+                Responsive = true,
+                Interaction = new Interaction { Mode = InteractionMode.Index },
+                Scales = new Scales
+                {
+                    X = new () { Title = new ChartAxesTitle { Text = $"Meses {SelectedYear}", Display = true } },
+                    Y = new () { Title = new ChartAxesTitle { Text = "Cantidades", Display = true } }
+                },
+                Plugins = new ()
+                {
+                    Title = new () { Text = $"Ofertas {SelectedYear}", Display = true },
+                    Datalabels = new () { Color = "white" }
+                }
+            };
+
+        if (lineChart != null)
+        {
+            await lineChart.UpdateAsync(chartData, lineChartOptions);
+        }
+    }
+
+    private async Task<List<double?>> GetData()
+    {
+        using (var dbTemp = DbContextFactory.CreateDbContext())
+        {
+            List<double?> listOfAmountsByMonth = dbTemp.Offers
+                                                        .Where(p => p.Creation.Year == SelectedYear)
+                                                        .OrderBy(x => x.Creation.Month)
+                                                        .GroupBy(p => p.Creation.Month)
+                                                        .Select(g => (double?)g.Count())
+                                                        .ToList();
+            return listOfAmountsByMonth;
+        }
+    }
+
+    private async Task OnYearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var year))
+        {
+            SelectedYear = year;
+            await UpdateLineChart();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadYears()
+    {
+        using (var dbtmp = DbContextFactory.CreateDbContext())
+        {
+            availableYears = dbtmp.Offers.AsNoTracking()
+                                .Select(e => e.Creation.Year)
+                                .Distinct()
+                                .OrderByDescending(year => year)
+                                .ToList();
+        }
+    }
+}

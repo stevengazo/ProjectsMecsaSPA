@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class projectsmigration : Migration
+    public partial class ProjectMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -30,7 +31,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     OfferId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Creation = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Customer = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Customer = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     ContactType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -114,6 +115,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
                     OC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     OCDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OfferId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     IsCompleted = table.Column<bool>(type: "bit", nullable: false),
                     Isfactured = table.Column<bool>(type: "bit", nullable: false),

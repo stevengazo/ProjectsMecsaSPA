@@ -12,12 +12,18 @@
         <td>@offer.Description</td>
         <td>$@offer.Amount</td>
         <td>
-            <a href="/offers/@offer.OfferId" class="btn btn-outline-info btn-sm">
-                <Icon Name="IconName.EyeFill" />
-            </a>
-            <a class="btn btn-outline-success btn-sm" @onclick="()=> IsEditing = true">
-                <Icon Name="IconName.PencilFill" />
-            </a>
+            <Tooltip Class="d-inline-block" Title="Ver Oferta" role="button">
+                <a href="/offers/@offer.OfferId" class="btn btn-outline-info btn-sm" target="_blank">
+                    <Icon Name="IconName.EyeFill" />
+                </a>
+            </Tooltip>
+            <Tooltip Class="d-inline-block" Title="Edición monto y estado" role="button">
+                <a class="btn btn-outline-success btn-sm" @onclick="()=> IsEditing = true">
+                    <Icon Name="IconName.PencilFill" />
+                </a>
+            </Tooltip>
+
+
         </td>
     </tr>
 }
@@ -27,17 +33,17 @@ else
         <td>@offer.OfferId</td>
         <td>
             <EditForm Model="offer">
-                <InputDate @bind-Value="offer.Creation"> </InputDate>
+                <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm"> </InputDate>
             </EditForm>
         </td>
         <td>
             <EditForm Model="offer">
-                <InputText @bind-Value="offer.Customer"></InputText>
+                <InputText @bind-Value="offer.Customer" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
             <EditForm Model="offer">
-                <InputSelect @bind-Value="offer.State">
+                <InputSelect @bind-Value="offer.State" class="form-select form-select-sm">
                     <option value="Enviado">Enviado</option>
                     <option value="Negociación">Negociación</option>
                     <option value="Pendiente">Pendiente</option>
@@ -49,22 +55,28 @@ else
         <td>@offer.Author</td>
         <td>
             <EditForm Model="offer">
-                <InputText @bind-Value="offer.Description"></InputText>
+                <InputText @bind-Value="offer.Description" class="form-control form-control-sm"></InputText>
             </EditForm>
 
         </td>
         <td>
             <EditForm Model="offer">
-                <InputNumber @bind-Value="offer.Amount"></InputNumber>
+                <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm"></InputNumber>
             </EditForm>
         </td>
         <td>
-            <button class="btn btn-outline-danger btn-sm" @onclick="()=> IsEditing=false">
-                <Icon Name="IconName.XCircleFill" />
-            </button>
-            <button class="btn btn-outline-success btn-sm" @onclick="Update">
-                <Icon Name="IconName.CheckCircleFill" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Cancelar Cambios" role="button">
+                <button class="btn btn-outline-danger btn-sm" @onclick="()=> IsEditing=false">
+                    <Icon Name="IconName.XCircleFill" />
+                </button>
+            </Tooltip>
+            <Tooltip Class="d-inline-block" Title="Guardar Cambios" role="button">
+                <button class="btn btn-outline-success btn-sm" @onclick="Update">
+                    <Icon Name="IconName.CheckCircleFill" />
+                </button>
+            </Tooltip>
+
+
         </td>
     </tr>
 }

@@ -1,58 +1,48 @@
 ﻿@using Microsoft.AspNetCore.Identity
-
 @inject ApplicationDbContext dbContext;
-@inject ProjectsDBContext db
+@inject ProjectsDBContext db;
 
-@if (seller != null )
+@if (seller != null)
 {
-    if (seller.IsActive)
-    {
-        <button class="ml-1 btn btn-sm btn-outline-danger" @onclick="DisableSeller">Eliminar como Vendedor</button>
-    }
-    else{
-        <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">Suscribir como Vendedor</button>
-    }
+    <button class="ml-1 btn btn-sm btn-outline-@(seller.IsActive ? "danger" : "info")"
+            @onclick="seller.IsActive ? DisableSeller : SuscribeSeller">
+        @(seller.IsActive ? "Eliminar como Vendedor" : "Suscribir como Vendedor")
+    </button>
 }
 else
 {
-    <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">Suscribir como Vendedor</button>
+    <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">
+        Suscribir como Vendedor
+    </button>
 }
 
+<h3>Roles</h3>
 
-
-<h3>
-    Roles
-</h3>
-
-<div>
-    <label>
-        Roles
-    </label>
-    <select>
-        @foreach (var i in Roles)
+<div class="d-flex flex-row gap-2 h-50">
+    <label>Roles</label>
+    <select class="form-control-sm" @bind="idSelected">
+        @foreach (var role in Roles)
         {
-            <option value="@i.Id">@i.Name</option>
+            <option value="@role.Id">@role.Name</option>
         }
     </select>
-    <button>
-        Agregar Rol
-    </button>
+    <button class="btn btn-outline-info" @onclick="AddRol">Agregar Rol</button>
 </div>
 
 <table class="table">
     <thead>
         <tr>
-            <th>
-                Rol
-            </th>
+            <th>Rol</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var i in usedRoles)
+        @foreach (var role in usedRoles)
         {
             <tr>
+                <td>@role.Name</td>
                 <td>
-                    @i.Name
+                    <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveRole(role.Id)">Eliminar</button>
                 </td>
             </tr>
         }
@@ -61,26 +51,29 @@ else
 
 @code {
     [Parameter]
-    public string id { get; set; }
+    public string Id { get; set; }
+    private string idSelected = "";
+    private List<IdentityUserRole<string>> userRoles = new();
+    private List<IdentityRole> usedRoles = new();
+    private List<IdentityRole> Roles = new();
 
-    List<IdentityUserRole<string>> userRoles = new();
-    List<IdentityRole> usedRoles = new();
-
-    List<IdentityRole> Roles = new();
-
-    UserIdentityEx user = new();
-    Seller seller = null;
-
-
+    private UserIdentityEx user = new();
+    private Seller seller = null;
 
     protected override async Task OnInitializedAsync()
     {
+        user = dbContext.Users.FirstOrDefault(e => e.Id == Id);
         Roles = dbContext.Roles.ToList();
-        user = dbContext.Users.FirstOrDefault(e => e.Id == id);
+        await LoadUserRoles();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task LoadUserRoles()
+    {
         if (user != null)
         {
             userRoles = dbContext.UserRoles
-                .Where(e => e.UserId == id)
+                .Where(e => e.UserId == Id)
                 .ToList();
 
             var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
@@ -88,24 +81,44 @@ else
             usedRoles = dbContext.Roles
                 .Where(r => roleIds.Contains(r.Id))
                 .ToList();
-            seller = db.Seller.FirstOrDefault(e => e.SellerId == user.DNI);
 
+            seller = await db.Seller.FirstOrDefaultAsync(e => e.SellerId == user.DNI);
         }
-        else
-        {
-            seller = null;
-
-        }
-
-        await base.OnInitializedAsync();
     }
 
+    private async Task AddRol()
+    {
+        if (!string.IsNullOrEmpty(idSelected))
+        {
+            var identityUserRole = new IdentityUserRole<string>
+                {
+                    UserId = Id,
+                    RoleId = idSelected
+                };
+            dbContext.UserRoles.Add(identityUserRole);
+            await dbContext.SaveChangesAsync();
+            await LoadUserRoles();
+            StateHasChanged();
+        }
+    }
+
+    private async Task RemoveRole(string roleId)
+    {
+        var userRole = userRoles.FirstOrDefault(ur => ur.RoleId == roleId && ur.UserId == Id);
+        if (userRole != null)
+        {
+            dbContext.UserRoles.Remove(userRole);
+            await dbContext.SaveChangesAsync();
+            await LoadUserRoles();
+            StateHasChanged();
+        }
+    }
 
     private async Task DisableSeller()
     {
         seller.IsActive = false;
         db.Seller.Update(seller);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
     }
 
     private async Task SuscribeSeller()
@@ -113,7 +126,7 @@ else
         seller = db.Seller.FirstOrDefault(w => w.SellerId == user.DNI);
         if (seller == null)
         {
-            seller = new Seller()
+            seller = new Seller
                 {
                     SellerId = user.DNI,
                     SellerName = $"{user.Name} {user.LastName}",
@@ -121,19 +134,20 @@ else
                     DNI = user.DNI,
                     IsActive = true
                 };
-            using (var transaction = db.Database.BeginTransaction())
+            using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] ON");
                 db.Seller.Add(seller);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] OFF");
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
         }
-        else {
+        else
+        {
             seller.IsActive = true;
             db.Seller.Update(seller);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
     }
 }

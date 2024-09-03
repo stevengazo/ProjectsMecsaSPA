@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectsMecsaSPA.Areas.Identity;
 using ProjectsMecsaSPA.Data;
@@ -10,13 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(UsersConnection));
-//builder.Services.AddDbContext<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
-builder.Services.AddDbContextFactory<ProjectsDBContext>(options => options.UseSqlServer(ProjectsConnection));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(UsersConnection));
 
+builder.Services.AddDbContextFactory<ProjectsDBContext>(options =>
+    options.UseSqlServer(ProjectsConnection));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<UserIdentityEx>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

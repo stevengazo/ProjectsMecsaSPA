@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
+namespace ProjectsMecsaSPA.Migrations.AppDbContext
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240731233253_appidentity")]
-    partial class appidentity
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,6 +47,43 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            ConcurrencyStamp = "5f5bd6a8-15b1-4ef6-b218-82f1b1e5b819",
+                            Name = "administrador",
+                            NormalizedName = "ADMINISTRADOR"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            ConcurrencyStamp = "98802094-42cf-42f8-b77a-d434f9c5d4c8",
+                            Name = "ingeniero",
+                            NormalizedName = "INGENIERO"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            ConcurrencyStamp = "cc50af6e-28cf-4a72-af64-8e02a3836565",
+                            Name = "asistente",
+                            NormalizedName = "asistente"
+                        },
+                        new
+                        {
+                            Id = "4",
+                            ConcurrencyStamp = "40273df5-e677-4a8f-9895-83e0e835746f",
+                            Name = "vendedor",
+                            NormalizedName = "VENDEDOR"
+                        },
+                        new
+                        {
+                            Id = "5",
+                            ConcurrencyStamp = "61296637-0e56-4b7f-8ccb-ec8a6ac3d141",
+                            Name = "contabilidad",
+                            NormalizedName = "CONTABILIDAD"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -138,6 +173,13 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "1",
+                            RoleId = "1"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -235,6 +277,28 @@ namespace ProjectsMecsaSPA.Migrations.ApplicacionDbContext
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "baf8a51b-e798-4685-9510-872fc1919214",
+                            DNI = 0,
+                            Email = "admin@admin.com",
+                            EmailConfirmed = true,
+                            LastName = "",
+                            LockoutEnabled = false,
+                            Name = "Administrator",
+                            NormalizedEmail = "ADMIN@ADMIN.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAEAACcQAAAAENY8Hg0Rky4rJcT+22dj+yVMdUwOiArtym5p5QW53dxakvyGXobt/a6jKxMMyLaCcg==",
+                            PhoneNumber = "",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "a906e049-612c-4fe2-a376-3742231be322",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

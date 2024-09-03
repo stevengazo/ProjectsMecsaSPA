@@ -1,14 +1,16 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject NavigationManager Nav;
 
 
+<ConfirmDialog @ref="dialog" />
 
-<div class="border rounded m-1 shadow" >
+<div class="border rounded m-1 shadow p-2" >
     @if (IsEditing)
     {
         <table class="table table-sm">
             <tr>
                 <th>
-                    @nameof(customer.CustomerId)
+                    Id Interno
                 </th>
                 <td>
                     @customer.CustomerId
@@ -16,7 +18,7 @@
             </tr>
             <tr>
                 <th>
-                    @nameof(customer.Name)
+                    Nombre
                 </th>
                 <td>
                     <EditForm Model="customer">
@@ -39,7 +41,7 @@
             </tr>
             <tr>
                 <th>
-                    @nameof(customer.DNI)
+                    Cédula
                 </th>
                 <td>
                     <EditForm Model="customer">
@@ -48,9 +50,12 @@
                 </td>
             </tr>
         </table>
-        <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
-        <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
+        <div class="d-flex flex-row gap-2">
+            <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
+            <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
 
+            </div>
+       
     }
     else
     {
@@ -88,8 +93,15 @@
                 </td>
             </tr>
         </table>
-        <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+<div class="d-flex flex-row gap-2 p-2">
 
+            <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+            @if (CanDelete)
+            {
+                <button class="btn btn-sm btn-outline-danger" @onclick="Delete">Eliminar</button>
+            }
+       
+    </div>
     }
 
 </div>
@@ -100,6 +112,17 @@
 
 
     public bool IsEditing = false;
+    private bool CanDelete = false;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var s = DbContextFactory.CreateDbContext();
+        CanDelete = !s.Projects.Any(p => p.CustomerId == customer.CustomerId);
+        base.OnInitializedAsync();
+    }
+
 
     private async Task Update()
     {
@@ -108,5 +131,27 @@
         db.SaveChanges();
         IsEditing = false;
         StateHasChanged();
+    }
+
+
+    private ConfirmDialog dialog = default!;
+
+    private async Task Delete()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Borrar el cliente",
+            message1: "Este cliente será borrado de la base de datos",
+            message2: "Desea proceder?");
+
+        if (confirmation)
+        {
+            ProjectsDBContext db = DbContextFactory.CreateDbContext();
+            db.Customers.Remove(customer);
+            db.SaveChanges();
+            Nav.NavigateTo("/customers");
+        }
+        else
+        {
+        }
     }
 }

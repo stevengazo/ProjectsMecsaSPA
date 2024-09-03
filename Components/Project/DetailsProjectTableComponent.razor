@@ -45,7 +45,7 @@
                     <th>Cliente</th>
                     <td>
 
-                 
+
                         <AutoComplete @bind-Value="customerName"
                                       TItem="Customer"
                                       class="text-danger"
@@ -53,7 +53,7 @@
                                       PropertyName="Name"
                                       Placeholder="Search a customer..."
                                       OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
-                                     
+
                     </td>
                 </tr>
                 <tr>
@@ -62,6 +62,24 @@
                         <InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
                         <ValidationMessage For="@(() => project.Ubication)" />
                     </td>
+                </tr>
+                <tr>
+                    <th>
+                        <label for="Province">Provincia</label>
+                    </th>
+                    <th>
+                        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+                            <option value="San José">San Jose</option>
+                            <option value="Heredia">Heredia</option>
+                            <option value="Alajuela">Alajuela</option>
+                            <option value="Cartago">Cartago</option>
+                            <option value="Puntarenas">Puntarenas</option>
+                            <option value="Guanacaste">Guanacaste</option>
+                            <option value="Limón">Limón</option>
+                        </InputSelect>
+                        <ValidationMessage For="@(() => project.Province)" />
+
+                    </th>
                 </tr>
                 <tr>
                     <th>Monto</th>
@@ -116,20 +134,27 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Número de Oferta</th>
+                    <td>
+                        <InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => project.OfferId)" />
+                    </td>
+                </tr>
+                <tr>
                     <th>Vendedor</th>
                     <td>
                         <InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
                             @foreach (var item in sellers)
-                        {
-                            <option value="@item.SellerId">@item.SellerName</option>
-                        }
-                            </InputSelect>
+                            {
+                                <option value="@item.SellerId">@item.SellerName</option>
+                            }
+                        </InputSelect>
                     </td>
                 </tr>
             </tbody>
         </table>
 
-        
+
         <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
         <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
     </EditForm>
@@ -161,8 +186,7 @@ else
                     <a href="/customers/@project.CustomerId">
                         @project.Customer?.Name
                     </a>
-
-                    </td>
+                </td>
             </tr>
             <tr>
                 <th>Ubicación</th>
@@ -170,11 +194,15 @@ else
             </tr>
             <tr>
                 <th>Monto</th>
-                <td>@project.Amount.ToString("C",AmountCulture)</td>
+                <td>@project.Amount.ToString("C", AmountCulture)</td>
             </tr>
             <tr>
                 <th>Fecha Registro</th>
                 <td>@project.CreationDate.ToLongDateString()</td>
+            </tr>
+            <tr>
+                <th>Oferta</th>
+                <td>@project.OfferId</td>
             </tr>
             <tr>
                 <th>Estado del Proyecto</th>
@@ -198,7 +226,8 @@ else
             </tr>
             <tr>
                 <th>Estado Facturación Proyecto</th>
-                <td>@if (project.Isfactured)
+                <td>
+                    @if (project.Isfactured)
                     {
                         <label>Facturado</label>
                     }
@@ -224,40 +253,47 @@ else
         </tbody>
     </table>
     <div class="d-flex flex-row gap-2">
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+
+                <div>
+                    @if (!project.IsDeleted)
+                    {
+                        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+                    }
+                </div>
+                <div>
+                    @if (!project.Isfactured)
+                    {
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
+                    }
+                    @if (project.Isfactured)
+                    {
+                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
+                    }
+                </div>
+                <div>
+                    @if (!project.IsCompleted)
+                    {
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
+                    }
+                    @if (project.IsCompleted)
+                    {
+                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
+                    }
+                </div>
+
+
+            </Authorized>
+        </AuthorizeView>
         <div>
-            @if (!project.IsDeleted)
-            {
-                <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
-            }
-        </div>
-        <div>
-            @if (!project.Isfactured)
-            {
-                <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
-            }
-            @if (project.Isfactured)
-            {
-                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
-            }
-        </div>
-        <div>
-            @if (!project.IsCompleted)
-            {
-                <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
-            }
-            @if (project.IsCompleted)
-            {
-                <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
-            }
-        </div>
-        <div>
-            <button class="btn btn-sm btn-outline-warning" @onclick="Download" >
-               <Icon Name="IconName.Download"></Icon> Descargar Información
-                </button>
+            <button class="btn btn-sm btn-outline-warning" @onclick="Download">
+                <Icon Name="IconName.Download"></Icon> Descargar Información
+            </button>
 
         </div>
     </div>
-    
+
 
 
 }
@@ -272,7 +308,7 @@ else
 
     private string? customerName;
 
-    CultureInfo AmountCulture ;
+    CultureInfo AmountCulture;
 
     private Dictionary<int, string> customers = new();
     private Dictionary<int, string> types = new();
@@ -289,7 +325,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         AmountCulture = new CultureInfo(project.CurrencyType);
-        sellers = db.Seller.Where(e => e.IsActive).ToList();
+        sellers = db.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
         await LoadDataAsync();
     }
 
@@ -312,7 +348,7 @@ else
 
     private void OnAutoCompleteChanged(Customer customer)
     {
-        if(customer != null)
+        if (customer != null)
         {
             customerName = customer.Name;
             project.Customer = customer;
@@ -386,7 +422,7 @@ else
         // Invocar una función JavaScript para iniciar la descarga del PDF
         await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyecto {project.Title} {DateTime.Now.ToShortTimeString()}.pdf");
 
-        
+
     }
 
 

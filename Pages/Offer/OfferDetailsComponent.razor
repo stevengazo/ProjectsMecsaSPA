@@ -1,10 +1,17 @@
-﻿ @page "/offers/{id}"
- @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+﻿@page "/offers/{id}"
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject NavigationManager NAV;
 
-<h3>Detalles de la Oferta</h3>
+<AuthorizeView>
+    <Authorized>
+        <h3>Detalles de la Oferta</h3>
+        <OfferInfo offer="offer" />
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>
 
-<OfferInfo offer="offer" />
 @code {
     [Parameter]
     public string id { get; set; }
@@ -16,6 +23,6 @@
         var db = DbContextFactory.CreateDbContext();
         int.TryParse(id, out int _id);
         offer = db.Offers.FirstOrDefault(e => e.OfferId == _id);
-        base.OnInitializedAsync();   
+        base.OnInitializedAsync();
     }
 }

@@ -1,46 +1,75 @@
 ﻿@page "/chartsprojects"
 
-<Tabs EnableFadeEffect="true">
-    <Tab Title="Proyectos" Active="true">
-        <Content>
-            <div class="p-1">
-                <div class="container mt-4">
-                    <div class="row ">
-                        <!-- Primer componente en una columna de 12 espacios (total de la fila) -->
-                        <div class="col-md-6 mb-4  border rounded p-3">
-                            <ChartCountByStateComponent />
+<AuthorizeView>
+    <Authorized>
+        <Tabs EnableFadeEffect="true">
+            <Tab Title="Proyectos" Active="true">
+                <Content>
+                    <div class="m-1">
+                        <div class="container gap-3">
+                            <div class="row mb-3">
+                                <div class="col border p-2">
+                                    <ChartLineAmountInYear />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col border p-2">
+                                    <ChartLineCountProjectsComponent/>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col border  m-1 p-2">
+                                    <ChartCountByStateComponent />
+                                </div>
+                                <div class="col border  m-1 p-2">
+                                    <ChartAmountByState />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col border m-1 p-2">
+                                    <ChartProjectsCountBySeller />
+                                </div>
+                                <div class="col border  m-1 p-2">
+                                    <ChartAmountBySellerComponent />
+                                </div>
+                            </div>
                         </div>
-                        <!-- Tercer componente en una columna de 6 espacios (mitad de la fila) -->
-                        <div class="col-md-6 mb-4 border rounded p-3">
-                        </div>
-
                     </div>
-                    <div class="row ">
-
-                        <!-- Segundo componente en una columna de 6 espacios (mitad de la fila) -->
-                        <div class="col-md-6 mb-4 border rounded p-3">
-                            <ChartAmountByState />
+                </Content>
+            </Tab>
+            <Tab Title="Ofertas">
+                <Content>
+                    <div class="m-1">
+                        <div class="container gap-3">
+                            <div class="row mb-3">
+                                <div class="col border p-2">
+                                    <ChartQuantityByMontComponent />
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col border  m-1 p-2">
+                                    <ChartOfferByContactTypeComponent />
+                                </div>
+                                <div class="col border  m-1 p-2">
+                                    <ChartOfferByTypeContactComponent />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col border m-1 p-2">
+                                    <ChartOfferByTypeDDCEComponent />
+                                </div>
+                                <div class="col border  m-1 p-2">
+                                    <ChartOfferByTypeLightninStrikeComponent />
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Tercer componente en una columna de 6 espacios (mitad de la fila) -->
-                        <div class="col-md-6 mb-4  border rounded p-3">
-                            <ChartCountBySeller />
-                        </div>
-
                     </div>
-                </div>
-            </div>
+                </Content>
+            </Tab>
+        </Tabs>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent />
+    </NotAuthorized>
+</AuthorizeView>
 
-        </Content>
-    </Tab>
-    <Tab Title="Ofertas">
-        <Content>
-            <div class="p-1">
-                <h4>
-                    estadisticas de ofertas
-                </h4>
-                <ChartOfferByContactTypeComponent />
-            </div>
-        </Content>
-    </Tab>
-</Tabs>

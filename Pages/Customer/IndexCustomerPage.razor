@@ -2,25 +2,32 @@
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex flex-row justify-content-between">
+            <h3>Clientes</h3>
+            <button class="btn btn-outline-success" @onclick="ShowAddCustomer">Crear Cliente</button>
+        </div>
 
-<div class="d-flex flex-row justify-content-between">
-    <h3>Clientes</h3>
-    <button class="btn btn-outline-success" @onclick="ShowAddCustomer">Crear Cliente</button>
-</div>
-
-<div class="mt-3 bg-success text-white bg-opacity-75">
-    @message
-</div>
-<Offcanvas @ref="offcanvas" />
+        <div class="mt-3 bg-success text-white bg-opacity-75">
+            @message
+        </div>
+        <Offcanvas @ref="offcanvas" />
 
 
-<Tabs EnableFadeEffect="true">
-    <Tab Title="Todos" Active="true">
-        <Content>
-            <SearchCustomerComponent />
-        </Content>
-    </Tab>
-</Tabs>
+        <Tabs EnableFadeEffect="true">
+            <Tab Title="Todos" Active="true">
+                <Content>
+                    <SearchCustomerComponent />
+                </Content>
+            </Tab>
+        </Tabs>
+    </Authorized>
+    <NotAuthorized>
+        <ErrorViewComponent/>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 
 

@@ -11,7 +11,7 @@
         <td>@ProjectObj.ProjectId</td>
         <td>
             <EditForm Model="ProjectObj">
-                <InputText @bind-Value="ProjectObj.Title" />
+                <InputText @bind-Value="ProjectObj.Title" class="form-control form-control-sm" />
             </EditForm>
         </td>
         <td>@ProjectObj.Customer.Name</td>
@@ -41,6 +41,7 @@
         <td>@ProjectObj.CreationDate.ToShortDateString()</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
+
             <button class="btn btn-sm btn-success" @onclick="Update">
                 Guardar
             </button>
@@ -57,7 +58,11 @@ else
     <tr style="font-size:14px;" class="@stylerow">
         <td>@ProjectObj.ProjectId</td>
         <td>@ProjectObj.Title</td>
-        <td>@ProjectObj.Customer.Name</td>
+        <td>
+            <a target="_blank" href="/customers/@ProjectObj.CustomerId" class="text-decoration-none">
+                @ProjectObj.Customer.Name
+            </a>
+        </td>
         <td>@ProjectObj.Seller?.SellerName</td>
         <td>@ProjectObj.State?.StateName</td>
         <td>@ProjectObj.OC</td>
@@ -65,26 +70,42 @@ else
         <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
         <td>@ProjectObj.Amount.ToString("C")</td>
         <td>
-            <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info">
-                <Icon Name="IconName.Eye"></Icon>
-            </a>
-            <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
-                <Icon Name="IconName.PencilFill"></Icon>
-            </button>
+            <Tooltip Class="d-inline-block" Title="Ver Proyecto" role="button">
+                <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info" target="_blank">
+                    <Icon Name="IconName.Eye"></Icon>
+                </a>
+            </Tooltip>
+           
+            <AuthorizeView Roles="administrador,ingeniero">
+                <Authorized>
+                    <Tooltip Class="d-inline-block" Title="Editar Proyecto" role="button">
+                        <button class="btn btn-sm btn-outline-success" @onclick="()=>IsEditing=true">
+                            <Icon Name="IconName.PencilFill"></Icon>
+                        </button>
+                    </Tooltip>
+ 
+                </Authorized>
+            </AuthorizeView>
+
         </td>
         <td>
-            @if (ProjectObj.IsDeleted)
-            {
-                <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
-                    <Icon Name="IconName.CheckCircle"></Icon>
-                </button>
-            }
-            else
-            {
-                <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
-                    <Icon Name="IconName.XCircle"></Icon>
-                </button>
-            }
+            <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+                <Authorized>
+                    @if (ProjectObj.IsDeleted)
+                    {
+                        <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
+                            <Icon Name="IconName.CheckCircle"></Icon>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
+                            <Icon Name="IconName.XCircle"></Icon>
+                        </button>
+                    }
+                </Authorized>
+            </AuthorizeView>
+
         </td>
     </tr>
 
@@ -119,10 +140,10 @@ else
         }
         catch (InvalidOperationException e)
         {
-            
-                states = db.States.ToList();
-                types = db.Types.ToList();
-            
+
+            states = db.States.ToList();
+            types = db.Types.ToList();
+
         }
 
     }
@@ -134,16 +155,16 @@ else
             IsEditing = false;
             db.Projects.Update(ProjectObj);
             db.SaveChanges();
-
+            ProjectObj.State = states.FirstOrDefault(e => e.StateId == ProjectObj.StateId);
         }
         catch (InvalidOperationException e)
         {
             using (var d = DbContextFactory.CreateDbContext())
             {
                 IsEditing = false;
-              //  ProjectObj.State = null;
-              //  ProjectObj.Seller = null;
-               
+                //  ProjectObj.State = null;
+                //  ProjectObj.Seller = null;
+
                 d.Projects.Update(ProjectObj);
                 d.SaveChanges();
             }
@@ -151,7 +172,7 @@ else
         finally
         {
             StateHasChanged();
-        }     
+        }
     }
 
     private void Disable()

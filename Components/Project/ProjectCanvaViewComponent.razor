@@ -95,10 +95,15 @@
     @foreach (var i in project.Commentaries)
     {
         <div class="m-1 p-1 border rounded">
-            <label class="h6">@i.CreationDate.ToLongDateString() @i.Author</label>
-            <p class="text-muted">
+            <div class="d-flex flex-column justify-content-end">
+                <label style="font-size:16px;">@i.Author</label>
+
+                <label style="font-size:15px">@i.CreationDate.ToLongDateString() </label>
+                
+            </div>
+            <p class="text-muted" style="font-size:14px">
                 <small>
-                @i.CommentaryText
+                    @i.CommentaryText
                 </small>
             </p>
         </div>
@@ -111,8 +116,8 @@
 
     public async Task UpdateCommentaries()
     {
-        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).OrderByDescending(e=>e.CommentaryID).ToList();
-        
+        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).OrderByDescending(e => e.CommentaryID).ToList();
+
     }
 
 }

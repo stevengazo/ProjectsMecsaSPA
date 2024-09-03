@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ProjectsMecsaSPA.Data;
 using ProjectsMecsaSPA.Model;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,11 +16,13 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<UserIdentityEx> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly ApplicationDbContext _applicationDbContext;
 
-        public LoginModel(SignInManager<UserIdentityEx> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<UserIdentityEx> signInManager, ILogger<LoginModel> logger, ApplicationDbContext applicationDb)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _applicationDbContext = applicationDb;   
         }
 
         /// <summary>
@@ -58,9 +61,9 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required(ErrorMessage ="Ingrese el usuario")]
+            
+            public string UserName { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -105,10 +108,15 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                string email = _applicationDbContext.Users.FirstOrDefault(e => e.UserName == Input.UserName)?.Email;
+
+                email = (email == null) ? string.Empty : email;
+                
+
+                var result = await _signInManager.PasswordSignInAsync(Input.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
+                    _logger.LogInformation("Sesión Iniciada.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -122,7 +130,7 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Inicio de sesión invalido");
                     return Page();
                 }
             }

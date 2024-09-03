@@ -1,8 +1,13 @@
 ﻿@inject ApplicationDbContext dbContext;
 
+
+
+<ConfirmDialog @ref="dialog" />
+
 @if (IsEditing)
 {
     <tr>
+        
         <td>
             <EditForm Model="item" class="d-flex flex-row">
                 <InputText @bind-Value="item.Name" class="form-control form-control-sm"></InputText>
@@ -42,48 +47,46 @@
 }
 else
 {
-    <tr>
-        <td>
-            @item.Name @item.LastName
-        </td>
-        <td>
-            @item.DNI
-        </td>
-        <td>
-            @item.Email
-        </td>
-        <td>
-            @item.UserName
-        </td>
-        @if (item.EmailConfirmed)
-        {
+    @if (!isdelete)
+    {
+        <tr>
             <td>
-                Activo
+                @item.Name @item.LastName
             </td>
-        }
-        else
-        {
             <td>
-                Inactivo
+                @item.DNI
             </td>
-        }
-        <td>
-            <a href="user/@item.Id" class="btn btn-outline-info btn-sm">
-                <Icon Name="IconName.Eye"/>
-            </a>
-            <button class="btn btn-outline-success btn-sm" @onclick="()=>IsEditing =true">
-                <Icon Name="IconName.PencilFill" />
-            </button>
-            <a class="btn btn-outline-warning btn-sm">
-                <Icon Name="IconName.Asterisk" />
-            </a>
-
-            <a class="btn btn-outline-danger btn-sm">
-                <Icon Name="IconName.XCircleFill" />
-            </a>
-        </td>
-    </tr>
-
+            <td>
+                @item.Email
+            </td>
+            <td>
+                @item.UserName
+            </td>
+            @if (item.EmailConfirmed)
+            {
+                <td>
+                    Activo
+                </td>
+            }
+            else
+            {
+                <td>
+                    Inactivo
+                </td>
+            }
+            <td>
+                <a href="user/@item.Id" class="btn btn-outline-info btn-sm">
+                    <Icon Name="IconName.Eye" />
+                </a>
+                <button class="btn btn-outline-success btn-sm" @onclick="()=>IsEditing =true">
+                    <Icon Name="IconName.PencilFill" />
+                </button>
+                <a class="btn btn-outline-danger btn-sm" @onclick="ShowConfirmationAsync">
+                    <Icon Name="IconName.XCircleFill" />
+                </a>
+            </td>
+        </tr>
+    }
 }
 
 
@@ -92,6 +95,7 @@ else
     public UserIdentityEx item { get; set; }
 
     private bool IsEditing = false;
+    private bool isdelete = false;
 
     private async Task Update()
     {
@@ -100,6 +104,27 @@ else
         dbContext.Users.Update(item);
         dbContext.SaveChanges();
         IsEditing = false;
+    }
+
+
+    private ConfirmDialog dialog = default!;
+
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Borrado de Usuario",
+            message1: "El usuario será eliminado de la base de datos",
+            message2: "Desea proceder?");
+
+        if (confirmation)
+        {
+            dbContext.Users.Remove(item);
+            dbContext.SaveChanges();
+            isdelete = true;
+        }
+        else
+        {
+        }
     }
 
 }

@@ -1,5 +1,4 @@
-﻿
-@inject ProjectsDBContext db
+﻿@inject ProjectsDBContext db
 
 <h6>
     Monto Por Etapa @DateTime.Now.Year
@@ -20,7 +19,7 @@
     private List<double?> GetAmountsByState(List<string> states)
     {
         // Obtener todos los proyectos y convertir a una lista en memoria
-        var projects = db.Projects.Where(e=>e.CreationDate.Year== DateTime.Now.Year).ToList();
+        var projects = db.Projects.Where(e => e.CreationDate.Year == DateTime.Now.Year).ToList();
 
         // Obtener todos los estados y convertir a una lista en memoria
         var stateList = db.States.ToList();
