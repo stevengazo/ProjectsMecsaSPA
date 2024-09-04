@@ -1,0 +1,130 @@
+﻿@page "/chat"
+@inject ChatService ChatService
+
+<div class="container mt-4">
+    <h3 class="mb-4">Chat</h3>
+
+    <div class="form-group">
+        <input class="form-control" @bind="userName" placeholder="Enter your name" />
+    </div>
+
+    <div class="form-group">
+        <input class="form-control" @bind="groupName" placeholder="Enter room name" />
+    </div>
+    <button class="btn btn-primary" @onclick="JoinRoom">Join Room</button>
+    <button class="btn btn-secondary" @onclick="LeaveRoom">Leave Room</button>
+
+    <div class="mt-4">
+        <div class="form-group">
+            <textarea class="form-control" @bind="message" placeholder="Enter your message"></textarea>
+        </div>
+        <button class="btn btn-success" @onclick="SendMessage">Send Message</button>
+    </div>
+
+    <div class="mt-4">
+        <h4>Active Rooms:</h4>
+        <ul class="list-group">
+            @foreach (var room in activeRooms)
+            {
+                <li class="list-group-item @((room == selectedRoom) ? "active" : "")" @onclick="() => SelectRoom(room)">
+                    @room
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="mt-4">
+        <h4>Messages in @selectedRoom:</h4>
+        <ul class="list-group">
+            @foreach (var msg in messages)
+            {
+                @if (msg.Room == selectedRoom)
+                {
+                    <li class="list-group-item">@msg.Content</li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+
+@code {
+    private string userName;
+    private string groupName;
+    private string message;
+    private string selectedRoom;
+    private List<Message> messages = new List<Message>();
+    private List<string> activeRooms = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChatService.OnReceiveMessage((user, room, msg) =>
+        {
+            // Add the message to the list
+            messages.Add(new Message { User = user, Room = room, Content = $"{user} in {room}: {msg}" });
+            if (room == selectedRoom)
+            {
+                InvokeAsync(StateHasChanged);
+            }
+        });
+
+        ChatService.OnUpdateActiveRooms(updatedRooms =>
+        {
+            activeRooms = updatedRooms.ToList();
+            InvokeAsync(StateHasChanged);
+        });
+
+        await ChatService.StartAsync();
+        await UpdateActiveRooms();
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(selectedRoom) && !string.IsNullOrEmpty(message))
+        {
+            await ChatService.SendMessage(selectedRoom, userName, message);
+            message = string.Empty; // Clear message input
+        }
+    }
+
+    private async Task JoinRoom()
+    {
+        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(groupName))
+        {
+            await ChatService.JoinRoom(groupName, userName);
+            selectedRoom = groupName; // Automatically select the room after joining
+            await UpdateActiveRooms();
+        }
+    }
+
+    private async Task LeaveRoom()
+    {
+        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(selectedRoom))
+        {
+            await ChatService.LeaveRoom(selectedRoom, userName);
+            if (selectedRoom == groupName)
+            {
+                selectedRoom = null; // Clear the selection if leaving the current room
+            }
+            await UpdateActiveRooms();
+        }
+    }
+
+    private async Task UpdateActiveRooms()
+    {
+        activeRooms = (await ChatService.GetActiveRooms()).ToList();
+        StateHasChanged();
+    }
+
+    private void SelectRoom(string room)
+    {
+        selectedRoom = room;
+        StateHasChanged();
+    }
+
+    private class Message
+    {
+        public string User { get; set; }
+        public string Room { get; set; }
+        public string Content { get; set; }
+    }
+}
