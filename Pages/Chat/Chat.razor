@@ -1,25 +1,22 @@
 ﻿@page "/chat"
 @inject ChatService ChatService
 
-<div class="container mt-4">
+
+<di>
     <h3 class="mb-4">Chat</h3>
 
-    <div class="form-group">
+    <div class="form-group mt-1">
         <input class="form-control" @bind="userName" placeholder="Enter your name" />
     </div>
 
-    <div class="form-group">
-        <input class="form-control" @bind="groupName" placeholder="Enter room name" />
+    <div class="form-group mt-1">
+        <select class="form-control" @bind="groupName" placeholder="Enter room name" >
+            <option value="Ingeniería">Ingeniería</option>
+            <option value="Ingeniería">Proyectos & Contabilidad</option>
+        </select>
     </div>
     <button class="btn btn-primary" @onclick="JoinRoom">Join Room</button>
     <button class="btn btn-secondary" @onclick="LeaveRoom">Leave Room</button>
-
-    <div class="mt-4">
-        <div class="form-group">
-            <textarea class="form-control" @bind="message" placeholder="Enter your message"></textarea>
-        </div>
-        <button class="btn btn-success" @onclick="SendMessage">Send Message</button>
-    </div>
 
     <div class="mt-4">
         <h4>Active Rooms:</h4>
@@ -33,6 +30,17 @@
         </ul>
     </div>
 
+</di>
+
+<div class="container mt-4 border rounded p-1">
+    
+    <div class="w-100 d-flex flex-row">
+       
+            <textarea class="form-control form-control-sm m-1" @bind="message" placeholder="Ingrese su mensaje"></textarea>
+               <button class="btn btn-outline-success btn-sm m-1" @onclick="SendMessage">Enviar</button>
+    </div>
+
+    
     <div class="mt-4">
         <h4>Messages in @selectedRoom:</h4>
         <ul class="list-group">
