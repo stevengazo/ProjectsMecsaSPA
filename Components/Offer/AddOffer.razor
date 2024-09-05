@@ -190,7 +190,7 @@
         {
             try
             {
-                offer.Responsible = sellers.FirstOrDefault(i => i.SellerId == i.SellerId).SellerName;
+                offer.Responsible = sellers.FirstOrDefault(i => i.SellerId == int.Parse(offer.ResponsibleId)).SellerName;
                 context.Offers.Add(offer);
                 await context.SaveChangesAsync();
                 NAV.NavigateTo($"/offers/{offer.OfferId}");
