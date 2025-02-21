@@ -123,31 +123,39 @@ else
 
     private async Task SuscribeSeller()
     {
-        seller = db.Seller.FirstOrDefault(w => w.SellerId == user.DNI);
-        if (seller == null)
+        try
         {
-            seller = new Seller
-                {
-                    SellerId = user.DNI,
-                    SellerName = $"{user.Name} {user.LastName}",
-                    Email = user.Email,
-                    DNI = user.DNI,
-                    IsActive = true
-                };
-            using (var transaction = await db.Database.BeginTransactionAsync())
+            seller = db.Seller.FirstOrDefault(w => w.SellerId == user.DNI);
+            if (seller == null)
             {
-                db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] ON");
-                db.Seller.Add(seller);
+                seller = new Seller
+                    {
+                        SellerId = user.DNI,
+                        SellerName = $"{user.Name} {user.LastName}",
+                        Email = user.Email,
+                        DNI = user.DNI,
+                        IsActive = true
+                    };
+                using (var transaction = await db.Database.BeginTransactionAsync())
+                {
+                    db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] ON");
+                    db.Seller.Add(seller);
+                    await db.SaveChangesAsync();
+                    db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] OFF");
+                    await transaction.CommitAsync();
+                }
+            }
+            else
+            {
+                seller.IsActive = true;
+                db.Seller.Update(seller);
                 await db.SaveChangesAsync();
-                db.Database.ExecuteSqlRaw("SET IDENTITY_INSERT [dbo].[Seller] OFF");
-                await transaction.CommitAsync();
             }
         }
-        else
+        catch (Exception rtg)
         {
-            seller.IsActive = true;
-            db.Seller.Update(seller);
-            await db.SaveChangesAsync();
+            
+            throw;
         }
     }
 }

@@ -204,9 +204,8 @@
         // Cargar las dependencias desde la base de datos
         types = db.Types.ToList();
         customers = db.Customers.ToList();
-        sellers = db.Seller.ToList();
+        sellers = db.Seller .Where(s=> s.IsActive).OrderBy(s=>s.SellerName).ToList();
         states = db.States.ToList();
-
         project.CreationDate = DateTime.Now;
         project.OCDate = DateTime.Now;
 

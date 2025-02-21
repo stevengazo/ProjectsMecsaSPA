@@ -7,7 +7,6 @@
 
 <div class="d-flex flex-row justify-content-between">
     <h3>Proyectos</h3>
-       
             <AuthorizeView Roles="administrador,ingeniero">
                 <Authorized>
             <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
@@ -20,7 +19,7 @@
     @message
 </div>
 
-<AuthorizeView>
+<AuthorizeView Roles="administrador,ingeniero,asistente ,contabilidad,vendedor">
     <Authorized>
         <div class="mb-2 p-2">
             <Tabs EnableFadeEffect="true">

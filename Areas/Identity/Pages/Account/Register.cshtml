@@ -22,6 +22,11 @@
                 <span asp-validation-for="Input.lastname" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
+                <input asp-for="Input.dni" class="form-control" autocomplete="dni" aria-required="true" />
+                <label asp-for="Input.dni">Cédula</label>
+                <span asp-validation-for="Input.dni" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
                 <label asp-for="Input.Email">Correo electrónico</label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
