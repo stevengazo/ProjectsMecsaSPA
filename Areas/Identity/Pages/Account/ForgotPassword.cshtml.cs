@@ -70,8 +70,8 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
 
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "Cambio de Contraseña",
+                    $"Por favor cambie su contraseña con el siguiente enlace <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Haga click aqui</a>.");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }

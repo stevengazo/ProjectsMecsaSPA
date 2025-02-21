@@ -1,5 +1,6 @@
 ﻿@page "/create-project"
 @inject ProjectsDBContext db
+@inject NavigationManager Nav;
 
 
 @using Microsoft.AspNetCore.Components.Forms
@@ -62,12 +63,12 @@
             <label class="form-label" for="CustomerId">Cliente</label>
 
             <AutoComplete @bind-Value="customerName"
-                          TItem="Customer"
-                          class="form-control"
-                          DataProvider="CustomersDataProvider"
-                          PropertyName="Name"
-                          Placeholder="Search a customer..."
-                          OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+            TItem="Customer"
+            class="form-control"
+            DataProvider="CustomersDataProvider"
+            PropertyName="Name"
+            Placeholder="Search a customer..."
+            OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
 
         </div>
         <ValidationMessage For="@(() => project.CustomerId)" />
@@ -203,9 +204,8 @@
         // Cargar las dependencias desde la base de datos
         types = db.Types.ToList();
         customers = db.Customers.ToList();
-        sellers = db.Seller.ToList();
+        sellers = db.Seller .Where(s=> s.IsActive).OrderBy(s=>s.SellerName).ToList();
         states = db.States.ToList();
-
         project.CreationDate = DateTime.Now;
         project.OCDate = DateTime.Now;
 
@@ -276,21 +276,22 @@
                     db.Projects.Add(project);
                     await db.SaveChangesAsync();
                     transaction.Commit();
-                    ClearFormFields();
-                    if (OnAdded.HasDelegate)
+                    Nav.NavigateTo($"projects/{project.ProjectId}");
+                    // ClearFormFields();
+                  /*  if (OnAdded.HasDelegate)
                     {
                         await OnAdded.InvokeAsync();
-                    }
+                    }*/
                 }
                 catch (Exception e)
                 {
                     transaction.Rollback();
                     ErrorMessage = "Error, Verifique los datos";
                 }
-                finally
+               /* finally
                 {
                     ResetProjectsIdentity(db);
-                }
+                }*/
             }
         }
     }

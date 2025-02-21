@@ -1,9 +1,14 @@
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using ProjectsMecsaSPA.Areas.Identity;
 using ProjectsMecsaSPA.Data;
+using ProjectsMecsaSPA.Hubs;
 using ProjectsMecsaSPA.Model;
+using ProjectsMecsaSPA.Services;
+using ProjectsMecsaSPA.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +26,21 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<UserIdentityEx>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+builder.Services.AddScoped<ChatService>();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<UserIdentityEx>>();
 
 builder.Services.AddBlazorBootstrap();
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 
+
+#region Databases
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -64,6 +76,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+#endregion
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -82,6 +95,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+// Map SignalR Hubs
+app.MapHub<ChatHub>("/chathub");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -62,7 +62,7 @@
 
         var dataset = new LineChartDataset
             {
-                Label = $"Ofertas {SelectedYear}",
+                Label = $"{SelectedYear}",
                 Data = await GetData(),
                 BackgroundColor = color,
                 BorderColor = color,
@@ -136,13 +136,17 @@
     {
         using (var dbTemp = DbContextFactory.CreateDbContext())
         {
-            List<double?> listOfAmountsByMonth = dbTemp.Offers
-                                                        .Where(p => p.Creation.Year == SelectedYear)
-                                                        .OrderBy(x => x.Creation.Month)
-                                                        .GroupBy(p => p.Creation.Month)
-                                                        .Select(g => (double?)g.Count())
-                                                        .ToList();
+            // Consulta LINQ para obtener las ofertas agrupadas por mes
+            var query = from offer in dbTemp.Offers
+                        where offer.Creation.Year == SelectedYear
+                        group offer by offer.Creation.Month into groupedOffers
+                        orderby groupedOffers.Key // Ordenar por mes
+                        select (double?)groupedOffers.Count();
+
+            // Ejecutar la consulta de forma asincrónica
+            var listOfAmountsByMonth = await query.ToListAsync();
             return listOfAmountsByMonth;
+
         }
     }
 

@@ -83,6 +83,17 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
             [Display(Name = "Password")]
             public string Password { get; set; }
 
+
+            /// <summary>
+            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
+            ///     directly from your code. This API may change or be removed in future releases.
+            /// </summary>
+            [Required]
+            [System.ComponentModel.DataAnnotations.Range(100000000,9999999999,ErrorMessage = "La cèdula no debe ser nula, y debe ser entre:1-0000-0000,9-9999-9999")]
+            [DataType(DataType.Currency)]
+            [Display(Name = "dni")]
+            public int dni { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -112,7 +123,7 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 user.Name = Input.name;
                 user.LastName = Input.lastname;
-                user.DNI = 0;
+                user.DNI =  Input.dni;
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -130,8 +141,8 @@ namespace ProjectsMecsaSPA.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirmación de email",
+                        $"Por favor confirma tu correo  <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>Haciendo click aquí</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
