@@ -272,7 +272,7 @@
             {
                 try
                 {
-                  
+                    project.ProjectId = db.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault().ProjectId + 1;
                     project.IsCompleted = false;
                     project.Isfactured = false;
                     db.Projects.Add(project);
