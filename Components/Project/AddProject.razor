@@ -267,31 +267,24 @@
 
         if (project != null)
         {
+           // ResetProjectsIdentity(db);
             using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 try
                 {
+                  
                     project.IsCompleted = false;
                     project.Isfactured = false;
                     db.Projects.Add(project);
                     await db.SaveChangesAsync();
                     transaction.Commit();
                     Nav.NavigateTo($"projects/{project.ProjectId}");
-                    // ClearFormFields();
-                  /*  if (OnAdded.HasDelegate)
-                    {
-                        await OnAdded.InvokeAsync();
-                    }*/
                 }
                 catch (Exception e)
                 {
                     transaction.Rollback();
                     ErrorMessage = "Error, Verifique los datos";
                 }
-               /* finally
-                {
-                    ResetProjectsIdentity(db);
-                }*/
             }
         }
     }
