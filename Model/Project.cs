@@ -8,7 +8,6 @@ namespace ProjectsMecsaSPA.Model
     public class Project
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)] // No será autoincremental
         public int ProjectId { get; set; }
 
         [Required(ErrorMessage = "El título es obligatorio.")]

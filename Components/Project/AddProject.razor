@@ -1,6 +1,8 @@
 ﻿@page "/create-project"
 @inject ProjectsDBContext db
 @inject NavigationManager Nav;
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
 
 
 @using Microsoft.AspNetCore.Components.Forms
@@ -227,12 +229,13 @@
         }
     }
 
-    private void ResetProjectsIdentity(DbContext r)
+    private void ResetProjectsIdentity()
     {
         try
         {
-            var lastProject = db.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault();
-            using (var connection = r.Database.GetDbConnection())
+            var dbtmp = DbContextFactory.CreateDbContext();
+            var lastProject = dbtmp.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault();
+            using (var connection = dbtmp.Database.GetDbConnection())
             {
                 connection.Open();
                 using (var command = connection.CreateCommand())
@@ -240,6 +243,7 @@
                     command.CommandText = $"DBCC CHECKIDENT ('dbo.Projects', RESEED, {lastProject.ProjectId});";
                     command.ExecuteNonQuery();
                 }
+                connection.Close(); 
             }
             Console.WriteLine("El contador de identidad se ha reseteado correctamente.");
         }
@@ -264,15 +268,15 @@
 
     private async Task HandleValidSubmit()
     {
-
+         ResetProjectsIdentity();
+        
         if (project != null)
         {
-           // ResetProjectsIdentity(db);
             using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    project.ProjectId = db.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault().ProjectId + 1;
+                   
                     project.IsCompleted = false;
                     project.Isfactured = false;
                     db.Projects.Add(project);
