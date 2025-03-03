@@ -117,12 +117,15 @@
 
     public async Task UpdateCommentaries()
     {
-        project.Commentaries = db.Comments.Where(i => i.ProjectId == project.ProjectId).ToList();
+        project.Commentaries = db.Comments.AsNoTracking().Where(i => i.ProjectId == project.ProjectId).ToList();
     }
 
     public async Task UpdateBills()
     {
-        project.Bills = db.Bill.Where(i => i.ProjectId == project.ProjectId).ToList();
+        project.Bills = db.Bill
+                            .AsNoTracking()
+                            .Where(i => i.ProjectId == project.ProjectId)
+                            .ToList();
     }
     public async Task ShowAddBill()
     {
@@ -146,7 +149,7 @@
         await offcanvas.HideAsync();
         StateHasChanged();
         project.Bills.Clear();
-        project.Bills = db.Bill.Where(i => i.ProjectId == _id).ToList();
+        project.Bills = db.Bill.AsNoTracking().Where(i => i.ProjectId == _id).ToList();
         StateHasChanged();
 
     }

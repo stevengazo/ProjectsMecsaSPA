@@ -68,6 +68,17 @@
                 @project.TaskNumber
             </td>
         </tr>
+                <tr>
+            <td>
+                Enlace
+            </td>
+           <td>
+    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank">
+        Ver tarea
+    </a>
+</td>
+
+        </tr>
         <tr>
             <td>
                 Creación
@@ -94,18 +105,18 @@
 <div class="d-flex flex-column">
     @foreach (var i in project.Commentaries)
     {
-        <div class="m-1 p-1 border rounded">
-            <div class="d-flex flex-column justify-content-end">
-                <label style="font-size:16px;">@i.Author</label>
+            <div class="m-1 p-1 border rounded">
+                <div class="d-flex flex-column justify-content-end">
+                    <label style="font-size:16px;">@i.Author</label>
 
-                <label style="font-size:15px">@i.CreationDate.ToLongDateString()</label>
-            </div>
-            <p class="text-muted" style="font-size:14px; white-space: pre-line;">
-                <small>
+                    <label style="font-size:15px">@i.CreationDate.ToLongDateString()</label>
+                </div>
+                <p class="text-muted" style="font-size:14px; white-space: pre-line;">
+                    <small>
                     @i.CommentaryText
-                </small>
-            </p>
-        </div>
+                    </small>
+                </p>
+            </div>
     }
 
 </div>

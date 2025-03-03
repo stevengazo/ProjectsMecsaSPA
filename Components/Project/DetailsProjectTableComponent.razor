@@ -153,10 +153,9 @@
                 </tr>
             </tbody>
         </table>
-
-
-        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
         <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
+
     </EditForm>
 }
 else
@@ -194,7 +193,7 @@ else
             </tr>
             <tr>
                 <th>Monto</th>
-                <td>@project.Amount.ToString("C", AmountCulture)</td>
+                <td>@project.Amount.ToString("N2")</td>
             </tr>
             <tr>
                 <th>Fecha Registro</th>
@@ -252,6 +251,9 @@ else
             </tr>
         </tbody>
     </table>
+    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank">
+        Ver tarea
+    </a>
     <div class="d-flex flex-row gap-2">
         <AuthorizeView Roles="administrador,ingeniero,contabilidad">
             <Authorized>

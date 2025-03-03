@@ -1,11 +1,9 @@
-﻿@using System.Globalization
+﻿
 
-@if (AmountCulture != null)
-{
     <h6>
-        Monto Facturado: @Bills.Sum(e => e.Amount).ToString("C", AmountCulture)
+        Monto Facturado: @Bills.Sum(e => e.Amount).ToString("N2")
     </h6>
-}
+
 <table class="table">
     <thead>
         <tr>
@@ -22,9 +20,6 @@
                 Monto
             </td>
             <td>
-                Moneda
-            </td>
-            <td>
                 Nota
             </td>
             <td>
@@ -35,7 +30,7 @@
     <tbody>
         @foreach (var item in Bills)
         {
-            <BillRowComponent AmountCulture="AmountCulture" item="item" />
+            <BillRowComponent item="item" />
         }
     </tbody>
 </table>
@@ -44,23 +39,9 @@
     [Parameter]
     public List<Bill> Bills { get; set; }
 
-    CultureInfo AmountCulture = CultureInfo.InvariantCulture;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            if (Bills.Count > 0)
-            {
-                AmountCulture = new CultureInfo(Bills.FirstOrDefault().Currency);
-
-            }
-        }
-        catch (Exception r)
-        {
-            Console.WriteLine(r);
-        }
-
         base.OnInitializedAsync();
     }
 }
