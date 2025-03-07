@@ -1,62 +1,219 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
-using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
-using System;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types.ReplyMarkups;
+using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 public class TelegramService
 {
     private readonly string _botToken = "";
     private readonly TelegramBotClient _botClient;
-    private readonly Telegram.Bot.Types.User me;
-    private readonly CancellationTokenSource cts;
+    private readonly CancellationTokenSource _cts;
 
     public TelegramService()
     {
-        // Crea el bot cliente y lo configura
         _botClient = new TelegramBotClient(_botToken);
-        me = _botClient.GetMe().Result;
+        _cts = new CancellationTokenSource();
 
-        // Inicia un token de cancelación para detener el bot
-        cts = new CancellationTokenSource();
-
-        // Muestra información del bot
+        var me = _botClient.GetMeAsync().Result;
         Console.WriteLine("---------------------------");
         Console.WriteLine("Bot ID: " + me.Id);
-        Console.WriteLine("Bot Nombre: " + me.FirstName);
+        Console.WriteLine("Bot Name: " + me.FirstName);
+        Console.WriteLine("Bot Username: " + me.Username);
         Console.WriteLine("---------------------------");
 
-        // Muestra el nombre de usuario del bot y espera la entrada del usuario para finalizar
-        Console.WriteLine($"@{me.Username} is running... Press Enter to terminate");
-
-        // Configura el evento para manejar los mensajes
-        _botClient.OnMessage += OnMessage;
-        _botClient.OnError += OnError;
-
-
+        StartReceiving();
     }
 
-    // Maneja los mensajes recibidos por el bot
-    private async Task OnMessage(Message msg, UpdateType type)
+    private void StartReceiving()
     {
-        if (msg.Text is null) return; // solo manejamos mensajes de texto
-        Console.WriteLine($"Received {type} '{msg.Text}' in {msg.Chat}");
+        var receiverOptions = new ReceiverOptions
+        {
+            AllowedUpdates = Array.Empty<UpdateType>()
+        };
 
-        // Responde al mensaje recibido
-        await _botClient.SendMessage(msg.Chat, $"{msg.From} said: {msg.Text}");
+        _botClient.StartReceiving(
+            updateHandler: HandleUpdateAsync,
+            errorHandler: HandleErrorAsync,
+            receiverOptions: receiverOptions,
+            cancellationToken: _cts.Token
+        );
+
+        Console.WriteLine("Bot is running... Press Enter to terminate.");
     }
 
-    // Método para detener el bot cuando se presione Enter
+    private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    {
+        if (update.CallbackQuery != null)
+        {
+            await HandleCallbackQuery(update.CallbackQuery, cancellationToken);
+        }
+        else if (update.Message != null && update.Message.Text != null)
+        {
+            await HandleMessageAsync(update.Message, cancellationToken);
+        }
+    }
+
+    private async Task HandleMessageAsync(Message message, CancellationToken cancellationToken)
+    {
+        var chatId = message.Chat.Id;
+
+        if (message.Text == "/menu")
+        {
+            var inlineKeyboard = new InlineKeyboardMarkup(new[]
+            {
+                new[] { InlineKeyboardButton.WithCallbackData("Buscar proyecto", "search_project") },
+                new[] { InlineKeyboardButton.WithCallbackData("Ingresar información", "enter_info") }
+            });
+
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "Selecciona una opción:",
+                replyMarkup: inlineKeyboard,
+                cancellationToken: cancellationToken
+            );
+        }
+        else if (message.Text.StartsWith("/"))
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "Escribe /menu para ver las opciones disponibles.",
+                cancellationToken: cancellationToken
+            );
+        }
+        else
+        {
+            if (_userStates.TryGetValue(chatId, out var userState))
+            {
+                switch (userState)
+                {
+                    case UserState.WaitingForPhoneNumber:
+                        await HandlePhoneNumberInput(chatId, message.Text, cancellationToken);
+                        break;
+                    case UserState.WaitingForName:
+                        await HandleNameInput(chatId, message.Text, cancellationToken);
+                        break;
+                    case UserState.WaitingForIsTechnician:
+                        await HandleIsTechnicianInput(chatId, message.Text, cancellationToken);
+                        break;
+                    case UserState.WaitingForSubscription:
+                        await HandleSubscriptionInput(chatId, message.Text, cancellationToken);
+                        break;
+                }
+            }
+        }
+    }
+
+    private async Task HandleCallbackQuery(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    {
+        var chatId = callbackQuery.Message.Chat.Id;
+        var data = callbackQuery.Data;
+
+        if (data == "search_project")
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "Por favor, ingresa el número del proyecto:",
+                cancellationToken: cancellationToken
+            );
+        }
+        else if (data == "enter_info")
+        {
+            await _botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: "Por favor, ingresa tu número de teléfono:",
+                cancellationToken: cancellationToken
+            );
+
+            _userStates[chatId] = UserState.WaitingForPhoneNumber;
+        }
+    }
+
+    private async Task HandlePhoneNumberInput(long chatId, string phoneNumber, CancellationToken cancellationToken)
+    {
+        _userData[chatId] = new UserData { PhoneNumber = phoneNumber };
+        _userStates[chatId] = UserState.WaitingForName;
+
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "Gracias. Ahora, por favor, ingresa tu nombre:",
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private async Task HandleNameInput(long chatId, string name, CancellationToken cancellationToken)
+    {
+        _userData[chatId].Name = name;
+        _userStates[chatId] = UserState.WaitingForIsTechnician;
+
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "¿Eres técnico? (Sí/No)",
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private async Task HandleIsTechnicianInput(long chatId, string isTechnician, CancellationToken cancellationToken)
+    {
+        _userData[chatId].IsTechnician = isTechnician.ToLower() == "sí" || isTechnician.ToLower() == "si";
+        _userStates[chatId] = UserState.WaitingForSubscription;
+
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "¿Deseas suscribirte? (Sí/No)",
+            cancellationToken: cancellationToken
+        );
+    }
+
+    private async Task HandleSubscriptionInput(long chatId, string subscription, CancellationToken cancellationToken)
+    {
+        _userData[chatId].WantsSubscription = subscription.ToLower() == "sí" || subscription.ToLower() == "si";
+        _userStates.Remove(chatId);
+
+        await _botClient.SendTextMessageAsync(
+            chatId: chatId,
+            text: "Gracias por proporcionar tu información. ¡Hemos terminado!",
+            cancellationToken: cancellationToken
+        );
+
+        var userData = _userData[chatId];
+        Console.WriteLine($"Número de teléfono: {userData.PhoneNumber}, Nombre: {userData.Name}, Es técnico: {userData.IsTechnician}, Desea suscribirse: {userData.WantsSubscription}");
+    }
+
+    private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+    {
+        Console.WriteLine($"Error: {exception.Message}");
+        return Task.CompletedTask;
+    }
+
+    private enum UserState
+    {
+        WaitingForPhoneNumber,
+        WaitingForName,
+        WaitingForIsTechnician,
+        WaitingForSubscription
+    }
+
+    private readonly Dictionary<long, UserState> _userStates = new Dictionary<long, UserState>();
+
+    private class UserData
+    {
+        public string PhoneNumber { get; set; }
+        public string Name { get; set; }
+        public bool IsTechnician { get; set; }
+        public bool WantsSubscription { get; set; }
+    }
+
+    private readonly Dictionary<long, UserData> _userData = new Dictionary<long, UserData>();
+
     public void StopBot()
     {
-        Console.ReadLine();  // Espera por la entrada del usuario
-        cts.Cancel();        // Detiene el bot
-    }
-
-    // method to handle errors in polling or in your OnMessage/OnUpdate code
-    async Task OnError(Exception exception, HandleErrorSource source)
-    {
-        Console.WriteLine(exception); // just dump the exception to the console
+        Console.ReadLine();
+        _cts.Cancel();
+        Console.WriteLine("Bot has been stopped.");
     }
 }
