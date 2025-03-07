@@ -23,7 +23,7 @@
     {
         db = DbContextFactory.CreateDbContext();
         commentary = new();
-     
+
         commentary.ProjectId = ProjectId;
         base.OnInitializedAsync();   
     }
@@ -31,14 +31,27 @@
     private async Task Add()
     {
         GetAuthor();
-      
+
         commentary.CreationDate = DateTime.Now;
         commentary.ProjectId = ProjectId;
         db.Comments.Add(commentary);
         await db.SaveChangesAsync();
+        GenerateComment();
         OnAdded.InvokeAsync();
         commentary = new();
 
+    }
+
+    private async Task GenerateComment(){
+        var task = (from p in db.Projects
+                    where p.ProjectId == ProjectId
+                    select p.TaskNumber).FirstOrDefault();
+        var taskValid = int.TryParse(task, out int taskNumber);
+        if (taskValid)
+        {
+            Bitrix24ClientServices bitrix24ClientServices = new Bitrix24ClientServices();
+            await bitrix24ClientServices.SendTaskCommentAsync(taskNumber, commentary.CommentaryText);
+        }
     }
 
     private async Task GetAuthor()
