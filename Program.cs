@@ -36,10 +36,13 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+// Telegram
+// Cargar las configuraciones desde appsettings.json
+builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+builder.Services.AddHostedService<TelegramService>();
+
 
 var app = builder.Build();
-
-var telegramService = new TelegramService();    
 
 
 #region Databases
@@ -52,6 +55,8 @@ using (var scope = app.Services.CreateScope())
         {
             db.Database.Migrate();
         }
+        
+        Console.WriteLine(nameof(ProjectsDBContext) + "Created");
     }
     catch (Exception e)
     {
@@ -69,6 +74,8 @@ using (var scope = app.Services.CreateScope())
         {
             db.Database.Migrate();
         }
+     
+        Console.WriteLine(nameof(ApplicationDbContext) + "Created");
     }
     catch (Exception e)
     {
@@ -107,4 +114,10 @@ app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+
+
 app.Run();
+
+
+
+
