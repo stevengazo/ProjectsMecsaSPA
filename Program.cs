@@ -39,6 +39,8 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 
+var telegramService = new TelegramService();    
+
 
 #region Databases
 using (var scope = app.Services.CreateScope())
