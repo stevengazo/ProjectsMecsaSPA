@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 @if (IsEditing)
 {
@@ -25,9 +26,6 @@
             </EditForm>
         </td>
         <td>
-            @AmountCulture.NumberFormat.CurrencySymbol
-        </td>
-        <td>
             <EditForm Model="item">
                 <InputText @bind-Value="item.Note" class="form-control form-control-sm"></InputText>
             </EditForm>
@@ -44,64 +42,29 @@
 }
 else
 {
-    if(AmountCulture!= null)
-    {
-        <tr>
-            <td>
-                @item.BillNumber
-            </td>
-            <td>
-                @item.BillDate.ToShortDateString()
-            </td>
-            <td>
-                @item.Author
-            </td>
-            <td>
-                @item.Amount.ToString("C", AmountCulture)
-            </td>
-            <td>
-                @AmountCulture.NumberFormat.CurrencySymbol
-            </td>
-            <td>
-                @item.Note
-            </td>
-            <td>
-                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
-                    Editar
-                </button>
-            </td>
-        </tr>
-    }
-    else
-    {
-        <tr>
-            <td>
-                @item.BillNumber
-            </td>
-            <td>
-                @item.BillDate.ToShortDateString()
-            </td>
-            <td>
-                @item.Author
-            </td>
-            <td>
-                @item.Amount.ToString("C")
-            </td>
-            <td>
-            
-            </td>
-            <td>
-                @item.Note
-            </td>
-            <td>
-                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
-                    Editar
-                </button>
-            </td>
-        </tr>
-    }
 
-  
+    <tr>
+        <td>
+            @item.BillNumber
+        </td>
+        <td>
+            @item.BillDate.ToShortDateString()
+        </td>
+        <td>
+            @item.Author
+        </td>
+        <td>
+            @item.Amount.ToString("N2")
+        </td>
+        <td>
+            @item.Note
+        </td>
+        <td>
+            <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
+                Editar
+            </button>
+        </td>
+    </tr>
 
 }
 
@@ -109,8 +72,7 @@ else
 @code {
     [Parameter]
     public Bill item { get; set; }
-    [Parameter]
-    public  CultureInfo AmountCulture { get; set; }
+
 
     private bool IsEditing { get; set; }
 
@@ -119,16 +81,17 @@ else
     {
         try
         {
+            var dbcontext = DbContextFactory.CreateDbContext();
             item.Note = string.IsNullOrEmpty(item.Note) ? "" : item.Note;
             item.Author = string.IsNullOrEmpty(item.Author) ? "" : item.Author;
-            db.Bill.Update(item);
-            db.SaveChanges();
+            dbcontext.Bill.Update(item);
+            dbcontext.SaveChanges();
             IsEditing = false;
             StateHasChanged();
         }
-        catch (Exception)
-        {
-            
+        catch (Exception ex)
+    {
+            Console.WriteLine(ex.Message);
             throw;
         }
     }

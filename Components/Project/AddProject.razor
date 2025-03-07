@@ -1,6 +1,8 @@
 ﻿@page "/create-project"
 @inject ProjectsDBContext db
 @inject NavigationManager Nav;
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
 
 
 @using Microsoft.AspNetCore.Components.Forms
@@ -126,6 +128,7 @@
     <div class="form-group">
         <div class=" form-floating mt-1 mb-1">
             <InputSelect class="form-select form-select-sm" @bind-Value="project.CurrencyType">
+                <option value=""></option>
                 <option value="en-US">Dolar</option>
                 <option value="es-CR">Colon</option>
                 <option value="Euro">Euro</option>
@@ -227,12 +230,13 @@
         }
     }
 
-    private void ResetProjectsIdentity(DbContext r)
+    private void ResetProjectsIdentity()
     {
         try
         {
-            var lastProject = db.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault();
-            using (var connection = r.Database.GetDbConnection())
+            var dbtmp = DbContextFactory.CreateDbContext();
+            var lastProject = dbtmp.Projects.OrderByDescending(p => p.ProjectId).FirstOrDefault();
+            using (var connection = dbtmp.Database.GetDbConnection())
             {
                 connection.Open();
                 using (var command = connection.CreateCommand())
@@ -240,6 +244,7 @@
                     command.CommandText = $"DBCC CHECKIDENT ('dbo.Projects', RESEED, {lastProject.ProjectId});";
                     command.ExecuteNonQuery();
                 }
+                connection.Close(); 
             }
             Console.WriteLine("El contador de identidad se ha reseteado correctamente.");
         }
@@ -264,34 +269,27 @@
 
     private async Task HandleValidSubmit()
     {
-
+         ResetProjectsIdentity();
+        
         if (project != null)
         {
             using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 try
                 {
+                   
                     project.IsCompleted = false;
                     project.Isfactured = false;
                     db.Projects.Add(project);
                     await db.SaveChangesAsync();
                     transaction.Commit();
                     Nav.NavigateTo($"projects/{project.ProjectId}");
-                    // ClearFormFields();
-                  /*  if (OnAdded.HasDelegate)
-                    {
-                        await OnAdded.InvokeAsync();
-                    }*/
                 }
                 catch (Exception e)
                 {
                     transaction.Rollback();
                     ErrorMessage = "Error, Verifique los datos";
                 }
-               /* finally
-                {
-                    ResetProjectsIdentity(db);
-                }*/
             }
         }
     }

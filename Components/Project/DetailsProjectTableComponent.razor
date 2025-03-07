@@ -1,6 +1,10 @@
 ﻿@page "/project-edit"
 @inject ProjectsDBContext db
 @inject IJSRuntime JS
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
 
 
 @using System.ComponentModel.DataAnnotations
@@ -153,10 +157,9 @@
                 </tr>
             </tbody>
         </table>
-
-
-        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
         <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
+
     </EditForm>
 }
 else
@@ -177,7 +180,11 @@ else
             </tr>
             <tr>
                 <th>Número Tarea</th>
-                <td>@project.TaskNumber</td>
+                <td>
+                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-outline-success" target="_blank">
+                        @project.TaskNumber
+                    </a>
+                </td>
             </tr>
             <tr>
                 <th>Cliente</th>
@@ -194,7 +201,7 @@ else
             </tr>
             <tr>
                 <th>Monto</th>
-                <td>@project.Amount.ToString("C", AmountCulture)</td>
+                <td>@project.Amount.ToString("N2")</td>
             </tr>
             <tr>
                 <th>Fecha Registro</th>
@@ -252,6 +259,7 @@ else
             </tr>
         </tbody>
     </table>
+  
     <div class="d-flex flex-row gap-2">
         <AuthorizeView Roles="administrador,ingeniero,contabilidad">
             <Authorized>
@@ -371,18 +379,19 @@ else
     {
         try
         {
+            var dbtmp = DbContextFactory.CreateDbContext();
             if (project != null)
             {
                 // Desvincula relaciones si es necesario
-                project.Seller = db.Seller.FirstOrDefault(e => e.SellerId == project.SellerId);
-                project.State = db.States.FirstOrDefault(e => e.StateId == project.StateId);
-                project.Customer = db.Customers.FirstOrDefault(e => e.CustomerId == project.CustomerId);
-                project.Type = db.Types.FirstOrDefault(e => e.TypeId == project.TypeId);
-                db.Projects.Update(project);
-                await db.SaveChangesAsync();
+                project.Seller = dbtmp.Seller.FirstOrDefault(e => e.SellerId == project.SellerId);
+                project.State = dbtmp.States.FirstOrDefault(e => e.StateId == project.StateId);
+                project.Customer = dbtmp.Customers.FirstOrDefault(e => e.CustomerId == project.CustomerId);
+                project.Type = dbtmp.Types.FirstOrDefault(e => e.TypeId == project.TypeId);
+                dbtmp.Projects.Update(project);
+                await dbtmp.SaveChangesAsync();
 
                 // Recargar el objeto desde la base de datos
-                project = await db.Projects
+                project = await dbtmp.Projects
                     .Include(p => p.Customer)
                     .Include(p => p.State)
                     .Include(p => p.Type)
@@ -400,16 +409,18 @@ else
 
     private async Task UpdateIsComplete(bool state)
     {
+        var dbtmp = DbContextFactory.CreateDbContext();
         project.IsCompleted = state;
-        db.Projects.Update(project);
-        db.SaveChanges();
+        dbtmp.Projects.Update(project);
+        dbtmp.SaveChanges();
     }
 
     private async Task UpdateIsFactured(bool state)
     {
+        var dbtmp = DbContextFactory.CreateDbContext();
         project.Isfactured = state;
-        db.Projects.Update(project);
-        db.SaveChanges();
+        dbtmp.Projects.Update(project);
+        dbtmp.SaveChanges();
     }
 
     private async Task Download()
