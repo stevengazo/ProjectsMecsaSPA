@@ -13,12 +13,12 @@
                 <div class="col h-100">
                     <h5>@Obj.Key.StateName</h5>
                     <SortableList class="h-100"
-                                  TItem="Project"
-                                  Name="@($"{Obj.Key.StateName}")"
-                                  Data="@Obj.Value"
-                                  Context="project"
-                                  OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
-                                  OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
+                    TItem="Project"
+                    Name="@($"{Obj.Key.StateName}")"
+                    Data="@Obj.Value"
+                    Context="project"
+                    OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
+                    OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
                         <ItemTemplate>
                             <div class="card-body" @onclick="() => HandleProjectView(project)">
                                 <div class="d-flex justify-content-between">
@@ -40,8 +40,6 @@
         <ErrorViewComponent />
     </NotAuthorized>
 </AuthorizeView>
-
-
 
 
 
@@ -164,12 +162,15 @@
         ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
         /// Insert Project
         ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
+
         ProjectTemp.StateId = TargetState.StateId;
 
         ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
 
         db.Projects.Update(ProjectTemp);
         await db.SaveChangesAsync();
+
+        SendBitrix24Commentary(ProjectTemp, TargetState.StateName);
 
 
     }
@@ -207,4 +208,15 @@
         await offcanvas.ShowAsync<ProjectCanvaViewComponent>("Información del Proyecto", parameters);
     }
 
+
+    private async Task SendBitrix24Commentary(Project project, string State)
+    {
+        bool IsValid = int.TryParse(project.TaskNumber, out int _task);
+        if (project != null  && IsValid)
+        {
+            Bitrix24ClientServices b24 = new Bitrix24ClientServices();
+            string Message = $"Se ha movido el proyecto {project.Title} ({project.ProjectId}-{project.TaskNumber}) a la etapa: {State}.";
+            await b24.SendTaskCommentAsync(_task,Message,186);
+        } 
+    }
 }

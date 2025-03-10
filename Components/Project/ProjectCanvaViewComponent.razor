@@ -68,17 +68,7 @@
                 @project.TaskNumber
             </td>
         </tr>
-                <tr>
-            <td>
-                Enlace
-            </td>
-           <td>
-    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank">
-        Ver tarea
-    </a>
-</td>
 
-        </tr>
         <tr>
             <td>
                 Creación
@@ -97,7 +87,12 @@
         </tr>
     </tbody>
 </table>
-<a href="/projects/@project.ProjectId" class="btn btn-sm btn-outline-info">Ver Proyecto</a>
+<div class="">
+    <a href="/projects/@project.ProjectId" class="btn btn-sm btn-outline-info">Ver Proyecto</a>
+    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank" class="btn btn-sm btn-outline-success">
+        Ver tarea
+    </a>
+</div>
 <h5>
     Comentarios
 </h5>

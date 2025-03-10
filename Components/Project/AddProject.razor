@@ -230,6 +230,15 @@
         }
     }
 
+    private async Task SendBitrixCommentary(){
+
+        var valid = int.TryParse(project.TaskNumber, out int taskNumber);
+        Bitrix24ClientServices bitrix24ClientServices = new Bitrix24ClientServices();
+        await bitrix24ClientServices.SendTaskCommentAsync(taskNumber, $"Número de Proyecto {project.ProjectId}. Ver más detalles en app para proyectos.", 252);
+
+    }
+
+
     private void ResetProjectsIdentity()
     {
         try
@@ -269,20 +278,21 @@
 
     private async Task HandleValidSubmit()
     {
-         ResetProjectsIdentity();
-        
+        ResetProjectsIdentity();
+
         if (project != null)
         {
             using (var transaction = await db.Database.BeginTransactionAsync())
             {
                 try
                 {
-                   
+
                     project.IsCompleted = false;
                     project.Isfactured = false;
                     db.Projects.Add(project);
                     await db.SaveChangesAsync();
                     transaction.Commit();
+                    SendBitrixCommentary();// Mensaje automatico a bitrix
                     Nav.NavigateTo($"projects/{project.ProjectId}");
                 }
                 catch (Exception e)

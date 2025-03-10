@@ -4,9 +4,9 @@ namespace ProjectsMecsaSPA.Services
 {
     public class Bitrix24ClientServices
     {
-        private  readonly string UrlTaskAdd = "";
+        private  readonly string UrlTaskAdd = "https://grupomecsa.bitrix24.es/rest/107/lnnu4xzcwspoclru/task.commentitem.add.json";
 
-        public async Task SendTaskCommentAsync(int taskId, string message)
+        public async Task SendTaskCommentAsync(int taskId, string message,int  userid)
         {
             using (HttpClient client = new HttpClient())
             {
@@ -14,8 +14,8 @@ namespace ProjectsMecsaSPA.Services
                 {
                     fields = new
                     {
-                        AUTHOR_ID = 186,
-                        POST_MESSAGE = $"SPA - comentario automático: {message}" 
+                        AUTHOR_ID = userid,
+                        POST_MESSAGE = $"Proyectos - 🤖: {message}" 
                     }
                 };
 
