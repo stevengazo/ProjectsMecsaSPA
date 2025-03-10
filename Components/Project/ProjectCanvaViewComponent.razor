@@ -103,12 +103,22 @@
         </a>
     </div>
 </div>
-<div class="border rounded rounded-md shadow p-1 my-3">
-    <h5>
-        Comentarios
-    </h5>
-    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-</div>
+
+<AuthorizeView Roles="administrador,ingeniero,asistente">
+    <Authorized>
+        <div class="border rounded rounded-md shadow p-1 my-3">
+            <h5>
+                Comentarios
+            </h5>
+            <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+        </div>
+
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
+
 
 @if( project.Commentaries.Count > 0)
 {

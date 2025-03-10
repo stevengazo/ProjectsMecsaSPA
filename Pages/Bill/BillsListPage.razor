@@ -145,7 +145,13 @@
                                     <td>@item.ProjectName</td>
                                     <td>@item.status</td>
                                     <td>@item.CreationDate.ToShortDateString()</td>
-                                    <td>@item.ProjectAmount.ToString("N2")</td>
+                                  
+                                    @if(item.ProjectAmount == 0){
+                                        <td class="text-danger">@item.ProjectAmount.ToString("N2")</td>
+                                    }else{
+                                         <td>@item.ProjectAmount.ToString("N2")</td>
+                                    }
+                                   
                                     <td>@if (item.billMark)
                                         {
                                             <label>
