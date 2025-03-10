@@ -164,7 +164,7 @@
 }
 else
 {
-    <table class="table table-hover border">
+    <table class="table  table-hover border table-striped">
         <tbody>
             <tr>
                 <th>Número Proyecto</th>
@@ -181,16 +181,15 @@ else
             <tr>
                 <th>Número Tarea</th>
                 <td>
-                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-outline-success" target="_blank">
+                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
                         @project.TaskNumber
                     </a>
                 </td>
             </tr>
             <tr>
                 <th>Cliente</th>
-
                 <td>
-                    <a href="/customers/@project.CustomerId">
+                    <a href="/customers/@project.CustomerId" class="btn btn-sm btn-outline-success">
                         @project.Customer?.Name
                     </a>
                 </td>

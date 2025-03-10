@@ -7,7 +7,7 @@
 
 <AuthorizeView>
     <Authorized>
-        <h3>Detalles del Proyecto</h3>
+        <h3 class="text-center">Detalles del Proyecto</h3>
         @if (project.IsDeleted)
         {
             <h3 class="text-danger">
@@ -18,28 +18,34 @@
             </p>
         }
 
-        <div class="container">
+        <div class="container pb-5">
             <div class="row">
                 <!-- Detalles del Proyecto -->
                 <div class=" shadow p-1 border rounded ">
                     <DetailsProjectTableComponent project="project" />
                 </div>
-                <TelegramBotMessage />
             </div>
-            <div class="row mt-3 shadow p-1 border rounded ">
+            <div class="row mt-2 shadow p-1 border rounded ">
                 <Tabs EnableFadeEffect="true">
                     <Tab Title="Archivos" Active="true">
                         <Content>
+                           
                             @if (!project.IsDeleted)
                             {
-                                <UploadFileComponent id="project.ProjectId" />
+                                <div class="border rounded rounded-sm shadow p-1 m-1">
+                                    <UploadFileComponent id="project.ProjectId" />
+                                </div>
                             }
-                            <FileManagementComponent id="project.ProjectId" />
+                            <div class="border rounded rounded-sm shadow p-1 mx-1 my-3">
+                                <FileManagementComponent id="project.ProjectId" />
+                            </div>
+
+                         
                         </Content>
                     </Tab>
                     <Tab Title="Facturas">
                         <Content>
-                            <div class="p-1 d-flex flex-column">
+                            <div class="py-3 px-1 d-flex flex-column">
                                 <div class="">
                                     <button @onclick="ShowAddBill" class="btn btn-outline-success">
                                         Agregar Factura
@@ -54,18 +60,27 @@
                     </Tab>
                     <Tab Title="Comentarios">
                         <Content>
-                            <div class="overflow-auto">
-                                <h5>Comentarios</h5>
-                                @if (!project.IsDeleted)
-                                {
-                                    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-                                }
+                            <div class="overflow-auto py-3">
+                                <div class=" my-2">
+                                    <h5>Nuevo Comentario</h5>
+                                    @if (!project.IsDeleted)
+                                    {
+                                        <CommentaryAddComponent  ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                                    }
+                                </div>
                                 <div class="d-flex flex-column overflow">
+                                    <h5>Comentarios</h5>
                                     @foreach (var i in project.Commentaries)
                                     {
-                                        <div class="mx-2 my-1 p-2 border rounded">
-                                            <label>@i.CreationDate.ToLongDateString() - @i.Author</label>
-                                            <p>@i.CommentaryText</p>
+                                        <div class="m-0.5 py-1 px-2 border rounded">
+                                            <div class="d-flex flex-row justify-content-between">
+                                                <label style="font-size:16px;">@i.Author</label>
+                                                <label style="font-size:15px">@i.CreationDate.ToString("dd MMM yy")</label>
+                                            </div>
+                                            <hr class="p-0 mx-0 my-2" />
+                                            <p class="text-muted my-3" style="font-size:14px; white-space: pre-line;">
+                                                @i.CommentaryText
+                                            </p>
                                         </div>
                                     }
                                 </div>

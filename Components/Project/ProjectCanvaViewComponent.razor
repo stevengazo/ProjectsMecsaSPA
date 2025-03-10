@@ -1,120 +1,142 @@
 ﻿@inject ProjectsDBContext db
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Categoria
-            </th>
-            <th>
-                Datos
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                Id
-            </td>
-            <td>
-                @project.ProjectId
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Titulo
-            </td>
-            <td>
-                @project.Title
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Cliente
-            </td>
-            <td>
-                @project.Customer?.Name
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Vendedor
-            </td>
-            <td>
-                @project.Seller?.SellerName
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Etapa
-            </td>
-            <td>
-                @project.State?.StateName
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Tipo Proyecto
-            </td>
-            <td>
-                @project.Type?.Name
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Tarea
-            </td>
-            <td>
-                @project.TaskNumber
-            </td>
-        </tr>
+<div class="border rounded rounded-md shadow p-1 ">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Categoria
+                </th>
+                <th>
+                    Datos
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    Id
+                </td>
+                <td>
+                    @project.ProjectId
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Titulo
+                </td>
+                <td>
+                    @project.Title
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Cliente
+                </td>
+                <td>
+                    @project.Customer?.Name
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Vendedor
+                </td>
+                <td>
+                    @project.Seller?.SellerName
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Etapa
+                </td>
+                <td>
+                    @project.State?.StateName
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tipo Proyecto
+                </td>
+                <td>
+                    @project.Type?.Name
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Tarea
+                </td>
+                <td>
+                    @project.TaskNumber
+                </td>
+            </tr>
 
-        <tr>
-            <td>
-                Creación
-            </td>
-            <td>
-                @project.CreationDate.ToLongDateString()
-            </td>
-        </tr>
-        <tr>
-            <td>
-                OC
-            </td>
-            <td>
-                @project.OC
-            </td>
-        </tr>
-    </tbody>
-</table>
-<div class="">
-    <a href="/projects/@project.ProjectId" class="btn btn-sm btn-outline-info">Ver Proyecto</a>
-    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank" class="btn btn-sm btn-outline-success">
-        Ver tarea
-    </a>
+            <tr>
+                <td>
+                    Creación
+                </td>
+                <td>
+                    @project.CreationDate.ToLongDateString()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    OC
+                </td>
+                <td>
+                    @project.OC
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-<h5>
-    Comentarios
-</h5>
-<CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-<div class="d-flex flex-column">
-    @foreach (var i in project.Commentaries)
-    {
-            <div class="m-1 p-1 border rounded">
-                <div class="d-flex flex-column justify-content-end">
-                    <label style="font-size:16px;">@i.Author</label>
 
-                    <label style="font-size:15px">@i.CreationDate.ToLongDateString()</label>
+
+
+<div class="my-3">
+    <h5>
+        Acciones
+    </h5>
+    <div class="d-flex gap-3 border rounded-md rounded shadow px-3 py-2">
+        <a href="/projects/@project.ProjectId" class="btn btn-sm btn-outline-info">Ver Proyecto</a>
+        <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" target="_blank" class="btn btn-sm btn-outline-success">
+            Ver tarea
+        </a>
+    </div>
+</div>
+<div class="border rounded rounded-md shadow p-1 my-3">
+    <h5>
+        Comentarios
+    </h5>
+    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+</div>
+
+@if( project.Commentaries.Count > 0)
+{
+    <div class="border rounded rounded-md shadow p-1 my-3">
+        <h5>
+            Comentarios Agregados
+        </h5>
+        <div class="d-flex flex-column">
+            @foreach (var i in project.Commentaries)
+            {
+                <div class="m-0.5 py-1 px-2 border rounded">
+                    <div class="d-flex flex-row justify-content-between">
+                        <label style="font-size:16px;">@i.Author</label>
+                        <label style="font-size:15px">@i.CreationDate.ToString("dd MMM yy")</label>
+                    </div>
+                    <hr class="p-0 mx-0 my-2"/>
+                    <p class="text-muted my-3" style="font-size:14px; white-space: pre-line;">
+                            @i.CommentaryText
+                    </p>
                 </div>
-                <p class="text-muted" style="font-size:14px; white-space: pre-line;">
-                    <small>
-                    @i.CommentaryText
-                    </small>
-                </p>
-            </div>
-    }
+            }
+        </div>
+    </div>
+}
 
-</div>
+
+
+
 
 @code {
     [Parameter]
