@@ -11,7 +11,7 @@
 			<h2>
 				Compania
 			</h2>
-			<select class="form-control h-50 w-25">
+			<select class="form-control h-50 w-25" @onchange="ChangeCompany">
 				@foreach (var company in Companies)
 				{
 					<option value="@company.CompanyId">@company.CompanyName</option>
@@ -24,12 +24,12 @@
 				<div class="col h-100">
 					<h5>@Obj.Key.StateName</h5>
 					<SortableList class="h-100"
-								  TItem="Project"
-								  Name="@($"{Obj.Key.StateName}")"
-								  Data="@Obj.Value"
-								  Context="project"
-								  OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
-								  OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
+					TItem="Project"
+					Name="@($"{Obj.Key.StateName}")"
+					Data="@Obj.Value"
+					Context="project"
+					OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
+					OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
 						<ItemTemplate>
 							<div class="card-body" @onclick="() => HandleProjectView(project)">
 								<div class="d-flex justify-content-between">
@@ -68,10 +68,11 @@
 			// Cargar estados
 			States = db.States.Where(i => !i.IsDeleted).ToList();
 
+
 			// Inicializar el diccionario ProjectLists con listas vacías para cada estado
 			foreach (var state in States)
 			{
-				ProjectLists[state] = GetProjectsByState(state.StateId);
+				ProjectLists[state] = GetProjectsByState(state.StateId,Companies.FirstOrDefault().CompanyId);
 			}
 		}
 		catch (ObjectDisposedException e)
@@ -122,15 +123,49 @@
 			.Include(e => e.Seller)
 			.OrderByDescending(e => e.ProjectId)
 			.Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
-
-
 		}
 
 		catch (Exception e)
 		{
 			throw e;
 		}
+	}
 
+	private List<Project> GetProjectsByState(int stateId, int companyId)
+	{
+		try
+		{
+			return
+		db.Projects
+		.Include(e => e.Type)
+		.Include(e => e.Commentaries)
+		.Include(e => e.Customer)
+		.Include(e => e.State)
+		.Include(e => e.Seller)
+		.OrderByDescending(e => e.ProjectId)
+		.Where(i => !i.IsDeleted &&
+			i.StateId == stateId && i.CompanyId == companyId
+			&& (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
+		}
+		catch (ObjectDisposedException e)
+		{
+			Console.WriteLine(e.Message);
+
+			return
+			db.Projects
+			.Include(e => e.Type)
+			.Include(e => e.Commentaries)
+			.Include(e => e.Customer)
+			.Include(e => e.State)
+			.Include(e => e.Seller)
+			.OrderByDescending(e => e.ProjectId)
+			.Where(i => !i.IsDeleted && i.CompanyId ==companyId && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+		}
+
+		catch (Exception e)
+		{
+			throw e;
+		}
 	}
 
 
@@ -230,5 +265,17 @@
 			string Message = $"Se ha movido el proyecto {project.Title} ({project.ProjectId}-{project.TaskNumber}) a la etapa: {State}.";
 			await b24.SendTaskCommentAsync(_task, Message, 186);
 		}
+	}
+	
+	
+	private void ChangeCompany(ChangeEventArgs args)
+	{
+		ProjectLists.Clear();
+		var companyId = int.Parse(args.Value.ToString());	
+		foreach (var state in States)
+		{
+			ProjectLists[state] = GetProjectsByState(state.StateId, companyId);
+		}
+
 	}
 }
