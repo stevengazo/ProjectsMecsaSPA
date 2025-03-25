@@ -71,6 +71,8 @@ namespace ProjectsMecsaSPA.Model
         public string Province { get; set; }
 
         #region Relaciones
+        public int CompanyId { get; set; }
+        public Company Company { get; set; }
         public Seller Seller { get; set; }
         public TypeModel Type { get; set; }
         public Customer Customer { get; set; }

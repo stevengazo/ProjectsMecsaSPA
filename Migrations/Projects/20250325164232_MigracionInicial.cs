@@ -5,10 +5,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class ProjectMigration : Migration
+    public partial class MigracionInicial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Company",
+                columns: table => new
+                {
+                    CompanyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Company", x => x.CompanyId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
@@ -123,11 +136,18 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     StateId = table.Column<int>(type: "int", nullable: false),
                     CurrencyType = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     TypeOfChange = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    Province = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Province = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CompanyId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.ProjectId);
+                    table.ForeignKey(
+                        name: "FK_Projects_Company_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Company",
+                        principalColumn: "CompanyId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Projects_Customers_CustomerId",
                         column: x => x.CustomerId,
@@ -162,8 +182,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BillNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
+                    AmountOriginal = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
+                    TypeOfChange = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    TaskNumber = table.Column<int>(type: "int", nullable: false),
                     Author = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastEditor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -228,6 +251,34 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "BillFiles",
+                columns: table => new
+                {
+                    BillFileId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileExtension = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Creation = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    BillId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillFiles", x => x.BillFileId);
+                    table.ForeignKey(
+                        name: "FK_BillFiles_Bill_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bill",
+                        principalColumn: "BillId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Company",
+                columns: new[] { "CompanyId", "CompanyName" },
+                values: new object[] { 1, "Default" });
+
             migrationBuilder.InsertData(
                 table: "Customers",
                 columns: new[] { "CustomerId", "DNI", "Name", "Type" },
@@ -277,6 +328,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BillFiles_BillId",
+                table: "BillFiles",
+                column: "BillId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ProjectId",
                 table: "Comments",
                 column: "ProjectId");
@@ -285,6 +341,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "IX_Files_ProjectId",
                 table: "Files",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_CompanyId",
+                table: "Projects",
+                column: "CompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_CustomerId",
@@ -310,7 +371,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Bill");
+                name: "BillFiles");
 
             migrationBuilder.DropTable(
                 name: "Comments");
@@ -322,7 +383,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "Offers");
 
             migrationBuilder.DropTable(
+                name: "Bill");
+
+            migrationBuilder.DropTable(
                 name: "Projects");
+
+            migrationBuilder.DropTable(
+                name: "Company");
 
             migrationBuilder.DropTable(
                 name: "Customers");
