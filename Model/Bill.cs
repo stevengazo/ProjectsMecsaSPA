@@ -17,12 +17,24 @@ namespace ProjectsMecsaSPA.Model
         [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
         public decimal Amount { get; set; }
 
+        [Required(ErrorMessage = "El importe es obligatorio.")]
+        [Column(TypeName = "decimal(15, 3)")]
+        [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
+        public decimal AmountOriginal { get; set; }
+
+        [Required(ErrorMessage = "El importe es obligatorio.")]
+        [Column(TypeName = "decimal(15, 3)")]
+        [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
+        public decimal TypeOfChange { get; set; }
+
         [Required(ErrorMessage = "La moneda es obligatoria.")]
         [StringLength(10, ErrorMessage = "La moneda no puede tener más de 10 caracteres.")]
         public string Currency { get; set; }
 
         [StringLength(500, ErrorMessage = "La nota no puede tener más de 500 caracteres.")]
         public string Note { get; set; }
+        [Required( ErrorMessage = "Debe Indicar el numero de tarea")]
+        public int TaskNumber { get; set; }
 
         [Required(ErrorMessage = "El autor es obligatorio.")]
         [StringLength(100, ErrorMessage = "El autor no puede tener más de 100 caracteres.")]
@@ -40,10 +52,12 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "La fecha de factura es obligatoria.")]
         public DateTime BillDate { get; set; }
 
-
         public Project? Project { get; set; }
 
         [Required(ErrorMessage = "El ID del proyecto es obligatorio.")]
         public int ProjectId { get; set; }
+
+        public ICollection<BillFile> BillFiles { get; set; }
+
     }
 }

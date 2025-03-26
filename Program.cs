@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using ProjectsMecsaSPA.Hubs;
 using ProjectsMecsaSPA.Model;
 using ProjectsMecsaSPA.Services;
 using ProjectsMecsaSPA.Utilities;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,8 +40,8 @@ builder.Services.AddBlazorBootstrap();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 // Telegram
 // Cargar las configuraciones desde appsettings.json
-builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
-builder.Services.AddHostedService<TelegramService>();
+//builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+//builder.Services.AddHostedService<TelegramService>();
 
 
 var app = builder.Build();
@@ -98,6 +100,20 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
+var path = Path.Combine(Directory.GetCurrentDirectory(), "bills");
+if (!Directory.Exists(path))
+{
+    Directory.CreateDirectory(path);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(path),
+    RequestPath = "/drive-facturas"
+});
+
 
 app.UseHttpsRedirection();
 

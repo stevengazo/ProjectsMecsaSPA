@@ -14,14 +14,22 @@ namespace ProjectsMecsaSPA.Data
         public DbSet<TypeModel> Types { get; set; }
         public DbSet<Seller> Seller { get; set; }
         public DbSet<Bill> Bill { get; set; }
+        public DbSet<BillFile> BillFiles { get; set; }
+        public DbSet<Company> Company { get; set; }
 
         public ProjectsDBContext(DbContextOptions contextOptions) : base(contextOptions)
         {
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            Company company = new Company()
+            {
+                CompanyId = 1,
+                CompanyName = "Default"
+            };
+            modelBuilder.Entity<Company>().HasData(company);    
 
             Seller seller = new()
             {
@@ -30,7 +38,9 @@ namespace ProjectsMecsaSPA.Data
                 Email = ""
 
             };
+          
             modelBuilder.Entity<Seller>().HasData(seller);
+            
             List<TypeModel> typeModels = new List<TypeModel>() {
                 new TypeModel()
                 {
