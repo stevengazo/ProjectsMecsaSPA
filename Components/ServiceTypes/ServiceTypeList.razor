@@ -1,0 +1,42 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<div>
+	<h5>Agregar Servicio</h5>
+	<EditForm Model="@typeModelObj">
+		<div>
+			<label>Nombre</label>
+			<InputText class="form-control" @bind-Value="typeModelObj.Name" />
+		</div>
+	</EditForm>
+	<button class="btn btn-primary" @onclick="AddTypeModelAsync">Agregar</button>
+</div>
+
+@foreach (var i in TypesModels)
+{
+	<ServiceTypeData TypeModelData="i" />
+}
+
+@code {
+	List<TypeModel> TypesModels = new List<TypeModel>();
+	ProjectsDBContext db;
+
+	private TypeModel typeModelObj { get; set; }
+	protected override async Task OnInitializedAsync()
+	{
+		db = DbContextFactory.CreateDbContext();
+		typeModelObj = new();
+		TypesModels = await db.Types.AsNoTracking().ToListAsync();
+	}
+
+	async Task AddTypeModelAsync()
+	{
+		if (!string.IsNullOrEmpty(typeModelObj.Name))
+		{
+			db.Types.Add(typeModelObj);
+			db.SaveChanges();
+			TypesModels.Add(typeModelObj);
+			typeModelObj = new();
+			StateHasChanged();
+		}
+	}
+}

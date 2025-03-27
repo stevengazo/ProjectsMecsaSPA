@@ -1,0 +1,41 @@
+﻿@inject ProjectsDBContext db
+
+
+<div>
+	<h5>Agregar Compania</h5>
+	<EditForm Model="@companyNew">
+		<div>
+			<label>Nombre</label>
+			<InputText class="form-control" @bind-Value="companyNew.CompanyName" />
+		</div>
+	</EditForm>
+	<button class="btn btn-primary" @onclick="AddCompanyAsync">Agregar</button>
+</div>
+
+@foreach (var i in companies)
+{
+	<CompanyData Company="@i" />
+}
+
+@code {
+	List<Company> companies = new List<Company>();
+
+	private Company companyNew { get; set; }	
+	protected override async Task OnInitializedAsync()
+	{
+		companyNew = new Company();	
+		companies = await db.Company.AsNoTracking().ToListAsync();
+	}
+
+	async Task AddCompanyAsync()
+	{
+		if(!string.IsNullOrEmpty(companyNew.CompanyName))
+		{
+			db.Company.Add(companyNew);
+			db.SaveChanges();
+			companies.Add(companyNew);
+			companyNew = new Company();
+			StateHasChanged();
+		}
+	}
+}

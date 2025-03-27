@@ -1,0 +1,47 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<div class="card p-2 shadow-sm d-flex flex-row align-items-center gap-2">
+    <h6 class="mb-0 flex-grow-1">@TypeModelData.Name</h6>
+
+    @if (CanEdit)
+    {
+        <EditForm Model="@TypeModelData" OnValidSubmit="EditTypeModel" class="d-flex align-items-center gap-2">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <InputText class="form-control form-control-sm" @bind-Value="TypeModelData.Name" style="width: 200px;" />
+
+            <button type="submit" class="btn btn-success btn-sm">✔</button>
+            <button type="button" class="btn btn-secondary btn-sm" @onclick="()=> CanEdit = false">✖</button>
+        </EditForm>
+    }
+    else
+    {
+        <button class="btn btn-primary btn-sm" @onclick="()=> CanEdit = true">✎</button>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public TypeModel TypeModelData { get; set; }
+
+    ProjectsDBContext db;
+
+    bool CanEdit { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+
+    }
+
+    async Task EditTypeModel()
+    {
+        if (TypeModelData != null && !string.IsNullOrEmpty(TypeModelData.Name))
+        {
+            db.Types.Update(TypeModelData);
+            await db.SaveChangesAsync();
+            CanEdit = false;
+        }
+    }
+}

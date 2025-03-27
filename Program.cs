@@ -11,10 +11,14 @@ using ProjectsMecsaSPA.Model;
 using ProjectsMecsaSPA.Services;
 using ProjectsMecsaSPA.Utilities;
 using Microsoft.Extensions.FileProviders;
+using static ProjectsMecsaSPA.Components.Config.AppSettingsConfig;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+
 var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
 
