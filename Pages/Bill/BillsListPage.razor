@@ -1,216 +1,217 @@
 ﻿@page "/billslist"
+@using ProjectsMecsaSPA.Utilities
 @inject ProjectsDBContext db
+@inject IJSRuntime JS
 
 
 <h3>Lista de Facturas</h3>
 
 <AuthorizeView>
-    <Authorized>
+	<Authorized>
 
-        <Tabs EnableFadeEffect="true">
-            <Tab Title="Facturas Cargadas" Active="true">
-                <Content>
-                    <p>Facturas del año en curso</p>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Proyecto Id</th>
-                                <th>Tarea</th>
-                                <th>Id</th>
-                                <th>Proyecto</th>
-                                <th>Autor</th>
-                                <th>Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var bill in bills)
-                            {
-                                <tr>
-                                    <td>
-                                        <a href="/projects/@bill.Project?.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
-                                            @bill.Project?.ProjectId
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
-                                            @bill.Project?.TaskNumber
-                                        </a>
-                                    </td>
-                                    <td>@bill.BillDate.ToShortDateString()</td>
-                                    <td>@bill.Project?.Title</td>
-                                    <td>@bill.Author</td>
-                                    <td>@bill.Amount.ToString("N2")</td>
+		<Tabs EnableFadeEffect="true">
+			<Tab Title="Facturas Cargadas" Active="true">
+				<Content>
+					<p>Facturas del año en curso</p>
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th>Proyecto Id</th>
+								<th>Tarea</th>
+								<th>Id</th>
+								<th>Proyecto</th>
+								<th>Autor</th>
+								<th>Monto</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var bill in bills)
+							{
+								<tr>
+									<td>
+										<a href="/projects/@bill.Project?.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+											@bill.Project?.ProjectId
+										</a>
+									</td>
+									<td>
+										<a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+											@bill.Project?.TaskNumber
+										</a>
+									</td>
+									<td>@bill.BillDate.ToShortDateString()</td>
+									<td>@bill.Project?.Title</td>
+									<td>@bill.Author</td>
+									<td>@bill.Amount.ToString("N2")</td>
 
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+								</tr>
+							}
+						</tbody>
+					</table>
 
-                </Content>
-            </Tab>
-            <Tab Title="Estado de Proyectos">
-                <Content>
-                    <div class="p-1 d-flex flex-column">
-                        <h3>Resumen de Facturas por Proyecto</h3>
-                        <p>Facturas del año en curso y los ultimos 4 meses del anterior</p>
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Tarea</th>
-                                    <th>Proyecto</th>
-                                    <th>Estado</th>
-                                    <th>Fecha de Proyecto</th>
-                                    <th>Monto Registrado</th>
-                                    <th>Total Facturado</th>
-                                    <th>Porcentaje de Facturación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in totalByProject)
-                                {
-                                // Calcular el porcentaje asegurando que no haya excedentes
-                                    var porcentaje = item.ProjectAmount > 0 ? ((item.BillsTotalAmount / item.ProjectAmount) * 100) : 0;
+				</Content>
+			</Tab>
+			<Tab Title="Estado de Proyectos">
+				<Content>
+					<div class="p-1 d-flex flex-column">
+						<h3>Resumen de Facturas por Proyecto</h3>
+						<p>Facturas del año en curso y los ultimos 4 meses del anterior</p>
+						<table class="table table-striped table-hover">
+							<thead>
+								<tr>
+									<th>Id</th>
+									<th>Tarea</th>
+									<th>Proyecto</th>
+									<th>Estado</th>
+									<th>Fecha de Proyecto</th>
+									<th>Monto Registrado</th>
+									<th>Total Facturado</th>
+									<th>Porcentaje de Facturación</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in totalByProject)
+								{
+									// Calcular el porcentaje asegurando que no haya excedentes
+									var porcentaje = item.ProjectAmount > 0 ? ((item.BillsTotalAmount / item.ProjectAmount) * 100) : 0;
+									<tr>
+										<td>
+											<a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+												@item.ProjectId
+											</a>
+										</td>
+										<td>
+											<a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+												@item.TaskNumber
+											</a>
+										</td>
+										<td>@item.ProjectName</td>
+										<td>@item.status</td>
+										<td>@item.CreationDate.ToShortDateString()</td>
+										<td>@item.ProjectAmount.ToString("N2")</td>
+										<td>@item.BillsTotalAmount.ToString("N2")</td>
+										<td>
+											@if(porcentaje>100){
+												<Progress Class="mb-3">
+													<ProgressBar Color="ProgressColor.Warning" Width="100" label="@porcentaje.ToString("F2")"  /> 
+												</Progress>
+											}
+											else if(item.ProjectAmount ==0){
+												<Progress Class="mb-3">
+													<ProgressBar Width="100" Color="ProgressColor.Danger" label="Monto de Proyecto no Indicado" />
+												</Progress>
 
+											}else
+											{
+												<Progress Class="mb-3">
+													<ProgressBar Width="@double.Parse(porcentaje.ToString("F2"))" label="@porcentaje.ToString("F2")"   /> 
+												</Progress>
+											}
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Sin Facturación">
+				<Content>
+					<p>Facturas del año en curso. Esto incluye todos los proyectos que no posean una factura registrada.</p>
+					<button class=" btn btn-sm btn-outline-success" @onclick="DownloadPWithOutBill">Descargar Hoja de calculo</button>
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th>Id</th>
+								<th>Tarea</th>
+								<th>Proyecto</th>
+								<th>Fecha de Creación</th>
+								<th>Monto Registrado</th>
+								<th>Estado</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in projectsWithoutBilling)
+							{
+								<tr>
+									<td>
+										<a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+											@item.ProjectId
+										</a>
+									</td>
+									<td>
+										<a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+											@item.TaskNumber
+										</a>
+									</td>
+									<td>@item.ProjectName</td>
+									<td>@item.status</td>
+									<td>@item.CreationDate.ToShortDateString()</td>
 
-                                    <tr>
-                                        <td>
-                                            <a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
-                                                @item.ProjectId
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
-                                                @item.TaskNumber
-                                            </a>
-                                        </td>
-                                        <td>@item.ProjectName</td>
-                                        <td>@item.status</td>
-                                        <td>@item.CreationDate.ToShortDateString()</td>
-                                        <td>@item.ProjectAmount.ToString("N2")</td>
-                                        <td>@item.BillsTotalAmount.ToString("N2")</td>
-                                        <td>
-                                            @if(porcentaje>100){
-                                                <Progress Class="mb-3">
-                                                    <ProgressBar Color="ProgressColor.Warning" Width="100" label="@porcentaje.ToString("F2")"  /> 
-                                                </Progress>
-                                            }
-                                            else if(item.ProjectAmount ==0){
-                                                <Progress Class="mb-3">
-                                                    <ProgressBar Width="100" Color="ProgressColor.Danger" label="Monto de Proyecto no Indicado" />
-                                                </Progress>
+									@if(item.ProjectAmount == 0){
+										<td class="text-danger">@item.ProjectAmount.ToString("N2")</td>
+									}else{
+										<td>@item.ProjectAmount.ToString("N2")</td>
+									}
 
-                                            }else
-                                            {
-                                                <Progress Class="mb-3">
-                                                    <ProgressBar Width="@double.Parse(porcentaje.ToString("F2"))" label="@porcentaje.ToString("F2")"   /> 
-                                                </Progress>
-                                            }
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </Content>
-            </Tab>
-            <Tab Title="Sin Facturación">
-                <Content>
-                    <p>Facturas del año en curso. Esto incluye todos los proyectos que no posean una factura registrada.</p>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Tarea</th>
-                                <th>Proyecto</th>
-                                <th>Fecha de Creación</th>
-                                <th>Monto Registrado</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in projectsWithoutBilling)
-                            {
-                                <tr>
-                                    <td>
-                                        <a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
-                                            @item.ProjectId
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
-                                            @item.TaskNumber
-                                        </a>
-                                    </td>
-                                    <td>@item.ProjectName</td>
-                                    <td>@item.status</td>
-                                    <td>@item.CreationDate.ToShortDateString()</td>
-                                  
-                                    @if(item.ProjectAmount == 0){
-                                        <td class="text-danger">@item.ProjectAmount.ToString("N2")</td>
-                                    }else{
-                                         <td>@item.ProjectAmount.ToString("N2")</td>
-                                    }
-                                   
-                                    <td>@if (item.billMark)
-                                        {
-                                            <label>
-                                                Marcado como Facturado
-                                            </label>
-                                        } else
-                                        {
-                                            <label>
-                                                No ha sido marcado como facturado
-                                            </label>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </Content>
-            </Tab>
+									<td>@if (item.billMark)
+										{
+											<label>
+												Marcado como Facturado
+											</label>
+										} else
+										{
+											<label>
+												No ha sido marcado como facturado
+											</label>
+										}
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</Content>
+			</Tab>
 
-        </Tabs>
-    </Authorized>
-    <NotAuthorized>
-        <ErrorViewComponent />
-    </NotAuthorized>
+		</Tabs>
+	</Authorized>
+	<NotAuthorized>
+		<ErrorViewComponent />
+	</NotAuthorized>
 </AuthorizeView>
 
 
 
 @code {
 
-    List<Bill> bills = new List<Bill>();
-    List<ProjectBillSummary> totalByProject = new List<ProjectBillSummary>();
+	List<Bill> bills = new List<Bill>();
+	List<ProjectBillSummary> totalByProject = new List<ProjectBillSummary>();
 
-    protected override Task OnInitializedAsync()
-    {
-        bills = db.Bill.AsNoTracking().Include(e => e.Project).OrderByDescending(e => e.BillDate).ToList();
+	protected override Task OnInitializedAsync()
+	{
+		bills = db.Bill.AsNoTracking().Include(e => e.Project).OrderByDescending(e => e.BillDate).ToList();
 
-        GetAmountBillByProject();
-        GetProjectsWithoutBilling(); // Obtener los proyectos sin facturar
+		GetAmountBillByProject();
+		GetProjectsWithoutBilling(); // Obtener los proyectos sin facturar
 
-        return base.OnInitializedAsync();
-    }
+		return base.OnInitializedAsync();
+	}
 
-    private async Task GetAmountBillByProject()
-    {
-        var currentYear = DateTime.Now.Year;  // Año actual
-        var lastYear = currentYear - 1;       // Año anterior
+	private async Task GetAmountBillByProject()
+	{
+		var currentYear = DateTime.Now.Year;  // Año actual
+		var lastYear = currentYear - 1;       // Año anterior
 
-        // Obtener las fechas de inicio para los filtros
-        var startDateCurrentYear = new DateTime(currentYear, 1, 1);  // 1 de enero del año en curso
-        var startDateLastYear = new DateTime(lastYear, 9, 1);       // 1 de septiembre del año anterior
+		// Obtener las fechas de inicio para los filtros
+		var startDateCurrentYear = new DateTime(currentYear, 1, 1);  // 1 de enero del año en curso
+		var startDateLastYear = new DateTime(lastYear, 9, 1);       // 1 de septiembre del año anterior
 
-        // Filtrar las facturas que están en el rango de fechas adecuado
-        totalByProject = db.Bill.Include(e => e.Project)
-        .Include(e => e.Project.State)
-            .Where(b => (b.BillDate >= startDateCurrentYear && b.BillDate <= DateTime.Now) ||
-                        (b.BillDate >= startDateLastYear && b.BillDate < new DateTime(lastYear, 12, 31)))
-            .GroupBy(b => b.Project.ProjectId)
-            .Select(g => new ProjectBillSummary
+		// Filtrar las facturas que están en el rango de fechas adecuado
+		totalByProject = db.Bill.Include(e => e.Project)
+		.Include(e => e.Project.State)
+			.Where(b => (b.BillDate >= startDateCurrentYear && b.BillDate <= DateTime.Now) ||
+						(b.BillDate >= startDateLastYear && b.BillDate < new DateTime(lastYear, 12, 31)))
+			.GroupBy(b => b.Project.ProjectId)
+			.Select(g => new ProjectBillSummary
                 {
                     ProjectId = g.Key,
                     TaskNumber = g.First().Project.TaskNumber,
@@ -221,23 +222,23 @@
                     billMark = g.First().Project.Isfactured,
                     BillsTotalAmount = g.Sum(b => b.Amount)
                 })
-                .OrderByDescending(e => e.ProjectId)
-            .ToList();
-    }
+				.OrderByDescending(e => e.ProjectId)
+			.ToList();
+	}
 
 
-    List<ProjectBillSummary> projectsWithoutBilling = new List<ProjectBillSummary>();
+	List<ProjectBillSummary> projectsWithoutBilling = new List<ProjectBillSummary>();
 
-    private async Task GetProjectsWithoutBilling()
-    {
-        var currentYear = DateTime.Now.Year;
+	private async Task GetProjectsWithoutBilling()
+	{
+		var currentYear = DateTime.Now.Year;
 
-        // Filtrar los proyectos que no tienen facturación registrada
-        projectsWithoutBilling = await db.Projects
-        .Include(e => e.State)
-        .AsNoTracking()
-            .Where(p => p.CreationDate.Year == currentYear && !db.Bill.Any(b => b.ProjectId == p.ProjectId)) // Proyectos sin facturas
-            .Select(p => new ProjectBillSummary
+		// Filtrar los proyectos que no tienen facturación registrada
+		projectsWithoutBilling = await db.Projects
+		.Include(e => e.State)
+		.AsNoTracking()
+			.Where(p => p.CreationDate.Year == currentYear && !db.Bill.Any(b => b.ProjectId == p.ProjectId)) // Proyectos sin facturas
+			.Select(p => new ProjectBillSummary
                 {
                     ProjectId = p.ProjectId,
                     ProjectName = p.Title,
@@ -248,20 +249,28 @@
                     billMark = p.Isfactured,
                     BillsTotalAmount = 0 // No hay facturación registrada
                 })
-                .OrderByDescending(e => e.ProjectId)
-            .ToListAsync(); // Se usa ToListAsync para trabajar de manera asincrónica
-    }
+				.OrderByDescending(e => e.ProjectId)
+			.ToListAsync(); // Se usa ToListAsync para trabajar de manera asincrónica
+	}
 
-    public class ProjectBillSummary
-    {
-        public int ProjectId { get; set; }
-        public string ProjectName { get; set; }
-        public DateTime CreationDate { get; set; }
-        public decimal ProjectAmount { get; set; }
-        public decimal BillsTotalAmount { get; set; }
-        public string TaskNumber { get; set; }
-        public bool billMark { get; set; }
-        public string status { get; set; }
-    }
+	public class ProjectBillSummary
+	{
+		public int ProjectId { get; set; }
+		public string ProjectName { get; set; }
+		public DateTime CreationDate { get; set; }
+		public decimal ProjectAmount { get; set; }
+		public decimal BillsTotalAmount { get; set; }
+		public string TaskNumber { get; set; }
+		public bool billMark { get; set; }
+		public string status { get; set; }
+	}
+	private async void DownloadPWithOutBill(MouseEventArgs args)
+	{
+		var data = await XmlsGenerate.GenerateFileProjects(projectsWithoutBilling);
+		var pdfBase64 = Convert.ToBase64String(data);
 
+		// Invocar una función JavaScript para iniciar la descarga del PDF
+		await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos Sin Facturas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+
+	}
 }

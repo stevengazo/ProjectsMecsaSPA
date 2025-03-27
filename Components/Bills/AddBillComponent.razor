@@ -3,12 +3,49 @@
 @inject IWebHostEnvironment env
 @inject IJSRuntime jS;
 @inject FileStorageService FileStorageService
+@inject Bitrix24ClientService Bitrix24Client
+
+
+
+
+<style>
+	.custom-file-input {
+		all: unset; /* Elimina todos los estilos predeterminados */
+	}
+
+	.file-drop-zone {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 90%;
+		min-height: 150px;
+		border: 1px dashed #ff9320;
+		border-radius: 10px;
+		background-color: #f8f9fa;
+		text-align: center;
+		padding: 10px;
+		transition: background-color 0.3s, border-color 0.3s;
+		cursor: pointer;
+	}
+
+		.file-drop-zone p {
+			font-size: 1rem;
+			color: #333;
+		}
+
+		.file-drop-zone:hover,
+		.hover {
+			border-color: #00ca71;
+			background-color: #e6ffe6;
+		}
+</style>
 
 
 <EditForm Model="bill" OnValidSubmit="Add">
 	<DataAnnotationsValidator />
 	<ValidationSummary />
-
+	<!-- Number Bill-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
@@ -16,7 +53,7 @@
 		</div>
 		<ValidationMessage For="@(() => bill.BillNumber)" class="text-danger" />
 	</div>
-
+	<!-- Amount-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputNumber @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
@@ -24,7 +61,7 @@
 		</div>
 		<ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
 	</div>
-
+	<!-- Note-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputTextArea @bind-Value="bill.Note" class="form-control" id="Note" />
@@ -44,6 +81,7 @@
 		</div>
 		<ValidationMessage For="@(() => bill.Currency)" />
 	</div>
+	<!-- Facturation Task-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputNumber @bind-Value="bill.TaskNumber" class="form-control" id="TaskNumber" />
@@ -51,7 +89,7 @@
 		</div>
 		<ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger" />
 	</div>
-
+	<!-- Author-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputText @bind-Value="bill.Author" class="form-control" id="Author" />
@@ -59,7 +97,7 @@
 		</div>
 		<ValidationMessage For="@(() => bill.Author)" class="text-danger" />
 	</div>
-
+	<!-- Bill Date-->
 	<div class="form-group">
 		<div class="form-floating mt-1">
 			<InputDate @bind-Value="bill.BillDate" class="form-control" id="BillDate" />
@@ -67,52 +105,20 @@
 		</div>
 		<ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
 	</div>
-
+	<!-- Files-->
+	<div class="border shadow-sm rounded p-3 text-center">
+		<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
+		<InputFile multiple OnChange="@OnChange"
+				   @ondragenter="OnDragEnter"
+				   @ondragleave="OnDragLeave"
+				   @ondragover="OnDragEnter"
+				   class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+	</div>
+	<!-- Submit Button-->
 	<button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
 </EditForm>
 
-<div class="border shadow-sm rounded p-3 text-center">
-	<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
-	<InputFile multiple OnChange="@OnChange"
-	@ondragenter="OnDragEnter"
-	@ondragleave="OnDragLeave"
-	@ondragover="OnDragEnter"
-	class="@($"file-drop-zone custom-file-input {HoverClass}")" />
-</div>
 
-
-<style>
-	.custom-file-input {
-	all: unset; /* Elimina todos los estilos predeterminados */
-	}
-
-	.file-drop-zone {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	width: 90%;
-	min-height: 150px;
-	border: 1px dashed #ff9320;
-	border-radius: 10px;
-	background-color: #f8f9fa;
-	text-align: center;
-	padding: 10px;
-	transition: background-color 0.3s, border-color 0.3s;
-	cursor: pointer;
-	}
-
-	.file-drop-zone p {
-	font-size: 1rem;
-	color: #333;
-	}
-
-	.file-drop-zone:hover,
-	.hover {
-	border-color: #00ca71;
-	background-color: #e6ffe6;
-	}
-</style>
 
 <div class="border shadow-sm rounded p-2 m-1">
 	<h6 class="fw-bold mb-2">Archivos</h6>

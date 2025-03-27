@@ -2,6 +2,7 @@
 
 using ClosedXML.Excel;
 using ProjectsMecsaSPA.Model;
+using static ProjectsMecsaSPA.Pages.Bill.BillsListPage;
 
 namespace ProjectsMecsaSPA.Utilities
 {
@@ -80,6 +81,53 @@ namespace ProjectsMecsaSPA.Utilities
             using var memoryStream = new MemoryStream();
             workbook.SaveAs(memoryStream);
             return memoryStream.ToArray();
+        }
+        public static async Task<byte[]> GenerateFileProjects(IEnumerable<ProjectBillSummary> projects)
+        {
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Projects");
+
+            // Encabezados de las columnas
+            worksheet.Cell(1, 1).Value = "ProjectId";
+            worksheet.Cell(1, 2).Value = "ProjectName";
+            worksheet.Cell(1, 3).Value = "CreationDate";
+            worksheet.Cell(1, 4).Value = "ProjectAmount";
+            worksheet.Cell(1, 5).Value = "BillsTotalAmount";
+            worksheet.Cell(1, 6).Value = "TaskNumber";
+            worksheet.Cell(1, 7).Value = "Bill Mark";
+            worksheet.Cell(1, 8).Value = "Status";
+
+            // Llenar los datos
+            int row = 2;
+            foreach (var project in projects)
+            {
+                worksheet.Cell(row, 1).Value = project.ProjectId;
+                worksheet.Cell(row, 2).Value = project.ProjectName;
+                worksheet.Cell(row, 3).Value = project.CreationDate;
+                worksheet.Cell(row, 4).Value = project.ProjectAmount;
+                worksheet.Cell(row, 5).Value = project.BillsTotalAmount;
+                worksheet.Cell(row, 6).Value = project.TaskNumber;
+                worksheet.Cell(row, 7).Value = project.billMark;
+                worksheet.Cell(row, 8).Value = project.status;
+
+                row++;
+            }
+
+            // Ajustar el ancho de las columnas
+            worksheet.Columns().AdjustToContents();
+
+            // Guardar el archivo en un array de bytes
+            using var memoryStream = new MemoryStream();
+            workbook.SaveAs(memoryStream);
+            return memoryStream.ToArray();
+        }
+
+
+
+
+        public static async Task<byte[]> GenerateFileProjects(List<Project> projects)
+        {
+            return await GenerateFileProjects(projects.AsEnumerable());
         }
 
 
