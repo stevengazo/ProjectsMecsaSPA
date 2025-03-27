@@ -4,7 +4,7 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject CentralBankService BancoCentralService
 @inject FileStorageService FileStorageService
-
+@inject Bitrix24ClientService Bitrix24Client
 
 
 @using Microsoft.AspNetCore.Components.Forms
@@ -68,12 +68,12 @@
 		<div class="form-group">
 			<div class="mt-1 mb-1">
 				<AutoComplete @bind-Value="customerName"
-							  TItem="Customer"
-							  class="form-control"
-							  DataProvider="CustomersDataProvider"
-							  PropertyName="Name"
-							  Placeholder="Buscar Cliente..."
-							  OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+				TItem="Customer"
+				class="form-control"
+				DataProvider="CustomersDataProvider"
+				PropertyName="Name"
+				Placeholder="Buscar Cliente..."
+				OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
 
 			</div>
 			<ValidationMessage For="@(() => project.CustomerId)" />
@@ -252,7 +252,7 @@
 	}
 
 	#region Central Bank Type Of change
-	
+
 	private async Task OnChangeOCDateAsync()
 	{
 		project.TypeOfChange = await BancoCentralService.ObtenerTipoCambioAsync(project.OCDate);
@@ -297,9 +297,12 @@
 	private async Task SendBitrixCommentary()
 	{
 		var valid = int.TryParse(project.TaskNumber, out int taskNumber);
-		Bitrix24ClientServices bitrix24ClientServices = new Bitrix24ClientServices();
-		await bitrix24ClientServices.SendTaskCommentAsync(taskNumber, $"Número de Proyecto {project.ProjectId}. Ver más detalles en app para proyectos.", 252);
+		await  Bitrix24Client.SendTaskCommentAsync(taskNumber, $"Número de Proyecto {project.ProjectId}. Ver más detalles en app para proyectos.", 252);
+		var result = await  Bitrix24Client.CreateSubfolderAsync(1116310, project.ProjectId.ToString() + "--" + project.Title);
+		project.FolderIDB24 = result;
 
+		db.Projects.Update(project);	
+		await db.SaveChangesAsync();	
 	}
 
 	private void ResetProjectsIdentity()

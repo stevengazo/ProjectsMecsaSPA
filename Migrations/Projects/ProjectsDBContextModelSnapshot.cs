@@ -349,6 +349,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<int>("FolderIDB24")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 

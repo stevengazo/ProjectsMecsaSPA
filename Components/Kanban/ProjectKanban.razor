@@ -1,7 +1,7 @@
 ﻿@using Microsoft.EntityFrameworkCore
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-
+@inject Bitrix24ClientService bitrix24;
 
 
 <Offcanvas @ref="offcanvas" />
@@ -212,9 +212,8 @@
             bool IsValid = int.TryParse(project.TaskNumber, out int _task);
             if (project != null && IsValid)
             {
-                Bitrix24ClientServices b24 = new Bitrix24ClientServices();
                 string Message = $"Se ha movido el proyecto {project.Title} ({project.ProjectId}-{project.TaskNumber}) a la etapa: {State}.";
-                await b24.SendTaskCommentAsync(_task, Message, 186);
+                await bitrix24.SendTaskCommentAsync(_task, Message, 186);
             }
         }
     }

@@ -123,6 +123,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     TaskNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TypeId = table.Column<int>(type: "int", nullable: false),
+                    FolderIDB24 = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
                     Ubication = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),

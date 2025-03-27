@@ -28,6 +28,8 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "El tipo es obligatorio.")]
         public int TypeId { get; set; }
 
+        public int FolderIDB24 { get; set; }
+
         [Required(ErrorMessage = "El cliente es obligatorio.")]
         public int CustomerId { get; set; }
 

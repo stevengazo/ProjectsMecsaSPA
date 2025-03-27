@@ -69,22 +69,48 @@ else
         </td>
     </tr>
     <tr>
-        <Collapse @ref="collapse1">
-            <Card>
-                <CardBody>
-                    <table class="table table-hover">
-                        @foreach(var i in item.BillFiles)
-                        {
-                            <tr>
-                                <td>
-                                    <h6>@i.FileName</h6>
-                                </td>
-                            </tr>
-                        }
-                    </table>
-                </CardBody>
-            </Card>
-        </Collapse>
+       <td colspan="6">
+            <Collapse @ref="collapse1">
+                <Card>
+                    <CardBody>
+                        <table class="table table-hover table-stripped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Archivo
+                                    </th>
+                                    <th>
+                                        Creacion
+                                    </th>
+                                    <th>
+                                        Enlace
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in item.BillFiles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <h6>@i.FileName</h6>
+                                        </td>
+                                        <td>
+                                            <h6>@i.Creation.Value.ToLongDateString()</h6>
+                                        </td>
+                                        <td>
+                                            <a href="@GetDownloadUrl(i.FilePath)" class="btn btn-info" target="_blank">
+                                                <Icon Name="IconName.CloudArrowDownFill"></Icon>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </CardBody>
+                </Card>
+            </Collapse>
+       </td>
 
     </tr>
 }
@@ -99,6 +125,14 @@ else
 
     Collapse collapse1 = default!;
 
+    private string GetDownloadUrl(string filePath)
+    {
+        // Aquí eliminamos la parte 'projectsdata/' si está presente
+        filePath = filePath.Replace("projectsdata\\", "");
+
+        // Generamos la URL de descarga que apunta a /drive-facturas/{ruta_relativa_del_archivo}
+        return $"/drive-facturas/{filePath}";
+    }
     private void Update()
     {
         try

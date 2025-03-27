@@ -47,6 +47,7 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 //builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 //builder.Services.AddHostedService<TelegramService>();
 // Central Bank Service
+builder.Services.AddHttpClient<Bitrix24ClientService>();
 builder.Services.AddHttpClient<CentralBankService>();
 builder.Services.AddSingleton<FileStorageService>();
 

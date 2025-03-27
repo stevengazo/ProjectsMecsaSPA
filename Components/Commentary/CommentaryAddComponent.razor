@@ -2,6 +2,7 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject ApplicationDbContext dbIdentity;
 @inject AuthenticationStateProvider asp;
+@inject Bitrix24ClientService bitrix24Client;
 
 <EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
     <div >
@@ -48,9 +49,8 @@
                     select p.TaskNumber).FirstOrDefault();
         var taskValid = int.TryParse(task, out int taskNumber);
         if (taskValid)
-        {
-            Bitrix24ClientServices bitrix24ClientServices = new Bitrix24ClientServices();
-            await bitrix24ClientServices.SendTaskCommentAsync(taskNumber, commentary.CommentaryText,186);
+        {    
+            await bitrix24Client.SendTaskCommentAsync(taskNumber, commentary.CommentaryText,186);
         }
     }
 
