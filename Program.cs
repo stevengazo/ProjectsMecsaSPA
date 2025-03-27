@@ -12,6 +12,7 @@ using ProjectsMecsaSPA.Services;
 using ProjectsMecsaSPA.Utilities;
 using Microsoft.Extensions.FileProviders;
 using static ProjectsMecsaSPA.Components.Config.AppSettingsConfig;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 
+
 var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
+
+#region Limites
+builder.Services.Configure<HubOptions>(options =>
+{
+    options.MaximumReceiveMessageSize = 20 * 1024 * 1024; // 20 MB
+});
+
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 20 * 1024 * 1024; // 20 MB
+});
+
+#endregion
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(UsersConnection));
