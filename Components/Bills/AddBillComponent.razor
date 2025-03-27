@@ -2,6 +2,7 @@
 @inject ProjectsDBContext db
 @inject IWebHostEnvironment env
 @inject IJSRuntime jS;
+@inject FileStorageService FileStorageService
 
 
 <EditForm Model="bill" OnValidSubmit="Add">
@@ -9,7 +10,7 @@
 	<ValidationSummary />
 
 	<div class="form-group">
-		<div class="form-floating mt-1">	
+		<div class="form-floating mt-1">
 			<InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
 			<label class="form-label" for="BillNumber">Número de Factura</label>
 		</div>
@@ -18,7 +19,7 @@
 
 	<div class="form-group">
 		<div class="form-floating mt-1">
-			<InputNumber  @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
+			<InputNumber @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
 			<label class="form-label" for="Amount">Importe</label>
 		</div>
 		<ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
@@ -73,44 +74,44 @@
 <div class="border shadow-sm rounded p-3 text-center">
 	<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
 	<InputFile multiple OnChange="@OnChange"
-			   @ondragenter="OnDragEnter"
-			   @ondragleave="OnDragLeave"
-			   @ondragover="OnDragEnter"
-			   class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+	@ondragenter="OnDragEnter"
+	@ondragleave="OnDragLeave"
+	@ondragover="OnDragEnter"
+	class="@($"file-drop-zone custom-file-input {HoverClass}")" />
 </div>
 
 
 <style>
 	.custom-file-input {
-		all: unset; /* Elimina todos los estilos predeterminados */
+	all: unset; /* Elimina todos los estilos predeterminados */
 	}
 
 	.file-drop-zone {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		width: 90%;
-		min-height: 150px;
-		border: 1px dashed #ff9320;
-		border-radius: 10px;
-		background-color: #f8f9fa;
-		text-align: center;
-		padding: 10px;
-		transition: background-color 0.3s, border-color 0.3s;
-		cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 90%;
+	min-height: 150px;
+	border: 1px dashed #ff9320;
+	border-radius: 10px;
+	background-color: #f8f9fa;
+	text-align: center;
+	padding: 10px;
+	transition: background-color 0.3s, border-color 0.3s;
+	cursor: pointer;
 	}
 
-		.file-drop-zone p {
-			font-size: 1rem;
-			color: #333;
-		}
+	.file-drop-zone p {
+	font-size: 1rem;
+	color: #333;
+	}
 
-		.file-drop-zone:hover,
-		.hover {
-			border-color: #00ca71;
-			background-color: #e6ffe6;
-		}
+	.file-drop-zone:hover,
+	.hover {
+	border-color: #00ca71;
+	background-color: #e6ffe6;
+	}
 </style>
 
 <div class="border shadow-sm rounded p-2 m-1">
@@ -142,17 +143,11 @@
 
 	List<IBrowserFile> files = new();
 
-
-
 	Bill bill = new()
-		{
-
-			LastEditionDate = DateTime.Now,
-			BillDate = DateTime.Now
-		};
-
-
-
+	{
+		LastEditionDate = DateTime.Now,
+		BillDate = DateTime.Now
+	};
 
 	private void DeleteFile(IBrowserFile file)
 	{
@@ -166,9 +161,6 @@
 		bill.ProjectId = ProjectId;
 	}
 
-
-
-
 	private async Task Add()
 	{
 		bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
@@ -179,6 +171,7 @@
 		using var context = db;
 		context.Bill.Add(bill);
 		await context.SaveChangesAsync();
+		await UploadFiles();
 		bill = new Bill
 			{
 				ProjectId = ProjectId,
@@ -193,6 +186,15 @@
 	void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
 	void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
 
+	async Task UploadFiles()
+	{
+		await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
+		foreach(var i in files)
+		{
+			var r = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+		}
+	}
+
 
 	async Task OnChange(InputFileChangeEventArgs e)
 	{
@@ -201,6 +203,7 @@
 			files.Add(file);
 		}
 	}
+
 
 
 }

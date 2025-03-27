@@ -3,6 +3,7 @@
 @inject NavigationManager Nav;
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject CentralBankService BancoCentralService
+@inject FileStorageService FileStorageService
 
 
 
@@ -344,6 +345,7 @@
 					db.Projects.Add(project);
 					await db.SaveChangesAsync();
 					transaction.Commit();
+					await FileStorageService.GenerateProjectDirectoryAsync(project.ProjectId);
 					SendBitrixCommentary();// Mensaje automatico a bitrix
 					Nav.NavigateTo($"projects/{project.ProjectId}");
 				}

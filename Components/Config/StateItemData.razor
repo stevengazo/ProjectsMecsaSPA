@@ -1,0 +1,66 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<div class="card p-2 shadow-sm d-flex flex-row align-items-center gap-2">
+    <h6 class="mb-0 flex-grow-1">@StateItem.StateName</h6>
+    <h6 class="mb-0 flex-grow-1">Prioridad @StateItem.OrderPriority</h6>
+
+    @if (CanEdit)
+    {
+        <EditForm Model="@StateItem" OnValidSubmit="EditState" class="d-flex align-items-center gap-2">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <InputText class="form-control form-control-sm" @bind-Value="StateItem.StateName" style="width: 200px;" />
+            <InputNumber class="form-control form-control-sm" @bind-Value="StateItem.OrderPriority" style="width: 200px;" />
+
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="text-danger">@ErrorMessage</div>
+            }
+
+            <button type="submit" class="btn btn-success btn-sm">✔</button>
+            <button type="button" class="btn btn-secondary btn-sm" @onclick="()=> CanEdit = false">✖</button>
+        </EditForm>
+    }
+    else
+    {
+        <button class="btn btn-primary btn-sm" @onclick="()=> CanEdit = true">✎</button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public State StateItem { get; set; }
+
+    private ProjectsDBContext db;
+
+    private bool CanEdit { get; set; } = false;
+    private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+    }
+
+    async Task EditState()
+    {
+        // Verifica si ya existe un estado con el mismo OrderPriority
+        var exist = db.States.FirstOrDefault(e => e.OrderPriority == StateItem.OrderPriority && e.StateId != StateItem.StateId);
+
+        // Verifica que el nombre del estado no esté vacío y que el número de prioridad no esté duplicado
+        if (string.IsNullOrEmpty(StateItem.StateName))
+        {
+            ErrorMessage = "El nombre del estado es obligatorio.";
+        }
+        else if (exist != null)
+        {
+            ErrorMessage = "El número de prioridad ya está asignado a otro estado.";
+        }
+        else
+        {
+            ErrorMessage = null; // Limpiar el mensaje de error
+            db.States.Update(StateItem);
+            await db.SaveChangesAsync();
+            CanEdit = false;
+        }
+    }
+}

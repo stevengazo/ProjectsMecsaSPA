@@ -48,6 +48,7 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 //builder.Services.AddHostedService<TelegramService>();
 // Central Bank Service
 builder.Services.AddHttpClient<CentralBankService>();
+builder.Services.AddSingleton<FileStorageService>();
 
 
 var app = builder.Build();
@@ -107,7 +108,7 @@ else
 }
 
 
-var path = Path.Combine(Directory.GetCurrentDirectory(), "bills");
+var path = Path.Combine(Directory.GetCurrentDirectory(), "projectsdata");
 if (!Directory.Exists(path))
 {
     Directory.CreateDirectory(path);
