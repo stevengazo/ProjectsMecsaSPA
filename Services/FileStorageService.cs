@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace ProjectsMecsaSPA.Services
 {
-    
         public class FileStorageService
         {
             private readonly string _baseRoute = Path.Combine(Directory.GetCurrentDirectory(), "projectsdata");
@@ -22,12 +21,21 @@ namespace ProjectsMecsaSPA.Services
             // Genera el directorio de una factura dentro del proyecto
             public async Task GenerateBillDirectoryAsync(int projectId, string BillId)
             {
-                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), BillId);
+            try
+            {
+                Directory.CreateDirectory(Path.Combine(_baseRoute, projectId.ToString(), "bills"));
+                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), "bills", BillId);
                 if (!Directory.Exists(billDirectory))
                 {
                     Directory.CreateDirectory(billDirectory);
                 }
                 await Task.CompletedTask;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
             }
 
             // Subir archivos de la factura y devolver la ruta relativa
@@ -39,7 +47,7 @@ namespace ProjectsMecsaSPA.Services
                 await GenerateBillDirectoryAsync(projectId, BillId);
 
                 // Directorio de la factura
-                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), BillId);
+                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), "bills", BillId);
 
               
                     var fileName = Path.GetFileName(file.Name);
@@ -55,7 +63,7 @@ namespace ProjectsMecsaSPA.Services
                     }
 
                     // Agregar la ruta relativa del archivo
-                    var relativePath = Path.Combine("projectsdata", projectId.ToString(), BillId, fileName);
+                    var relativePath = Path.Combine("projectsdata", projectId.ToString(),"bills", BillId, fileName);
 
             return relativePath;
             }
@@ -63,14 +71,14 @@ namespace ProjectsMecsaSPA.Services
             // Obtener los archivos de una factura
             public async Task<List<string>> GetBillsFilesAsync(int projectId, string BillId)
             {
-                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), BillId);
+                var billDirectory = Path.Combine(_baseRoute, projectId.ToString(), "bills", BillId);
                 if (!Directory.Exists(billDirectory))
                 {
                     return new List<string>();
                 }
 
                 var files = Directory.GetFiles(billDirectory);
-                return files.Select(file => Path.Combine("projectsdata", projectId.ToString(), BillId, Path.GetFileName(file))).ToList();
+                return files.Select(file => Path.Combine("projectsdata", projectId.ToString(), "bills", BillId, Path.GetFileName(file))).ToList();
             }
         }
     }

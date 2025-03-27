@@ -191,7 +191,14 @@
 		await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
 		foreach(var i in files)
 		{
-			var r = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+			BillFile tmpBill = new BillFile();
+			tmpBill.FileName = i.Name;
+			tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+			tmpBill.FileExtension = Path.GetExtension(i.Name);
+			tmpBill.Creation	= DateTime.Now;
+			tmpBill.BillId = bill.BillId;
+			db.BillFiles.Add(tmpBill);
+			await db.SaveChangesAsync();
 		}
 	}
 
