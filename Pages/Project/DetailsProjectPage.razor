@@ -16,6 +16,8 @@
     </p>
 }
 
+<AuthorizeView>
+	<Authorized>
         <div class="container">
             <div class="row">
                 <!-- Detalles del Proyecto -->
@@ -45,7 +47,7 @@
                                 </div>
 
                                 <div>
-                                    <BillTableComponent Bills="project.Bills.ToList()" />
+                                    <BillTableComponent Bills="Bills.ToList()" />
                                 </div>
                             </div>
                         </Content>
