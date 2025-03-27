@@ -44,6 +44,8 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "La orden de compra es requerido.")]
         public string OC { get; set; }
 
+        public int TAX { get; set; }
+
         [Required(ErrorMessage = "La fecha de OC es obligatoria.")]
         public DateTime OCDate { get; set; }
         [MaxLength(100,ErrorMessage ="El tamaño no puede ser mayor a 100 caracteres")]

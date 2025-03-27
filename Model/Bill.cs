@@ -17,16 +17,6 @@ namespace ProjectsMecsaSPA.Model
         [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
         public decimal Amount { get; set; }
 
-        [Required(ErrorMessage = "El importe es obligatorio.")]
-        [Column(TypeName = "decimal(15, 3)")]
-        [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
-        public decimal AmountOriginal { get; set; }
-
-        [Required(ErrorMessage = "El importe es obligatorio.")]
-        [Column(TypeName = "decimal(15, 3)")]
-        [Range(0, double.MaxValue, ErrorMessage = "El importe debe ser un valor positivo.")]
-        public decimal TypeOfChange { get; set; }
-
         [Required(ErrorMessage = "La moneda es obligatoria.")]
         [StringLength(10, ErrorMessage = "La moneda no puede tener más de 10 caracteres.")]
         public string Currency { get; set; }

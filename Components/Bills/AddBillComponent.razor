@@ -1,77 +1,206 @@
 ﻿@page "/add-bill"
 @inject ProjectsDBContext db
+@inject IWebHostEnvironment env
+@inject IJSRuntime jS;
+
 
 <EditForm Model="bill" OnValidSubmit="Add">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+	<DataAnnotationsValidator />
+	<ValidationSummary />
 
-    <div class="row mb-2">
-        <label>Número de Factura</label>
-        <InputText @bind-Value="bill.BillNumber" class="form-control form-control-sm"></InputText>
-        <ValidationMessage For="@(() => bill.BillNumber)" />
-    </div>
-    <div class="row mb-2">
-        <label>Importe</label>
-        <InputNumber @bind-Value="bill.Amount" class="form-control form-control-sm" step="0.001"></InputNumber>
-        <ValidationMessage For="@(() => bill.Amount)" />
-    </div>
+	<div class="form-group">
+		<div class="form-floating mt-1">	
+			<InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
+			<label class="form-label" for="BillNumber">Número de Factura</label>
+		</div>
+		<ValidationMessage For="@(() => bill.BillNumber)" class="text-danger" />
+	</div>
 
-    <div class="row mb-2">
-        <label>Nota</label>
-        <InputTextArea @bind-Value="bill.Note" class="form-control form-control-sm"></InputTextArea>
-        <ValidationMessage For="@(() => bill.Note)" />
-    </div>
-    <div class="row mb-2">
-        <label>Autor</label>
-        <InputText @bind-Value="bill.Author" class="form-control form-control-sm"></InputText>
-        <ValidationMessage For="@(() => bill.Author)" />
-    </div>
-    <div class="row mb-2">
-        <label>Fecha de Factura</label>
-        <InputDate @bind-Value="bill.BillDate" class="form-control form-control-sm"></InputDate>
-        <ValidationMessage For="@(() => bill.BillDate)" />
-    </div>
+	<div class="form-group">
+		<div class="form-floating mt-1">
+			<InputNumber  @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
+			<label class="form-label" for="Amount">Importe</label>
+		</div>
+		<ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
+	</div>
 
-    <button type="submit" class="btn btn-outline-success">Agregar Factura</button>
+	<div class="form-group">
+		<div class="form-floating mt-1">
+			<InputTextArea @bind-Value="bill.Note" class="form-control" id="Note" />
+			<label class="form-label" for="Note">Nota</label>
+		</div>
+		<ValidationMessage For="@(() => bill.Note)" class="text-danger" />
+	</div>
+	<!--Currency Type-->
+	<div class="form-group">
+		<div class=" form-floating mt-1 mb-1">
+			<InputSelect class="form-select form-select-sm" @bind-Value="bill.Currency">
+				<option value="">Seleccione</option>
+				<option value="en-US">Dolar</option>
+				<option value="es-CR">Colon</option>
+			</InputSelect>
+			<label class="form-label" for="IsCompleted">Moneda (Original)</label>
+		</div>
+		<ValidationMessage For="@(() => bill.Currency)" />
+	</div>
+	<div class="form-group">
+		<div class="form-floating mt-1">
+			<InputNumber @bind-Value="bill.TaskNumber" class="form-control" id="TaskNumber" />
+			<label class="form-label" for="TaskNumber">Número de Tarea de Facturacion</label>
+		</div>
+		<ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger" />
+	</div>
+
+	<div class="form-group">
+		<div class="form-floating mt-1">
+			<InputText @bind-Value="bill.Author" class="form-control" id="Author" />
+			<label class="form-label" for="Author">Autor</label>
+		</div>
+		<ValidationMessage For="@(() => bill.Author)" class="text-danger" />
+	</div>
+
+	<div class="form-group">
+		<div class="form-floating mt-1">
+			<InputDate @bind-Value="bill.BillDate" class="form-control" id="BillDate" />
+			<label class="form-label" for="BillDate">Fecha de Factura</label>
+		</div>
+		<ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
+	</div>
+
+	<button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
 </EditForm>
 
+<div class="border shadow-sm rounded p-3 text-center">
+	<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
+	<InputFile multiple OnChange="@OnChange"
+			   @ondragenter="OnDragEnter"
+			   @ondragleave="OnDragLeave"
+			   @ondragover="OnDragEnter"
+			   class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+</div>
+
+
+<style>
+	.custom-file-input {
+		all: unset; /* Elimina todos los estilos predeterminados */
+	}
+
+	.file-drop-zone {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 90%;
+		min-height: 150px;
+		border: 1px dashed #ff9320;
+		border-radius: 10px;
+		background-color: #f8f9fa;
+		text-align: center;
+		padding: 10px;
+		transition: background-color 0.3s, border-color 0.3s;
+		cursor: pointer;
+	}
+
+		.file-drop-zone p {
+			font-size: 1rem;
+			color: #333;
+		}
+
+		.file-drop-zone:hover,
+		.hover {
+			border-color: #00ca71;
+			background-color: #e6ffe6;
+		}
+</style>
+
+<div class="border shadow-sm rounded p-2 m-1">
+	<h6 class="fw-bold mb-2">Archivos</h6>
+	<ul class="list-unstyled">
+		@foreach (var file in files)
+		{
+			<li class="d-flex align-items-center justify-content-between p-1 border-bottom">
+				<span>@file.Name</span>
+				<button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
+			</li>
+		}
+	</ul>
+</div>
+
+
+
+
 @code {
-    [Parameter]
-    public int ProjectId { get; set; }
-    [Parameter]
-    public string CurrencyType { get; set; }
-    [Parameter]
-    public EventCallback OnAdded { get; set; }
+	[Parameter]
+	public int ProjectId { get; set; }
+	[Parameter]
+	public string CurrencyType { get; set; }
+	[Parameter]
+	public EventCallback OnAdded { get; set; }
 
-    Bill bill = new()
-        {
 
-            LastEditionDate = DateTime.Now,
-            BillDate = DateTime.Now
-        };
-    protected override Task OnInitializedAsync()
-    {
-        bill.Currency = CurrencyType;
-        return base.OnInitializedAsync();
-        bill.ProjectId = ProjectId;
-    }
+	private ElementReference fileDropContainer;
 
-    private async Task Add()
-    {
-        bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
-        bill.AuthorId = "";
-        bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
-        bill.Currency = CurrencyType;
-        bill.ProjectId = ProjectId;
-        using var context = db;
-        context.Bill.Add(bill);
-        await context.SaveChangesAsync();
-        bill = new Bill
-            {
-                ProjectId = ProjectId,
-                LastEditionDate = DateTime.Now,
-                BillDate = DateTime.Now
-            };
-        await OnAdded.InvokeAsync(null);
-    }
+	List<IBrowserFile> files = new();
+
+
+
+	Bill bill = new()
+		{
+
+			LastEditionDate = DateTime.Now,
+			BillDate = DateTime.Now
+		};
+
+
+
+
+	private void DeleteFile(IBrowserFile file)
+	{
+		files.Remove(file);
+	}
+
+	protected override Task OnInitializedAsync()
+	{
+		bill.Currency = CurrencyType;
+		return base.OnInitializedAsync();
+		bill.ProjectId = ProjectId;
+	}
+
+
+
+
+	private async Task Add()
+	{
+		bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
+		bill.AuthorId = "";
+		bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
+		bill.Currency = CurrencyType;
+		bill.ProjectId = ProjectId;
+		using var context = db;
+		context.Bill.Add(bill);
+		await context.SaveChangesAsync();
+		bill = new Bill
+			{
+				ProjectId = ProjectId,
+				LastEditionDate = DateTime.Now,
+				BillDate = DateTime.Now
+			};
+		await OnAdded.InvokeAsync(null);
+	}
+
+	string HoverClass { get; set; } = string.Empty;
+
+	void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
+	void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
+
+
+	async Task OnChange(InputFileChangeEventArgs e)
+	{
+		foreach (var file in e.GetMultipleFiles())
+		{
+			files.Add(file);
+		}
+	}
+
+
 }

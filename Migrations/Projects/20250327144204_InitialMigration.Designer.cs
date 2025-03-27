@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20250325164232_MigracionInicial")]
-    partial class MigracionInicial
+    [Migration("20250327144204_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,9 +33,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillId"), 1L, 1);
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,3)");
-
-                    b.Property<decimal>("AmountOriginal")
                         .HasColumnType("decimal(15,3)");
 
                     b.Property<string>("Author")
@@ -79,9 +76,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<int>("TaskNumber")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TypeOfChange")
-                        .HasColumnType("decimal(15,3)");
 
                     b.HasKey("BillId");
 
@@ -388,6 +382,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("int");
 
                     b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TAX")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskNumber")

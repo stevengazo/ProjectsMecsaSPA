@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class MigracionInicial : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -127,6 +127,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     Ubication = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
                     OC = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    TAX = table.Column<int>(type: "int", nullable: false),
                     OCDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     OfferId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -182,8 +183,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BillNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    AmountOriginal = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
-                    TypeOfChange = table.Column<decimal>(type: "decimal(15,3)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     TaskNumber = table.Column<int>(type: "int", nullable: false),

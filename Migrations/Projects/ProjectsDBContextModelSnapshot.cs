@@ -33,9 +33,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(15,3)");
 
-                    b.Property<decimal>("AmountOriginal")
-                        .HasColumnType("decimal(15,3)");
-
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -77,9 +74,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<int>("TaskNumber")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("TypeOfChange")
-                        .HasColumnType("decimal(15,3)");
 
                     b.HasKey("BillId");
 
@@ -386,6 +380,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("int");
 
                     b.Property<int>("StateId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TAX")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskNumber")

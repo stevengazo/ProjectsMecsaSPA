@@ -42,6 +42,8 @@ builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 // Cargar las configuraciones desde appsettings.json
 //builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 //builder.Services.AddHostedService<TelegramService>();
+// Central Bank Service
+builder.Services.AddHttpClient<CentralBankService>();
 
 
 var app = builder.Build();
@@ -86,7 +88,6 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
-
 #endregion
 
 // Configure the HTTP request pipeline.
