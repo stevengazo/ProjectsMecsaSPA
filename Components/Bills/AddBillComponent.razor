@@ -5,42 +5,38 @@
 @inject FileStorageService FileStorageService
 @inject Bitrix24ClientService Bitrix24Client
 
-
-
-
 <style>
 	.custom-file-input {
-		all: unset; /* Elimina todos los estilos predeterminados */
+	all: unset; /* Elimina todos los estilos predeterminados */
 	}
 
 	.file-drop-zone {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		width: 90%;
-		min-height: 150px;
-		border: 1px dashed #ff9320;
-		border-radius: 10px;
-		background-color: #f8f9fa;
-		text-align: center;
-		padding: 10px;
-		transition: background-color 0.3s, border-color 0.3s;
-		cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 90%;
+	min-height: 150px;
+	border: 1px dashed #ff9320;
+	border-radius: 10px;
+	background-color: #f8f9fa;
+	text-align: center;
+	padding: 10px;
+	transition: background-color 0.3s, border-color 0.3s;
+	cursor: pointer;
 	}
 
-		.file-drop-zone p {
-			font-size: 1rem;
-			color: #333;
-		}
+	.file-drop-zone p {
+	font-size: 1rem;
+	color: #333;
+	}
 
-		.file-drop-zone:hover,
-		.hover {
-			border-color: #00ca71;
-			background-color: #e6ffe6;
-		}
+	.file-drop-zone:hover,
+	.hover {
+	border-color: #00ca71;
+	background-color: #e6ffe6;
+	}
 </style>
-
 
 <EditForm Model="bill" OnValidSubmit="Add">
 	<DataAnnotationsValidator />
@@ -109,41 +105,38 @@
 	<div class="border shadow-sm rounded p-3 text-center">
 		<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
 		<InputFile multiple OnChange="@OnChange"
-				   @ondragenter="OnDragEnter"
-				   @ondragleave="OnDragLeave"
-				   @ondragover="OnDragEnter"
-				   class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+		@ondragenter="OnDragEnter"
+		@ondragleave="OnDragLeave"
+		@ondragover="OnDragEnter"
+		MaxFileSize="20971520"
+		class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+	</div>
+	<!-- File List-->
+	<div class="border shadow-sm rounded p-2 m-1">
+		<h6 class="fw-bold mb-2">Archivos por Subir</h6>
+		<ul class="list-unstyled">
+			@foreach (var file in files)
+			{
+				<li class="d-flex align-items-center justify-content-between p-1 border-bottom">
+					<span>@file.Name</span>
+					<button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
+				</li>
+			}
+		</ul>
 	</div>
 	<!-- Submit Button-->
 	<button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
 </EditForm>
 
-
-
-<div class="border shadow-sm rounded p-2 m-1">
-	<h6 class="fw-bold mb-2">Archivos</h6>
-	<ul class="list-unstyled">
-		@foreach (var file in files)
-		{
-			<li class="d-flex align-items-center justify-content-between p-1 border-bottom">
-				<span>@file.Name</span>
-				<button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
-			</li>
-		}
-	</ul>
-</div>
-
-
-
-
 @code {
 	[Parameter]
 	public int ProjectId { get; set; }
 	[Parameter]
+	public int FolderId { get; set; }
+	[Parameter]
 	public string CurrencyType { get; set; }
 	[Parameter]
 	public EventCallback OnAdded { get; set; }
-
 
 	private ElementReference fileDropContainer;
 
@@ -203,9 +196,20 @@
 			tmpBill.FileExtension = Path.GetExtension(i.Name);
 			tmpBill.Creation	= DateTime.Now;
 			tmpBill.BillId = bill.BillId;
+			tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId,tmpBill.FileName, tmpBill.FilePath);
 			db.BillFiles.Add(tmpBill);
 			await db.SaveChangesAsync();
 		}
+		files.Clear();
+	}
+
+	async Task<string> TaskUploadFileToBitrixAsync(int folderId,string Name,string pathFile )
+	{
+		byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
+		 var response =await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
+
+		return "";
+
 	}
 
 

@@ -9,6 +9,7 @@ namespace ProjectsMecsaSPA.Model
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public string FileExtension { get; set; }
+        public string? B24FileId { get; set; }   
         public DateTime? Creation { get; set; }
         public int BillId { get; set; }
         public Bill Bill { get; set; }

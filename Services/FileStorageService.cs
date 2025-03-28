@@ -54,7 +54,7 @@ namespace ProjectsMecsaSPA.Services
                     var filePath = Path.Combine(billDirectory, fileName);
 
                     // Guardar el archivo en el directorio correspondiente
-                    using (var stream = file.OpenReadStream())
+                    using (var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024))
                     {
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
                         {

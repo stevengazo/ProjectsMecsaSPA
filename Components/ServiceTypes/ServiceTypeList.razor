@@ -2,13 +2,17 @@
 
 <div>
 	<h5>Agregar Servicio</h5>
-	<EditForm Model="@typeModelObj">
-		<div>
-			<label>Nombre</label>
-			<InputText class="form-control" @bind-Value="typeModelObj.Name" />
-		</div>
-	</EditForm>
-	<button class="btn btn-primary" @onclick="AddTypeModelAsync">Agregar</button>
+	<div class="d-flex flex-row gap-1">
+		<EditForm Model="@typeModelObj">
+			<div class="form-floating">
+		
+				<InputText id="Name" class="form-control" @bind-Value="typeModelObj.Name" />
+				<label for="Name">Nombre</label>
+			</div>
+		</EditForm>
+		<button class="btn btn-primary btn-sm" @onclick="AddTypeModelAsync">Agregar</button>
+
+	</div>
 </div>
 
 @foreach (var i in TypesModels)

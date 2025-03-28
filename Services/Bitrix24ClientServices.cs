@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Runtime.Intrinsics.Arm;
+using System.Text;
 using System.Text.Json;
 
 
@@ -94,18 +97,105 @@ namespace ProjectsMecsaSPA.Services
 
         public async Task<string> UploadFileAsync(int folderId, string fileName, byte[] fileData)
         {
-            var url = "https://grupomecsa.bitrix24.es/rest/107/nusehi6j9orv0j8i/disk.folder.uploadfile.json";
-
-            using (var formData = new MultipartFormDataContent())
+            try
             {
-                formData.Add(new StringContent(folderId.ToString()), "id");
-                formData.Add(new StringContent(JsonSerializer.Serialize(new { NAME = fileName })), "data");
-                formData.Add(new ByteArrayContent(fileData), "fileContent", fileName);
 
-                var response = await _httpClient.PostAsync(url, formData);
-                response.EnsureSuccessStatusCode();
+                var urlBase = "";
 
-                return await response.Content.ReadAsStringAsync();
+                // Paso 1: Obtener el uploadUrl
+                var uploadUrl = await GetUploadUrl(urlBase, folderId, fileName);
+
+                
+
+                if (string.IsNullOrEmpty(uploadUrl))
+                {
+                    throw new Exception("No se pudo obtener el uploadUrl.");
+                }
+
+                var Url = new Uri(uploadUrl.Replace("\\",""));
+
+                // Paso 2: Subir el archivo
+                return await UploadFileToUrl(Url, fileName, fileData);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+        }
+
+        private async Task<string> GetUploadUrl(string urlBase,int folderId, string fileName)
+        {
+            try
+            {
+                // Realiza una solicitud POST para obtener el URL de carga
+                var url = $"{urlBase}?id={folderId}&data[NAME]={fileName}";
+
+                var response = await _httpClient.PostAsync(url, null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("Error al obtener el uploadUrl.");
+                }
+
+                // Leer la respuesta y extraer el uploadUrl
+                var content = await response.Content.ReadAsStringAsync();
+                var uploadUrl = ExtractUploadUrl(content);  // Necesitarás una función para extraer el uploadUrl desde el JSON
+
+                return uploadUrl;
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+        }
+
+        private string ExtractUploadUrl(string jsonResponse)
+        {
+            try
+            {
+                // Aquí debes analizar el JSON para obtener el uploadUrl
+                // Este es un ejemplo básico de cómo podrías hacerlo:
+                var start = jsonResponse.IndexOf("\"uploadUrl\":\"") + 13;
+                var end = jsonResponse.IndexOf("\"", start);
+                return jsonResponse.Substring(start, end - start);
+
+            }
+            catch (Exception er)
+            {
+
+                throw;
+            }        }
+
+        private async Task<string> UploadFileToUrl(Uri uploadUrl, string fileName, byte[] fileData)
+        {
+            try
+            {
+                // Crear el contenido de la solicitud multipart
+                using (var formData = new MultipartFormDataContent())
+                {
+                    formData.Add(new ByteArrayContent(fileData), "file", fileName);
+
+                    // Realizar la solicitud POST para cargar el archivo
+                    var response = await _httpClient.PostAsync(uploadUrl, formData);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception("Error al cargar el archivo.");
+                    }
+
+                    // Leer la respuesta (puedes modificar esto según lo que esperes recibir)
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    // Regresar la respuesta (puede ser el archivo cargado o algún mensaje de éxito)
+                    return responseContent;
+                }
+            }
+            catch (Exception ef)
+            {
+
+                throw;
             }
         }
     }

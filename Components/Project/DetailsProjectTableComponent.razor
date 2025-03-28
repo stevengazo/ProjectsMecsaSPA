@@ -4,9 +4,6 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 
-
-
-
 @using System.ComponentModel.DataAnnotations
 @using System.Globalization
 @using ProjectsMecsaSPA.Utilities
@@ -51,12 +48,12 @@
 
 
                         <AutoComplete @bind-Value="customerName"
-                                      TItem="Customer"
-                                      class="text-danger"
-                                      DataProvider="CustomersDataProvider"
-                                      PropertyName="Name"
-                                      Placeholder="Search a customer..."
-                                      OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+                        TItem="Customer"
+                        class="text-danger"
+                        DataProvider="CustomersDataProvider"
+                        PropertyName="Name"
+                        Placeholder="Search a customer..."
+                        OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
 
                     </td>
                 </tr>
@@ -145,6 +142,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Compañia</th>
+                    <td>
+                        <InputSelect @bind-Value="project.CompanyId" class="form-control form-control-sm">
+                            @foreach (var item in companies )
+                            {
+                                <option value="@item.CompanyId">@item.CompanyName</option>
+                            }
+                        </InputSelect>
+                    </td>
+                </tr>
+                <tr>
                     <th>Vendedor</th>
                     <td>
                         <InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
@@ -227,6 +235,10 @@ else
                 <td>@project.OCDate.ToLongDateString()</td>
             </tr>
             <tr>
+                <th>Compañia</th>
+                <td>@project.Company.CompanyName</td>
+            </tr>
+            <tr>
                 <th>Vendedor</th>
                 <td>@project.Seller.SellerName</td>
             </tr>
@@ -258,7 +270,7 @@ else
             </tr>
         </tbody>
     </table>
-  
+
     <div class="d-flex flex-row gap-2">
         <AuthorizeView Roles="administrador,ingeniero,contabilidad">
             <Authorized>
@@ -322,6 +334,7 @@ else
     private Dictionary<int, string> filteredCustomers = new();
     private Dictionary<int, string> States = new();
     List<Seller> sellers = new();
+    List<Company> companies = new();
 
     private string searchCustomer = "";
 
@@ -332,7 +345,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         AmountCulture = new CultureInfo(project.CurrencyType);
-        sellers = db.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
+        companies = db.Company.ToList();
+        sellers = db.Seller
+        .Where(e => e.IsActive)
+        .OrderBy(e => e.SellerName)
+        .ToList();
         await LoadDataAsync();
     }
 

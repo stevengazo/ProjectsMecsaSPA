@@ -31,8 +31,4 @@
     <PackageReference Include="WTelegramClient" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\Projects\" />
-  </ItemGroup>
-
 </Project>

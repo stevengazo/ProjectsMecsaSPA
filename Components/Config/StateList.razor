@@ -2,14 +2,17 @@
 
 
 <div>
-    <h5>Agregar Compañía</h5>
-    <EditForm Model="@StateNew">
-        <div>
-            <label>Nombre</label>
-            <InputText class="form-control" @bind-Value="StateNew.StateName" />
-        </div>
-    </EditForm>
-    <button class="btn btn-primary" @onclick="AddCompanyAsync">Agregar</button>
+    <h5>Compañías</h5>
+    <div class="d-flex flex-row">
+        <EditForm Model="@StateNew">
+            <div class="form-floating">
+                <InputText class="form-control" id="StateName" @bind-Value="StateNew.StateName" />
+                <label for="StateName">Nombre</label>
+            </div>
+        </EditForm>
+        <button class="btn btn-primary" @onclick="AddCompanyAsync">Agregar</button>
+
+    </div>
 </div>
 
 @foreach (var i in stateList)

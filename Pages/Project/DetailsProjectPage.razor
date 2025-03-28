@@ -25,7 +25,7 @@
                     <DetailsProjectTableComponent project="project" />
                 </div>
             </div>
-            <div class="row mt-3 shadow p-1 border rounded ">
+            <div class="row mt-3 shadow p-1 mb-3 border rounded ">
                 <Tabs EnableFadeEffect="true">
                     <Tab Title="Archivos" Active="true">
                         <Content>
@@ -107,6 +107,7 @@
 			.AsNoTracking()
 			.Include(e => e.State)
 			.Include(e => e.Type)
+			.Include(e => e.Company)
 			.Include(e => e.Customer)
 			.Include(e => e.Commentaries)
 			.Include(e => e.Seller)
@@ -143,8 +144,9 @@
 		{
 
 			{ nameof(AddBillComponent.OnAdded), EventCallback.Factory.Create(this, RefreshBills) },
-			 { "ProjectId", project.ProjectId },
-			 { "CurrencyType", project.CurrencyType }
+			{ "ProjectId", project.ProjectId },
+			{ "FolderId", project.FolderIDB24},
+			{ "CurrencyType", project.CurrencyType }
 		};
 
 		// Mostrar el componente AddProject dentro del Offcanvas
