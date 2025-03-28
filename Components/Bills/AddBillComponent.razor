@@ -1,4 +1,6 @@
 ﻿@page "/add-bill"
+@using Newtonsoft.Json
+@using ProjectsMecsaSPA.Model.Bitrix
 @inject ProjectsDBContext db
 @inject IWebHostEnvironment env
 @inject IJSRuntime jS;
@@ -6,210 +8,225 @@
 @inject Bitrix24ClientService Bitrix24Client
 
 <style>
-	.custom-file-input {
-	all: unset; /* Elimina todos los estilos predeterminados */
-	}
+    .custom-file-input {
+    all: unset; /* Elimina todos los estilos predeterminados */
+    }
 
-	.file-drop-zone {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	width: 90%;
-	min-height: 150px;
-	border: 1px dashed #ff9320;
-	border-radius: 10px;
-	background-color: #f8f9fa;
-	text-align: center;
-	padding: 10px;
-	transition: background-color 0.3s, border-color 0.3s;
-	cursor: pointer;
-	}
+    .file-drop-zone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    min-height: 150px;
+    border: 1px dashed #ff9320;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px;
+    transition: background-color 0.3s, border-color 0.3s;
+    cursor: pointer;
+    }
 
-	.file-drop-zone p {
-	font-size: 1rem;
-	color: #333;
-	}
+    .file-drop-zone p {
+    font-size: 1rem;
+    color: #333;
+    }
 
-	.file-drop-zone:hover,
-	.hover {
-	border-color: #00ca71;
-	background-color: #e6ffe6;
-	}
+    .file-drop-zone:hover,
+    .hover {
+    border-color: #00ca71;
+    background-color: #e6ffe6;
+    }
 </style>
 
 <EditForm Model="bill" OnValidSubmit="Add">
-	<DataAnnotationsValidator />
-	<ValidationSummary />
-	<!-- Number Bill-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
-			<label class="form-label" for="BillNumber">Número de Factura</label>
-		</div>
-		<ValidationMessage For="@(() => bill.BillNumber)" class="text-danger" />
-	</div>
-	<!-- Amount-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputNumber @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
-			<label class="form-label" for="Amount">Importe</label>
-		</div>
-		<ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
-	</div>
-	<!-- Note-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputTextArea @bind-Value="bill.Note" class="form-control" id="Note" />
-			<label class="form-label" for="Note">Nota</label>
-		</div>
-		<ValidationMessage For="@(() => bill.Note)" class="text-danger" />
-	</div>
-	<!--Currency Type-->
-	<div class="form-group">
-		<div class=" form-floating mt-1 mb-1">
-			<InputSelect class="form-select form-select-sm" @bind-Value="bill.Currency">
-				<option value="">Seleccione</option>
-				<option value="en-US">Dolar</option>
-				<option value="es-CR">Colon</option>
-			</InputSelect>
-			<label class="form-label" for="IsCompleted">Moneda (Original)</label>
-		</div>
-		<ValidationMessage For="@(() => bill.Currency)" />
-	</div>
-	<!-- Facturation Task-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputNumber @bind-Value="bill.TaskNumber" class="form-control" id="TaskNumber" />
-			<label class="form-label" for="TaskNumber">Número de Tarea de Facturacion</label>
-		</div>
-		<ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger" />
-	</div>
-	<!-- Author-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputText @bind-Value="bill.Author" class="form-control" id="Author" />
-			<label class="form-label" for="Author">Autor</label>
-		</div>
-		<ValidationMessage For="@(() => bill.Author)" class="text-danger" />
-	</div>
-	<!-- Bill Date-->
-	<div class="form-group">
-		<div class="form-floating mt-1">
-			<InputDate @bind-Value="bill.BillDate" class="form-control" id="BillDate" />
-			<label class="form-label" for="BillDate">Fecha de Factura</label>
-		</div>
-		<ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
-	</div>
-	<!-- Files-->
-	<div class="border shadow-sm rounded p-3 text-center">
-		<p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
-		<InputFile multiple OnChange="@OnChange"
-		@ondragenter="OnDragEnter"
-		@ondragleave="OnDragLeave"
-		@ondragover="OnDragEnter"
-		MaxFileSize="20971520"
-		class="@($"file-drop-zone custom-file-input {HoverClass}")" />
-	</div>
-	<!-- File List-->
-	<div class="border shadow-sm rounded p-2 m-1">
-		<h6 class="fw-bold mb-2">Archivos por Subir</h6>
-		<ul class="list-unstyled">
-			@foreach (var file in files)
-			{
-				<li class="d-flex align-items-center justify-content-between p-1 border-bottom">
-					<span>@file.Name</span>
-					<button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
-				</li>
-			}
-		</ul>
-	</div>
-	<!-- Submit Button-->
-	<button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <!-- Number Bill-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
+            <label class="form-label" for="BillNumber">Número de Factura</label>
+        </div>
+        <ValidationMessage For="@(() => bill.BillNumber)" class="text-danger" />
+    </div>
+    <!-- Amount-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputNumber @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
+            <label class="form-label" for="Amount">Importe</label>
+        </div>
+        <ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
+    </div>
+    <!-- Note-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputTextArea @bind-Value="bill.Note" class="form-control" id="Note" />
+            <label class="form-label" for="Note">Nota</label>
+        </div>
+        <ValidationMessage For="@(() => bill.Note)" class="text-danger" />
+    </div>
+    <!--Currency Type-->
+    <div class="form-group">
+        <div class=" form-floating mt-1 mb-1">
+            <InputSelect class="form-select form-select-sm" @bind-Value="bill.Currency">
+                <option value="">Seleccione</option>
+                <option value="en-US">Dolar</option>
+                <option value="es-CR">Colon</option>
+            </InputSelect>
+            <label class="form-label" for="IsCompleted">Moneda (Original)</label>
+        </div>
+        <ValidationMessage For="@(() => bill.Currency)" />
+    </div>
+    <!-- Facturation Task-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputNumber @bind-Value="bill.TaskNumber" class="form-control" id="TaskNumber" />
+            <label class="form-label" for="TaskNumber">Número de Tarea de Facturacion</label>
+        </div>
+        <ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger" />
+    </div>
+    <!-- Author-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputText @bind-Value="bill.Author" class="form-control" id="Author" />
+            <label class="form-label" for="Author">Autor</label>
+        </div>
+        <ValidationMessage For="@(() => bill.Author)" class="text-danger" />
+    </div>
+    <!-- Bill Date-->
+    <div class="form-group">
+        <div class="form-floating mt-1">
+            <InputDate @bind-Value="bill.BillDate" class="form-control" id="BillDate" />
+            <label class="form-label" for="BillDate">Fecha de Factura</label>
+        </div>
+        <ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
+    </div>
+    <!-- Files-->
+    <div class="border shadow-sm rounded p-3 text-center">
+        <p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
+        <InputFile multiple OnChange="@OnChange"
+        @ondragenter="OnDragEnter"
+        @ondragleave="OnDragLeave"
+        @ondragover="OnDragEnter"
+        MaxFileSize="20971520"
+        class="@($"file-drop-zone custom-file-input {HoverClass}")" />
+    </div>
+    <!-- File List-->
+    <div class="border shadow-sm rounded p-2 m-1">
+        <h6 class="fw-bold mb-2">Archivos por Subir</h6>
+        <ul class="list-unstyled">
+            @foreach (var file in files)
+            {
+                <li class="d-flex align-items-center justify-content-between p-1 border-bottom">
+                    <span>@file.Name</span>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
+                </li>
+            }
+        </ul>
+    </div>
+    <!-- Submit Button-->
+    <button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
 </EditForm>
 
 @code {
-	[Parameter]
-	public int ProjectId { get; set; }
-	[Parameter]
-	public int FolderId { get; set; }
-	[Parameter]
-	public string CurrencyType { get; set; }
-	[Parameter]
-	public EventCallback OnAdded { get; set; }
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public int FolderId { get; set; }
 
-	private ElementReference fileDropContainer;
+    [Parameter]
+    public string CurrencyType { get; set; }
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
 
-	List<IBrowserFile> files = new();
+    private ElementReference fileDropContainer;
 
-	Bill bill = new()
+    List<IBrowserFile> files = new();
+
+    Bill bill = new()
 	{
 		LastEditionDate = DateTime.Now,
 		BillDate = DateTime.Now
 	};
 
-	private void DeleteFile(IBrowserFile file)
-	{
-		files.Remove(file);
-	}
+    private void DeleteFile(IBrowserFile file)
+    {
+        files.Remove(file);
+    }
 
-	protected override Task OnInitializedAsync()
-	{
-		bill.Currency = CurrencyType;
-		return base.OnInitializedAsync();
-		bill.ProjectId = ProjectId;
-	}
+    protected override Task OnInitializedAsync()
+    {
+        bill.Currency = CurrencyType;
+        return base.OnInitializedAsync();
+        bill.ProjectId = ProjectId;
+    }
 
-	private async Task Add()
-	{
-		bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
-		bill.AuthorId = "";
-		bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
-		bill.Currency = CurrencyType;
-		bill.ProjectId = ProjectId;
-		using var context = db;
-		context.Bill.Add(bill);
-		await context.SaveChangesAsync();
-		await UploadFiles();
-		bill = new Bill
+    private async Task Add()
+    {
+        bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
+        bill.AuthorId = "";
+        bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
+        bill.Currency = CurrencyType;
+        bill.ProjectId = ProjectId;
+        using var context = db;
+        context.Bill.Add(bill);
+        await context.SaveChangesAsync();
+        await UploadFiles();
+        await SendCommentaryAsync();
+        bill = new Bill
 			{
 				ProjectId = ProjectId,
 				LastEditionDate = DateTime.Now,
 				BillDate = DateTime.Now
 			};
-		await OnAdded.InvokeAsync(null);
-	}
+        await OnAdded.InvokeAsync(null);
+    }
 
-	string HoverClass { get; set; } = string.Empty;
+    string HoverClass { get; set; } = string.Empty;
 
-	void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
-	void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
+    void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
+    void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
 
-	async Task UploadFiles()
-	{
-		await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
-		foreach(var i in files)
-		{
-			BillFile tmpBill = new BillFile();
-			tmpBill.FileName = i.Name;
-			tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
-			tmpBill.FileExtension = Path.GetExtension(i.Name);
-			tmpBill.Creation	= DateTime.Now;
-			tmpBill.BillId = bill.BillId;
-			tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId,tmpBill.FileName, tmpBill.FilePath);
-			db.BillFiles.Add(tmpBill);
-			await db.SaveChangesAsync();
-		}
-		files.Clear();
-	}
+    async Task SendCommentaryAsync()
+    {
+		
+        var files = db.BillFiles.Where(x => x.BillId == bill.BillId).Select(e=> e.B24FileId).ToArray();
+		if ( bill.TaskNumber != 0){
+          await  Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber,$"prueba de subida de factura",107,files);
+        }
+    }
 
-	async Task<string> TaskUploadFileToBitrixAsync(int folderId,string Name,string pathFile )
-	{
-		byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
-		 var response =await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
+    async Task UploadFiles()
+    {
+        await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
+        foreach(var i in files)
+        {
+            BillFile tmpBill = new BillFile();
+            tmpBill.FileName = i.Name;
+            tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+            tmpBill.FileExtension = Path.GetExtension(i.Name);
+            tmpBill.Creation	= DateTime.Now;
+            tmpBill.BillId = bill.BillId;
+            tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId,tmpBill.FileName, tmpBill.FilePath);
+            db.BillFiles.Add(tmpBill);
+            await db.SaveChangesAsync();
+        }
+        files.Clear();
+    }
 
+    async Task<string> TaskUploadFileToBitrixAsync(int folderId,string Name,string pathFile )
+    {
+        byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
+        var response =await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
+
+        if(response != null)
+        {
+            var ResponseObject = JsonConvert.DeserializeObject<BitrixFileResponse>(response);
+            return ResponseObject.result.ID.ToString();    
+		 }	
 		return "";
-
 	}
 
 

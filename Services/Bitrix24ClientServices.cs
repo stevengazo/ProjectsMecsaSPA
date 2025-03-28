@@ -29,6 +29,34 @@ namespace ProjectsMecsaSPA.Services
         /// <param name="message">message to send</param>
         /// <param name="userId">id of the user</param>
         /// <returns></returns>
+        public async Task SendTaskCommentAsync(int taskId, string message, int userId, string[] filesId)
+        {
+            var requestBody = new
+            {
+                fields = new
+                {
+                    AUTHOR_ID = userId,
+                    POST_MESSAGE = $"Proyectos - 🤖: {message}",
+                    UF_FORUM_MESSAGE_DOC = filesId.Select(fileId => "n" + fileId).ToArray()
+
+                }
+            };
+
+            string json = JsonSerializer.Serialize(requestBody);
+            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await _httpClient.PostAsync($"{_urlTaskAdd}?TASKID={taskId}", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Comentario enviado exitosamente.");
+            }
+            else
+            {
+                Console.WriteLine($"Error en el envío: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+            }
+        }
+
         public async Task SendTaskCommentAsync(int taskId, string message, int userId)
         {
             var requestBody = new
@@ -54,6 +82,7 @@ namespace ProjectsMecsaSPA.Services
                 Console.WriteLine($"Error en el envío: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
             }
         }
+
 
         /// <summary>
         /// Create a new subfolder in a parent folder in Bitrix24
@@ -94,13 +123,12 @@ namespace ProjectsMecsaSPA.Services
             throw new Exception("No se pudo obtener el ID de la respuesta.");
         }
 
-
         public async Task<string> UploadFileAsync(int folderId, string fileName, byte[] fileData)
         {
             try
             {
 
-                var urlBase = "";
+                var urlBase = "https://grupomecsa.bitrix24.es/rest/107/pf3z28pdm99vsumm/disk.folder.uploadfile.json";
 
                 // Paso 1: Obtener el uploadUrl
                 var uploadUrl = await GetUploadUrl(urlBase, folderId, fileName);
@@ -180,6 +208,7 @@ namespace ProjectsMecsaSPA.Services
                     // Realizar la solicitud POST para cargar el archivo
                     var response = await _httpClient.PostAsync(uploadUrl, formData);
 
+                    Console.WriteLine(response.Content.ReadAsStringAsync());
                     if (!response.IsSuccessStatusCode)
                     {
                         throw new Exception("Error al cargar el archivo.");
