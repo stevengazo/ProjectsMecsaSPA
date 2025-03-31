@@ -126,9 +126,17 @@
             }
         </ul>
     </div>
-    <!-- Submit Button-->
-    <button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
+    <div class="d-flex flex-row">
+        <!-- Submit Button-->
+        <button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
+        @if(IsLoading){
+            <Spinner Color="SpinnerColor.Success" />
+        }
+    </div>
+
 </EditForm>
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 @code {
     [Parameter]
@@ -141,9 +149,15 @@
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+	bool IsLoading { get; set; } = false;
+
     private ElementReference fileDropContainer;
 
     List<IBrowserFile> files = new();
+
+    string HoverClass { get; set; } = string.Empty;
 
     Bill bill = new()
 	{
@@ -165,6 +179,7 @@
 
     private async Task Add()
     {
+        IsLoading = true;   
         bill.LastEditor = "current_user"; // Reemplaza esto con el ID del usuario actual, si es necesario.
         bill.AuthorId = "";
         bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
@@ -181,20 +196,27 @@
 				LastEditionDate = DateTime.Now,
 				BillDate = DateTime.Now
 			};
+		IsLoading = false;
         await OnAdded.InvokeAsync(null);
     }
-
-    string HoverClass { get; set; } = string.Empty;
 
     void OnDragEnter(DragEventArgs e) => HoverClass = "hover";
     void OnDragLeave(DragEventArgs e) => HoverClass = string.Empty;
 
     async Task SendCommentaryAsync()
     {
-		
-        var files = db.BillFiles.Where(x => x.BillId == bill.BillId).Select(e=> e.B24FileId).ToArray();
-		if ( bill.TaskNumber != 0){
-          await  Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber,$"prueba de subida de factura",107,files);
+        try
+        {
+            var files = db.BillFiles.Where(x => x.BillId == bill.BillId).Select(e => e.B24FileId).ToArray();
+            if (bill.TaskNumber != 0)
+            {
+                string Message = $"\nInformacion Ingresada en App de Proyectos \nMonto: {bill.Amount.ToString("n2")} \nMoneda: {bill.Currency} \nCreacion: {bill.BillDate} \nProyectoId: {bill.ProjectId} \nDescripcion: {bill.Note}\nTarea: {bill.TaskNumber}";
+                await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 107, files);
+            }
+        }
+        catch (Exception ef)
+        {
+			Console.WriteLine(ef.Message);
         }
     }
 
@@ -229,15 +251,23 @@
 		return "";
 	}
 
-
 	async Task OnChange(InputFileChangeEventArgs e)
 	{
 		foreach (var file in e.GetMultipleFiles())
 		{
-			files.Add(file);
+			if (file.Size > 20971520)
+			{
+				messages.Add(new ToastMessage
+					{
+                        Type = ToastType.Warning,
+						Message = $"El archivo {file.Name} excede el tamaño máximo permitido de 10MB.\nEl archivo no será cargado.",
+						Title = "Advertencia"
+					});
+				continue;
+			}else{
+                files.Add(file);
+            }
 		}
 	}
-
-
 
 }

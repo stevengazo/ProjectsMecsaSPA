@@ -11,6 +11,7 @@ namespace ProjectsMecsaSPA.Services
     {
         private readonly HttpClient _httpClient;
         private readonly string _urlTaskAdd;
+        private readonly string _urlUploadFile;
         private readonly IConfiguration configuration;
 
         public Bitrix24ClientService(HttpClient httpClient, IConfiguration _configuration)
@@ -18,6 +19,8 @@ namespace ProjectsMecsaSPA.Services
             _httpClient = httpClient;
             _urlTaskAdd = _configuration["Bitrix24:UrlTaskAdd"]
                           ?? throw new ArgumentNullException("Bitrix24:UrlTaskAdd no está configurado");
+            _urlUploadFile = _configuration["Bitrix24:UrlUploadFile"]
+                          ?? throw new ArgumentNullException("Bitrix24:UrlUploadFile no está configurado");
             configuration = _configuration;
 
         }
@@ -128,12 +131,9 @@ namespace ProjectsMecsaSPA.Services
             try
             {
 
-                var urlBase = "https://grupomecsa.bitrix24.es/rest/107/pf3z28pdm99vsumm/disk.folder.uploadfile.json";
-
+                var urlBase = _urlUploadFile;
                 // Paso 1: Obtener el uploadUrl
                 var uploadUrl = await GetUploadUrl(urlBase, folderId, fileName);
-
-                
 
                 if (string.IsNullOrEmpty(uploadUrl))
                 {
@@ -188,36 +188,32 @@ namespace ProjectsMecsaSPA.Services
                 var start = jsonResponse.IndexOf("\"uploadUrl\":\"") + 13;
                 var end = jsonResponse.IndexOf("\"", start);
                 return jsonResponse.Substring(start, end - start);
-
             }
             catch (Exception er)
             {
 
                 throw;
-            }        }
+            }     
+        }
 
         private async Task<string> UploadFileToUrl(Uri uploadUrl, string fileName, byte[] fileData)
         {
             try
             {
-                // Crear el contenido de la solicitud multipart
                 using (var formData = new MultipartFormDataContent())
                 {
                     formData.Add(new ByteArrayContent(fileData), "file", fileName);
-
-                    // Realizar la solicitud POST para cargar el archivo
                     var response = await _httpClient.PostAsync(uploadUrl, formData);
 
-                    Console.WriteLine(response.Content.ReadAsStringAsync());
+                    var re = response.Content.ReadAsStringAsync();
+
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception("Error al cargar el archivo.");
+                        throw new Exception($"Error al cargar el archivo. {re}");
                     }
 
-                    // Leer la respuesta (puedes modificar esto según lo que esperes recibir)
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    // Regresar la respuesta (puede ser el archivo cargado o algún mensaje de éxito)
                     return responseContent;
                 }
             }
