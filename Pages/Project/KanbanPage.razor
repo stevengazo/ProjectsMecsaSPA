@@ -2,207 +2,281 @@
 @using Microsoft.EntityFrameworkCore
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject Bitrix24ClientService bitrix24;
+
 
 <Offcanvas @ref="offcanvas" />
 
 <AuthorizeView Roles="administrador,ingeniero,asistente">
-    <Authorized>
-        <div class="row overflow-scroll">
-            @foreach (var Obj in ProjectLists)
-            {
-                <div class="col h-100">
-                    <h5>@Obj.Key.StateName</h5>
-                    <SortableList class="h-100"
-                                  TItem="Project"
-                                  Name="@($"{Obj.Key.StateName}")"
-                                  Data="@Obj.Value"
-                                  Context="project"
-                                  OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
-                                  OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
-                        <ItemTemplate>
-                            <div class="card-body" @onclick="() => HandleProjectView(project)">
-                                <div class="d-flex justify-content-between">
-                                    <label style="font-size:16px;"><b>@project.Title</b></label>
-                                    <label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
-                                </div>
-                                <div class="d-flex flex-column mt-2">
-                                    <label style="font-size:14px;"><i>@project.Type?.Name</i></label>
-                                    <label style="font-size:12px;"><i>@project.Customer?.Name</i></label>
-                                </div>
-                            </div>
-                        </ItemTemplate>
-                    </SortableList>
-                </div>
-            }
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <ErrorViewComponent />
-    </NotAuthorized>
+	<Authorized>
+		<div class="d-flex flex-row  align-items-center justify-content-between h-50  mb-3  ">
+			<h2>
+				Compania
+			</h2>
+			<select class="form-control h-50 w-25" @onchange="ChangeCompany">
+				@foreach (var company in Companies)
+				{
+					<option value="@company.CompanyId">@company.CompanyName</option>
+				}
+			</select>
+		</div>
+		<div class="row overflow-scroll">
+			@foreach (var Obj in ProjectLists)
+			{
+				<div class="col h-100">
+					<h5>@Obj.Key.StateName</h5>
+					<SortableList class="h-100"
+					TItem="Project"
+					Name="@($"{Obj.Key.StateName}")"
+					Data="@Obj.Value"
+					Context="project"
+					OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
+					OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
+						<ItemTemplate>
+							<div class="card-body" @onclick="() => HandleProjectView(project)">
+								<div class="d-flex justify-content-between">
+									<label style="font-size:16px;"><b>@project.Title</b></label>
+									<label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
+								</div>
+								<div class="d-flex flex-column mt-2">
+									<label style="font-size:14px;"><i>@project.Type?.Name</i></label>
+									<label style="font-size:12px;"><i>Tarea @project.TaskNumber</i></label>
+								</div>
+							</div>
+						</ItemTemplate>
+					</SortableList>
+				</div>
+			}
+		</div>
+	</Authorized>
+	<NotAuthorized>
+		<ErrorViewComponent />
+	</NotAuthorized>
 </AuthorizeView>
 
 
 
-
-
 @code {
-    private Offcanvas offcanvas = default!;
-    public List<State> States { get; set; } = new();
-    public Dictionary<State, List<Project>> ProjectLists { get; set; } = new();
+	private Offcanvas offcanvas = default!;
+	public List<State> States { get; set; } = new();
+	public Dictionary<State, List<Project>> ProjectLists { get; set; } = new();
+	public List<Company> Companies { get; set; } = new();
+
+	protected override void OnInitialized()
+	{
+		try
+		{
+			Companies = db.Company.ToList();
+			// Cargar estados
+			States = db.States.Where(i => !i.IsDeleted).OrderBy(e=>e.OrderPriority).ToList();
 
 
-    protected override void OnInitialized()
-    {
-        try
-        {
-            // Cargar estados
-            States = db.States.Where(i => !i.IsDeleted).ToList();
+			// Inicializar el diccionario ProjectLists con listas vacías para cada estado
+			foreach (var state in States)
+			{
+				ProjectLists[state] = GetProjectsByState(state.StateId,Companies.FirstOrDefault().CompanyId);
+			}
+		}
+		catch (ObjectDisposedException e)
+		{
+			Console.WriteLine(e.Message);
 
-            // Inicializar el diccionario ProjectLists con listas vacías para cada estado
-            foreach (var state in States)
-            {
-                ProjectLists[state] = GetProjectsByState(state.StateId);
-            }
-        }
-        catch (ObjectDisposedException e)
-        {
-            Console.WriteLine(e.Message);
+			using (var context = DbContextFactory.CreateDbContext())
+			{
+				States = db.States.Where(i => !i.IsDeleted).ToList();
 
-            using (var context = DbContextFactory.CreateDbContext())
-            {
-                States = db.States.Where(i => !i.IsDeleted).ToList();
+			}
 
-            }
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e.InnerException);
+			throw;
+		}
 
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.InnerException);
-            throw;
-        }
+	}
 
-    }
+	private List<Project> GetProjectsByState(int stateId)
+	{
+		try
+		{
+			return
+		db.Projects
+		.Include(e => e.Type)
+		.Include(e => e.Commentaries)
+		.Include(e => e.Customer)
+		.Include(e => e.State)
+		.Include(e => e.Seller)
+		.OrderByDescending(e => e.ProjectId)
+		.Where(i => !i.IsDeleted &&
+			i.StateId == stateId
+			&& (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
+		}
+		catch (ObjectDisposedException e)
+		{
+			Console.WriteLine(e.Message);
 
-    private List<Project> GetProjectsByState(int stateId)
-    {
-        try
-        {
-            return
-     db.Projects
-     .Include(e => e.Type)
-     .Include(e => e.Commentaries)
-     .Include(e => e.Customer)
-     .Include(e => e.State)
-     .Include(e => e.Seller)
-     .OrderByDescending(e => e.ProjectId)
-     .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
-        }
-        catch (ObjectDisposedException e)
-        {
-            Console.WriteLine(e.Message);
+			return
+			db.Projects
+			.Include(e => e.Type)
+			.Include(e => e.Commentaries)
+			.Include(e => e.Customer)
+			.Include(e => e.State)
+			.Include(e => e.Seller)
+			.OrderByDescending(e => e.ProjectId)
+			.Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+		}
 
-            return
-      db.Projects
-      .Include(e => e.Type)
-      .Include(e => e.Commentaries)
-      .Include(e => e.Customer)
-      .Include(e => e.State)
-      .Include(e => e.Seller)
-      .OrderByDescending(e => e.ProjectId)
-      .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+		catch (Exception e)
+		{
+			throw e;
+		}
+	}
 
+	private List<Project> GetProjectsByState(int stateId, int companyId)
+	{
+		try
+		{
+			return
+		db.Projects
+		.Include(e => e.Type)
+		.Include(e => e.Commentaries)
+		.Include(e => e.Customer)
+		.Include(e => e.State)
+		.Include(e => e.Seller)
+		.OrderByDescending(e => e.ProjectId)
+		.Where(i => !i.IsDeleted &&
+			i.StateId == stateId && i.CompanyId == companyId
+			&& (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
+		}
+		catch (ObjectDisposedException e)
+		{
+			Console.WriteLine(e.Message);
 
-        }
+			return
+			db.Projects
+			.Include(e => e.Type)
+			.Include(e => e.Commentaries)
+			.Include(e => e.Customer)
+			.Include(e => e.State)
+			.Include(e => e.Seller)
+			.OrderByDescending(e => e.ProjectId)
+			.Where(i => !i.IsDeleted && i.CompanyId ==companyId && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+		}
 
-        catch (Exception e)
-        {
-            throw e;
-        }
-
-    }
-
-
-
-    private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
-    {
-
-        try
-        {
-            var TargetState = GetState(NameState);
-            var ProjectTemp = GetProject(TargetState, args.OldIndex);
-
-            ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
-            var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
-            if (args.NewIndex < size)
-            {
-                ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
-            }
-            else
-            {
-                ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
-            }
-
-        }
-        catch (Exception r)
-        {
-
-            throw r;
-        }
-
-    }
-
-    private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)
-    {
-        var TargetState = GetState(args.ToListName);
-        var OriginState = GetState(args.FromListName);
-
-        var ProjectTemp = GetProject(OriginState, args.OldIndex);
-
-        /// Delete  Project
-        ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
-        /// Insert Project
-        ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
-        ProjectTemp.StateId = TargetState.StateId;
-
-        ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
-
-        db.Projects.Update(ProjectTemp);
-        await db.SaveChangesAsync();
+		catch (Exception e)
+		{
+			throw e;
+		}
+	}
 
 
-    }
 
-    private State GetState(string Name)
-    {
-        return States.FirstOrDefault(i => i.StateName == Name);
-    }
+	private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
+	{
 
-    private Project GetProject(State searchState, int index)
-    {
-        try
-        {
-            return ProjectLists.Where(i => i.Key == searchState).FirstOrDefault().Value[index];
-        }
-        catch (Exception e)
-        {
+		try
+		{
+			var TargetState = GetState(NameState);
+			var ProjectTemp = GetProject(TargetState, args.OldIndex);
 
-            return null;
-        }
+			ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
+			var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
+			if (args.NewIndex < size)
+			{
+				ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
+			}
+			else
+			{
+				ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
+			}
 
-    }
+		}
+		catch (Exception r)
+		{
+
+			throw r;
+		}
+
+	}
+
+	private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)
+	{
+		var TargetState = GetState(args.ToListName);
+		var OriginState = GetState(args.FromListName);
+
+		var ProjectTemp = GetProject(OriginState, args.OldIndex);
+
+		/// Delete  Project
+		ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
+		/// Insert Project
+		ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
+
+		ProjectTemp.StateId = TargetState.StateId;
+
+		ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
+
+		db.Projects.Update(ProjectTemp);
+		await db.SaveChangesAsync();
+
+		SendBitrix24Commentary(ProjectTemp, TargetState.StateName);
 
 
-    private async Task HandleProjectView(Project e)
-    {
-        // Crear un diccionario para pasar parámetros al componente AddProject
-        var parameters = new Dictionary<string, object>();
-        parameters.Add("project", e);
+	}
+
+	private State GetState(string Name)
+	{
+		return States.FirstOrDefault(i => i.StateName == Name);
+	}
+
+	private Project GetProject(State searchState, int index)
+	{
+		try
+		{
+			return ProjectLists.Where(i => i.Key == searchState).FirstOrDefault().Value[index];
+		}
+		catch (Exception e)
+		{
+
+			return null;
+		}
+
+	}
 
 
-        // Mostrar el componente AddProject dentro del Offcanvas
-        // El primer parámetro es el título del Offcanvas
-        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
-        await offcanvas.ShowAsync<ProjectCanvaViewComponent>("Información del Proyecto", parameters);
-    }
+	private async Task HandleProjectView(Project e)
+	{
+		// Crear un diccionario para pasar parámetros al componente AddProject
+		var parameters = new Dictionary<string, object>();
+		parameters.Add("project", e);
 
+
+		// Mostrar el componente AddProject dentro del Offcanvas
+		// El primer parámetro es el título del Offcanvas
+		// El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+		await offcanvas.ShowAsync<ProjectCanvaViewComponent>("Información del Proyecto", parameters);
+	}
+
+
+	private async Task SendBitrix24Commentary(Project project, string State)
+	{
+		bool IsValid = int.TryParse(project.TaskNumber, out int _task);
+		if (project != null && IsValid)
+		{
+			string Message = $"Se ha movido el proyecto {project.Title} ({project.ProjectId}-{project.TaskNumber}) a la etapa: {State}.";
+			await bitrix24.SendTaskCommentAsync(_task, Message, 186);
+		}
+	}
+	
+	
+	private void ChangeCompany(ChangeEventArgs args)
+	{
+		ProjectLists.Clear();
+		var companyId = int.Parse(args.Value.ToString());	
+		foreach (var state in States)
+		{
+			ProjectLists[state] = GetProjectsByState(state.StateId, companyId);
+		}
+
+	}
 }

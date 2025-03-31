@@ -1,0 +1,48 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+<div>
+    <h5>Compañías</h5>
+    <div class="d-flex flex-row">
+        <EditForm Model="@StateNew">
+            <div class="form-floating">
+                <InputText class="form-control" id="StateName" @bind-Value="StateNew.StateName" />
+                <label for="StateName">Nombre</label>
+            </div>
+        </EditForm>
+        <button class="btn btn-primary" @onclick="AddCompanyAsync">Agregar</button>
+
+    </div>
+</div>
+
+@foreach (var i in stateList)
+{
+    <StateItemData stateItem="@i" />
+}
+
+@code {
+    List<State> stateList = new List<State>();
+    ProjectsDBContext db;
+
+    private State StateNew { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+		db = DbContextFactory.CreateDbContext();
+        StateNew = new State();
+        stateList = await db.States.AsNoTracking().ToListAsync();
+    }
+
+    async Task AddCompanyAsync()
+    {
+        if (!string.IsNullOrEmpty(StateNew.StateName))
+        {
+            StateNew.OrderPriority = db.States.OrderByDescending(e => e.OrderPriority).FirstOrDefault()?.OrderPriority + 1 ?? 1;
+            db.States.Add(StateNew);
+            await db.SaveChangesAsync(); 
+            stateList.Add(StateNew);
+            StateNew = new State();
+            StateHasChanged(); 
+        }
+    }
+}

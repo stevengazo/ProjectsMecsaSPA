@@ -23,6 +23,8 @@ namespace ProjectsMecsaSPA.Model
 
         [StringLength(500, ErrorMessage = "La nota no puede tener más de 500 caracteres.")]
         public string Note { get; set; }
+        [Required( ErrorMessage = "Debe Indicar el numero de tarea")]
+        public int TaskNumber { get; set; }
 
         [Required(ErrorMessage = "El autor es obligatorio.")]
         [StringLength(100, ErrorMessage = "El autor no puede tener más de 100 caracteres.")]
@@ -40,10 +42,12 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "La fecha de factura es obligatoria.")]
         public DateTime BillDate { get; set; }
 
-
         public Project? Project { get; set; }
 
         [Required(ErrorMessage = "El ID del proyecto es obligatorio.")]
         public int ProjectId { get; set; }
+
+        public ICollection<BillFile> BillFiles { get; set; }
+
     }
 }

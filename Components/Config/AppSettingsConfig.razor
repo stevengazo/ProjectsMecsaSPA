@@ -1,0 +1,86 @@
+﻿@page "/configuracion"
+@using System.Text.Json
+@inject IConfiguration Configuration
+@inject IWebHostEnvironment Env
+
+<h3>Configuración</h3>
+
+@if (settings != null)
+{
+    <EditForm Model="settings" OnValidSubmit="GuardarCambios">
+        <DataAnnotationsValidator />
+        <div class="m-1 border rounded-sm shadow p-1">
+            <h4>Banco Central</h4>
+            <p>Datos basicos para conexion con el API del Banco central de costa rica</p>
+            <InputText @bind-Value="settings.BancoCentral.Nombre" class="form-control w-50 m-1" placeholder="Nombre" />
+            <InputText @bind-Value="settings.BancoCentral.CorreoElectronico" class="form-control w-50 m-1" placeholder="Correo Electrónico" />
+            <InputText @bind-Value="settings.BancoCentral.Token" class="form-control w-50 m-1" placeholder="Token" />
+
+        </div>
+        <div class="m-1 border rounded-sm shadow p-1">
+        <h4>Telegram</h4>
+        <p>Datos para conexión con Bot de telegram</p>
+            <InputText @bind-Value="settings.TelegramSettings.BotToken" class="form-control w-75 m-1" placeholder="Bot Token" />
+        </div>
+        <div class="m-1 border rounded-sm shadow p-1">
+        <h4>SMTP</h4>
+        <p>Datos basicos para el envio de correo electronico</p>
+        <InputText @bind-Value="settings.Smtp.Host" class="form-control w-75 m-1" placeholder="Host" />
+            <InputNumber @bind-Value="settings.Smtp.Port" class="form-control w-75 m-1" placeholder="Puerto" />
+            <InputText @bind-Value="settings.Smtp.Username" class="form-control w-75 m-1" placeholder="Usuario" />
+            <InputText @bind-Value="settings.Smtp.Password" class="form-control w-75 m-1" placeholder="Contraseña" />
+        <InputCheckbox @bind-Value="settings.Smtp.EnableSsl" /> Habilitar SSL
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+    </EditForm>
+}
+
+@code {
+    private AppSettings settings;
+
+    protected override void OnInitialized()
+    {
+        // Lee la configuración directamente desde el archivo appsettings.json
+
+        var d = Configuration.Get<AppSettings>();
+        settings = d;
+    }
+
+
+    private async Task GuardarCambios()
+    {
+        var filePath = Path.Combine(Env.ContentRootPath, "appsettings.json");
+        var json = JsonSerializer.Serialize(new { AppSettings = settings }, new JsonSerializerOptions { WriteIndented = true });
+
+        // Guarda el archivo appsettings.json con los cambios
+        await File.WriteAllTextAsync(filePath, json);
+    }
+
+    public class AppSettings
+    {
+        public BancoCentral BancoCentral { get; set; } = new();
+        public TelegramSettings TelegramSettings { get; set; } = new();
+        public Smtp Smtp { get; set; } = new();
+    }
+
+    public class BancoCentral
+    {
+        public string Nombre { get; set; }
+        public string CorreoElectronico { get; set; }
+        public string Token { get; set; }
+    }
+
+    public class TelegramSettings
+    {
+        public string BotToken { get; set; }
+    }
+
+    public class Smtp
+    {
+        public string Host { get; set; }
+        public int Port { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public bool EnableSsl { get; set; }
+    }
+}

@@ -11,6 +11,7 @@ namespace ProjectsMecsaSPA.Model
         public DateTime Creation { get; set; }
         public string ContentType { get; set; }
         public byte[] Content { get; set; }
+        public string FilePath { get; set; }
         public int ProjectId { get; set; }
 
         #region Relaciones

@@ -1,6 +1,9 @@
 ﻿@using System.Globalization
 @inject ProjectsDBContext db
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject Bitrix24ClientService Bitrix24Client
 
+<ConfirmDialog @ref="dialog" />
 @if (IsEditing)
 {
     <tr>
@@ -25,9 +28,6 @@
             </EditForm>
         </td>
         <td>
-            @AmountCulture.NumberFormat.CurrencySymbol
-        </td>
-        <td>
             <EditForm Model="item">
                 <InputText @bind-Value="item.Note" class="form-control form-control-sm"></InputText>
             </EditForm>
@@ -44,92 +44,138 @@
 }
 else
 {
-    if(AmountCulture!= null)
-    {
-        <tr>
-            <td>
-                @item.BillNumber
-            </td>
-            <td>
-                @item.BillDate.ToShortDateString()
-            </td>
-            <td>
-                @item.Author
-            </td>
-            <td>
-                @item.Amount.ToString("C", AmountCulture)
-            </td>
-            <td>
-                @AmountCulture.NumberFormat.CurrencySymbol
-            </td>
-            <td>
-                @item.Note
-            </td>
-            <td>
-                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
-                    Editar
-                </button>
-            </td>
-        </tr>
-    }
-    else
-    {
-        <tr>
-            <td>
-                @item.BillNumber
-            </td>
-            <td>
-                @item.BillDate.ToShortDateString()
-            </td>
-            <td>
-                @item.Author
-            </td>
-            <td>
-                @item.Amount.ToString("C")
-            </td>
-            <td>
-            
-            </td>
-            <td>
-                @item.Note
-            </td>
-            <td>
-                <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
-                    Editar
-                </button>
-            </td>
-        </tr>
-    }
 
-  
+    <tr>
+        <td>
+            @item.BillNumber
+        </td>
+        <td>
+            @item.BillDate.ToShortDateString()
+        </td>
+        <td>
+            @item.Author
+        </td>
+        <td>
+            @item.Amount.ToString("N2")
+        </td>
+        <td>
+            @item.Note
+        </td>
+        <td>
+            <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
+                Archivos
+            </button>
+            <button class="btn btn-outline-success" @onclick="()=>IsEditing=true">
+                Editar
+            </button>
+            <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
+                Borrar
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="6">
+            <Collapse @ref="collapse1">
+                <Card>
+                    <CardBody>
+                        <table class="table table-hover table-stripped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Archivo
+                                    </th>
+                                    <th>
+                                        Creacion
+                                    </th>
+                                    <th>
+                                        Enlace
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var i in item.BillFiles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <h6>@i.FileName</h6>
+                                        </td>
+                                        <td>
+                                            <h6>@i.Creation.Value.ToLongDateString()</h6>
+                                        </td>
+                                        <td>
+                                            <a href="@GetDownloadUrl(i.FilePath)" class="btn btn-info" target="_blank">
+                                                <Icon Name="IconName.CloudArrowDownFill"></Icon>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </CardBody>
+                </Card>
+            </Collapse>
+        </td>
 
+    </tr>
 }
 
 
 @code {
     [Parameter]
     public Bill item { get; set; }
+
     [Parameter]
-    public  CultureInfo AmountCulture { get; set; }
+    public EventCallback OnDelete { get; set; }
+
+    private ConfirmDialog dialog = default!;
 
     private bool IsEditing { get; set; }
 
+    Collapse collapse1 = default!;
 
+    private string GetDownloadUrl(string filePath)
+    {
+        // Aquí eliminamos la parte 'projectsdata/' si está presente
+        filePath = filePath.Replace("projectsdata\\", "");
+
+        // Generamos la URL de descarga que apunta a /drive-facturas/{ruta_relativa_del_archivo}
+        return $"/drive-facturas/{filePath}";
+    }
     private void Update()
     {
         try
         {
+            var dbcontext = DbContextFactory.CreateDbContext();
             item.Note = string.IsNullOrEmpty(item.Note) ? "" : item.Note;
             item.Author = string.IsNullOrEmpty(item.Author) ? "" : item.Author;
-            db.Bill.Update(item);
-            db.SaveChanges();
+            dbcontext.Bill.Update(item);
+            dbcontext.SaveChanges();
             IsEditing = false;
             StateHasChanged();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            
+            Console.WriteLine(ex.Message);
             throw;
         }
     }
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Deseas borrar este archivo?",
+            message1: "Una vez haya sido borrado, no se podra recuperar. La información ingresada en Bitrix24 no será eliminada.",
+            message2: "Quieres proceder?");
+
+        if (confirmation)
+        {
+            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{ item.Amount}", 107);
+			await OnDelete.InvokeAsync(item);
+        }
+        else
+        {
+            // do something
+        }
+    }
+
+    private async Task ToggleContentAsync() => await collapse1.ToggleAsync();
 }

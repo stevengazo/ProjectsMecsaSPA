@@ -24,9 +24,9 @@
                     <th>@item.FileName</th>
                     <th>@item.Creation.ToLongDateString()</th>
                     <th>
-                        <button @onclick="() => DownloadPDF(item)" class="bg-warning border-0 h-100 rounded rounded-1 p-2">
-                           <Icon Name="IconName.Download" class="text-white" ></Icon>
-                        </button>
+                        <a href="@GetDownloadUrl(item.FilePath)" class="btn btn-info" target="_blank">
+                            <Icon Name="IconName.CloudArrowDownFill"></Icon>
+                        </a>
                         <button @onclick="() => Delete(item)" class="bg-danger border-0 h-100 rounded rounded-1 p-2">
                             <Icon Name="IconName.X" class="text-white"></Icon>
                         </button>
@@ -54,6 +54,15 @@
     {
         fileModels = await db.Files.Where(e => e.ProjectId == id).ToListAsync();
         StateHasChanged();
+    }
+
+    private string GetDownloadUrl(string filePath)
+    {
+        // Aquí eliminamos la parte 'projectsdata/' si está presente
+        filePath = filePath.Replace("projectsdata\\", "");
+
+        // Generamos la URL de descarga que apunta a /drive-facturas/{ruta_relativa_del_archivo}
+        return $"/drive-facturas/{filePath}";
     }
 
     public async Task RefreshTable()

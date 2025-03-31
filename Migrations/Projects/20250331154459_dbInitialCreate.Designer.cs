@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20240826162639_ProjectMigration")]
-    partial class ProjectMigration
+    [Migration("20250331154459_dbInitialCreate")]
+    partial class dbInitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -74,11 +74,50 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TaskNumber")
+                        .HasColumnType("int");
+
                     b.HasKey("BillId");
 
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Bill");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.BillFile", b =>
+                {
+                    b.Property<int>("BillFileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillFileId"), 1L, 1);
+
+                    b.Property<string>("B24FileId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Creation")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BillFileId");
+
+                    b.HasIndex("BillId");
+
+                    b.ToTable("BillFiles");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Commentary", b =>
@@ -108,6 +147,30 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasIndex("ProjectId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Company", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"), 1L, 1);
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CompanyId");
+
+                    b.ToTable("Company");
+
+                    b.HasData(
+                        new
+                        {
+                            CompanyId = 1,
+                            CompanyName = "Default"
+                        });
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Customer", b =>
@@ -165,6 +228,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -272,6 +339,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(15,3)");
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -287,6 +357,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("FolderIDB24")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
@@ -321,6 +394,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<int>("StateId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TAX")
+                        .HasColumnType("int");
+
                     b.Property<string>("TaskNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -343,6 +419,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("ProjectId");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("CustomerId");
 
@@ -571,6 +649,17 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.BillFile", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Bill", "Bill")
+                        .WithMany("BillFiles")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+                });
+
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Commentary", b =>
                 {
                     b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
@@ -595,6 +684,12 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Project", b =>
                 {
+                    b.HasOne("ProjectsMecsaSPA.Model.Company", "Company")
+                        .WithMany("Projects")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ProjectsMecsaSPA.Model.Customer", "Customer")
                         .WithMany("Projects")
                         .HasForeignKey("CustomerId")
@@ -619,6 +714,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Company");
+
                     b.Navigation("Customer");
 
                     b.Navigation("Seller");
@@ -626,6 +723,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("State");
 
                     b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>
+                {
+                    b.Navigation("BillFiles");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Company", b =>
+                {
+                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Customer", b =>

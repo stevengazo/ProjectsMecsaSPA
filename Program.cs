@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,12 +10,32 @@ using ProjectsMecsaSPA.Hubs;
 using ProjectsMecsaSPA.Model;
 using ProjectsMecsaSPA.Services;
 using ProjectsMecsaSPA.Utilities;
+using Microsoft.Extensions.FileProviders;
+using static ProjectsMecsaSPA.Components.Config.AppSettingsConfig;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+
+
 var UsersConnection = builder.Configuration.GetConnectionString("UsersConnection");
 var ProjectsConnection = builder.Configuration.GetConnectionString("ProjectsConnection");
+
+#region Limites
+builder.Services.Configure<HubOptions>(options =>
+{
+    options.MaximumReceiveMessageSize = 20 * 1024 * 1024; // 20 MB
+});
+
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 20 * 1024 * 1024; // 20 MB
+});
+
+#endregion
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(UsersConnection));
@@ -36,6 +57,15 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+// Telegram
+// Cargar las configuraciones desde appsettings.json
+//builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+//builder.Services.AddHostedService<TelegramService>();
+// Central Bank Service
+builder.Services.AddHttpClient<Bitrix24ClientService>();
+builder.Services.AddHttpClient<CentralBankService>();
+builder.Services.AddSingleton<FileStorageService>();
+
 
 var app = builder.Build();
 
@@ -50,6 +80,8 @@ using (var scope = app.Services.CreateScope())
         {
             db.Database.Migrate();
         }
+        
+        Console.WriteLine(nameof(ProjectsDBContext) + "Created");
     }
     catch (Exception e)
     {
@@ -67,6 +99,8 @@ using (var scope = app.Services.CreateScope())
         {
             db.Database.Migrate();
         }
+     
+        Console.WriteLine(nameof(ApplicationDbContext) + "Created");
     }
     catch (Exception e)
     {
@@ -75,7 +109,6 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
-
 #endregion
 
 // Configure the HTTP request pipeline.
@@ -89,6 +122,20 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
+var path = Path.Combine(Directory.GetCurrentDirectory(), "projectsdata");
+if (!Directory.Exists(path))
+{
+    Directory.CreateDirectory(path);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(path),
+    RequestPath = "/drive-facturas"
+});
+
 
 app.UseHttpsRedirection();
 
@@ -105,4 +152,10 @@ app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+
+
 app.Run();
+
+
+
+

@@ -2,6 +2,7 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject ApplicationDbContext dbIdentity;
 @inject AuthenticationStateProvider asp;
+@inject Bitrix24ClientService bitrix24Client;
 
 <EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
     <div >
@@ -23,7 +24,7 @@
     {
         db = DbContextFactory.CreateDbContext();
         commentary = new();
-     
+
         commentary.ProjectId = ProjectId;
         base.OnInitializedAsync();   
     }
@@ -31,14 +32,26 @@
     private async Task Add()
     {
         GetAuthor();
-      
+
         commentary.CreationDate = DateTime.Now;
         commentary.ProjectId = ProjectId;
         db.Comments.Add(commentary);
         await db.SaveChangesAsync();
+        GenerateComment();
         OnAdded.InvokeAsync();
         commentary = new();
 
+    }
+
+    private async Task GenerateComment(){
+        var task = (from p in db.Projects
+                    where p.ProjectId == ProjectId
+                    select p.TaskNumber).FirstOrDefault();
+        var taskValid = int.TryParse(task, out int taskNumber);
+        if (taskValid)
+        {    
+            await bitrix24Client.SendTaskCommentAsync(taskNumber, commentary.CommentaryText,186);
+        }
     }
 
     private async Task GetAuthor()
