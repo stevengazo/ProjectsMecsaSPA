@@ -1,11 +1,11 @@
 ﻿@page "/add-bill"
 @using Newtonsoft.Json
 @using ProjectsMecsaSPA.Model.Bitrix
-@inject ProjectsDBContext db
 @inject IWebHostEnvironment env
 @inject IJSRuntime jS;
 @inject FileStorageService FileStorageService
 @inject Bitrix24ClientService Bitrix24Client
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <style>
     .custom-file-input {
@@ -104,7 +104,7 @@
         <ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
     </div>
     <!-- Files-->
-    <div class="border shadow-sm rounded p-3 text-center">
+    <div class="border mt-1 shadow-sm rounded p-3 text-center">
         <p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
         <InputFile multiple OnChange="@OnChange"
         @ondragenter="OnDragEnter"
@@ -126,19 +126,24 @@
             }
         </ul>
     </div>
-    <div class="d-flex flex-row">
+    <!-- Send CRM-->
+    <div class="border shadow-sm rounded p-2 m-1 d-flex flex-row gap-1 justify-content-around align-items-center">
+        <label class="form-label">Enviar Datos a CRM</label>
+        <InputCheckbox class="form-control-sm" @bind-Value="SendData" />
+    </div>
+    <div class="d-flex flex-row justify-content-center align-items-center">
         <!-- Submit Button-->
         <button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
         @if(IsLoading){
             <Spinner Color="SpinnerColor.Success" />
         }
     </div>
-
 </EditForm>
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 @code {
+    #region Parameter
     [Parameter]
     public int ProjectId { get; set; }
     [Parameter]
@@ -149,21 +154,29 @@
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
-    List<ToastMessage> messages = new List<ToastMessage>();
+    #endregion
 
-	bool IsLoading { get; set; } = false;
+    #region Properties
+    private List<ToastMessage> messages = new List<ToastMessage>();
+    private List<IBrowserFile> files = new();
 
+    private bool IsLoading { get; set; } = false;
     private ElementReference fileDropContainer;
-
-    List<IBrowserFile> files = new();
-
-    string HoverClass { get; set; } = string.Empty;
+    private string HoverClass { get; set; } = string.Empty;
+    private ProjectsDBContext db;
 
     Bill bill = new()
-	{
-		LastEditionDate = DateTime.Now,
-		BillDate = DateTime.Now
-	};
+    {
+        LastEditionDate = DateTime.Now,
+        BillDate = DateTime.Now
+    };
+
+    private bool SendData { get; set; } = true;
+
+    #endregion
+
+
+
 
     private void DeleteFile(IBrowserFile file)
     {
@@ -185,9 +198,9 @@
         bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
         bill.Currency = CurrencyType;
         bill.ProjectId = ProjectId;
-        using var context = db;
-        context.Bill.Add(bill);
-        await context.SaveChangesAsync();
+		db = DbContextFactory.CreateDbContext();
+        db.Bill.Add(bill);
+        await db.SaveChangesAsync();
         await UploadFiles();
         await SendCommentaryAsync();
         bill = new Bill
@@ -197,6 +210,10 @@
 				BillDate = DateTime.Now
 			};
 		IsLoading = false;
+		files.Clear();
+		this.StateHasChanged();
+
+
         await OnAdded.InvokeAsync(null);
     }
 
@@ -207,11 +224,13 @@
     {
         try
         {
-            var files = db.BillFiles.Where(x => x.BillId == bill.BillId).Select(e => e.B24FileId).ToArray();
-            if (bill.TaskNumber != 0)
-            {
-                string Message = $"\nInformacion Ingresada en App de Proyectos \nMonto: {bill.Amount.ToString("n2")} \nMoneda: {bill.Currency} \nCreacion: {bill.BillDate} \nProyectoId: {bill.ProjectId} \nDescripcion: {bill.Note}\nTarea: {bill.TaskNumber}";
-                await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 107, files);
+            if(SendData){
+                var files = db.BillFiles.Where(x => x.BillId == bill.BillId).Select(e => e.B24FileId).ToArray();
+                if (bill.TaskNumber != 0)
+                {
+                    string Message = $"\nInformacion Ingresada en App de Proyectos \nMonto: {bill.Amount.ToString("n2")} \nMoneda: {bill.Currency} \nCreacion: {bill.BillDate} \nProyectoId: {bill.ProjectId} \nDescripcion: {bill.Note}\nTarea: {bill.TaskNumber}";
+                    await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 107, files);
+                }
             }
         }
         catch (Exception ef)
