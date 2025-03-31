@@ -1,4 +1,4 @@
-﻿
+﻿@inject ProjectsDBContext db
 
     <h6 class="text-end">
     <strong>Monto Facturado: </strong> @Bills.Sum(e => e.Amount).ToString("N2")
@@ -19,7 +19,7 @@
     <tbody>
         @foreach (var item in Bills)
         {
-            <BillRowComponent item="item" />
+            <BillRowComponent item="item" OnDelete="()=> RemoveBill(item)" />
         }
     </tbody>
 </table>
@@ -28,6 +28,12 @@
     [Parameter]
     public List<Bill> Bills { get; set; }
 
+    private void RemoveBill(Bill bill)
+    {
+        Bills.Remove(bill);
+		db.Remove(bill);
+		db.SaveChanges();
+    }
 
     protected override async Task OnInitializedAsync()
     {

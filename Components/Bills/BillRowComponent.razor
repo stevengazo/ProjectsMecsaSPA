@@ -1,7 +1,9 @@
 ﻿@using System.Globalization
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject Bitrix24ClientService Bitrix24Client
 
+<ConfirmDialog @ref="dialog" />
 @if (IsEditing)
 {
     <tr>
@@ -63,13 +65,16 @@ else
             <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
                 Archivos
             </button>
-            <button class="btn btn-outline-info" @onclick="()=>IsEditing=true">
+            <button class="btn btn-outline-success" @onclick="()=>IsEditing=true">
                 Editar
+            </button>
+            <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
+                Borrar
             </button>
         </td>
     </tr>
     <tr>
-       <td colspan="6">
+        <td colspan="6">
             <Collapse @ref="collapse1">
                 <Card>
                     <CardBody>
@@ -101,7 +106,6 @@ else
                                             <a href="@GetDownloadUrl(i.FilePath)" class="btn btn-info" target="_blank">
                                                 <Icon Name="IconName.CloudArrowDownFill"></Icon>
                                             </a>
-
                                         </td>
                                     </tr>
                                 }
@@ -110,7 +114,7 @@ else
                     </CardBody>
                 </Card>
             </Collapse>
-       </td>
+        </td>
 
     </tr>
 }
@@ -120,6 +124,10 @@ else
     [Parameter]
     public Bill item { get; set; }
 
+    [Parameter]
+    public EventCallback OnDelete { get; set; }
+
+    private ConfirmDialog dialog = default!;
 
     private bool IsEditing { get; set; }
 
@@ -146,10 +154,28 @@ else
             StateHasChanged();
         }
         catch (Exception ex)
-    {
+        {
             Console.WriteLine(ex.Message);
             throw;
         }
     }
+    private async Task ShowConfirmationAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: "Deseas borrar este archivo?",
+            message1: "Una vez haya sido borrado, no se podra recuperar. La información ingresada en Bitrix24 no será eliminada.",
+            message2: "Quieres proceder?");
+
+        if (confirmation)
+        {
+            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{ item.Amount}", 107);
+			await OnDelete.InvokeAsync(item);
+        }
+        else
+        {
+            // do something
+        }
+    }
+
     private async Task ToggleContentAsync() => await collapse1.ToggleAsync();
 }

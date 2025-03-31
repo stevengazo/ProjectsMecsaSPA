@@ -14,6 +14,12 @@
         </select>
     </div>
     <div class="col-auto">
+        <select @bind="SelectedCurrency" class="form-select">
+            <option value="en-US">Dolar</option>
+            <option value="es-CR">Colon</option>
+        </select>
+    </div>
+    <div class="col-auto">
         <button class="btn btn-outline-info" @onclick="AddDataSet">
             Añadir Datos
         </button>
@@ -38,6 +44,7 @@
     private ChartData chartData = default!;
 
     private int SelectedYear = DateTime.Now.Year;
+	string SelectedCurrency = "en-US";
     private List<int> availableYears = new List<int>();
 
     List<string>  labels = new List<string>();
@@ -78,7 +85,7 @@
         var dataset1 = new LineChartDataset
             {
 
-                Label = $"{SelectedYear}",
+                Label = $"{SelectedYear}-{SelectedCurrency}",
                 Data = await GetData(),
                 BackgroundColor = colors[colorI],
                 BorderColor = colors[colorI],
@@ -147,7 +154,7 @@
         using (var dbTemp = DbContextFactory.CreateDbContext())
         {
             List<double?> listOfAmountsByMonth = dbTemp.Projects
-                                                        .Where(p => p.CreationDate.Year == SelectedYear)
+                                                        .Where(p => (p.CreationDate.Year == SelectedYear )&& (p.CurrencyType.Equals( SelectedCurrency)) )
                                                         .OrderBy(x => x.CreationDate.Month)
                                                         .GroupBy(p => p.CreationDate.Month)
                                                         .Select(g => (double?)g.Sum(p => p.Amount))
