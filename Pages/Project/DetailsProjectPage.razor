@@ -8,78 +8,89 @@
 <h3 class="text-center">Detalles del Proyecto</h3>
 @if (project.IsDeleted)
 {
-    <h3 class="text-danger">
-        Este proyecto fue marcado como inactivo
-    </h3>
-    <p class="text-danger">
-        Este proyecto no aparecerá en la zona Kanban de planificación. Además no podrá ingresar nueva información
-    </p>
+	<h3 class="text-danger">
+		Este proyecto fue marcado como inactivo
+	</h3>
+	<p class="text-danger">
+		Este proyecto no aparecerá en la zona Kanban de planificación. Además no podrá ingresar nueva información
+	</p>
 }
 
-<AuthorizeView>
-	<Authorized>
-        <div class="container">
-            <div class="row">
-                <!-- Detalles del Proyecto -->
-                <div class=" shadow p-1 border rounded ">
-                    <DetailsProjectTableComponent project="project" />
-                </div>
-            </div>
-            <div class="row mt-3 shadow p-1 mb-3 border rounded ">
-                <Tabs EnableFadeEffect="true">
-                    <Tab Title="Archivos" Active="true">
-                        <Content>
-                            @if (!project.IsDeleted)
-                            {
-                                <UploadFileComponent id="project.ProjectId" />
-                            }
-                            <FileManagementComponent id="project.ProjectId" />
-                        </Content>
-                    </Tab>
-                    <Tab Title="Facturas">
-                        <Content>
-                            <div class="p-1 d-flex flex-column">
-                                <div class="">
-                                    <button @onclick="ShowAddBill" class="btn btn-outline-success">
-                                        Agregar Factura
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <BillTableComponent Bills="Bills.ToList()" />
-                                </div>
-                            </div>
-                        </Content>
-                    </Tab>
-                    <Tab Title="Comentarios">
-                        <Content>
-                            <div class="overflow-auto">
-                                <h5>Comentarios</h5>
-                                @if (!project.IsDeleted)
-                                {
-                                    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-                                }
-                                <div class="d-flex flex-column overflow">
-                                    @foreach (var i in project.Commentaries)
-                                    {
-                                        <div class="mx-2 my-1 p-2 border rounded">
-                                            <label>@i.CreationDate.ToLongDateString() - @i.Author</label>
-                                            <p>@i.CommentaryText</p>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </Content>
-                    </Tab>
-                </Tabs>
-            </div>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <ErrorViewComponent />
-    </NotAuthorized>
-</AuthorizeView>
-
+<div class="container">
+	<div class="row">
+		<!-- Detalles del Proyecto -->
+		<div class=" shadow p-1 border rounded ">
+			<AuthorizeView>
+				<Authorized>
+					<DetailsProjectTableComponent project="project" />
+				</Authorized>
+			</AuthorizeView>
+		</div>
+	</div>
+	<div class="row mt-3 shadow p-1 mb-3 border rounded ">
+		<Tabs EnableFadeEffect="true">
+			<Tab Title="Archivos" Active="true">
+				<Content>
+					<AuthorizeView>
+						<Authorized>
+							@if (!project.IsDeleted)
+							{
+								<UploadFileComponent id="project.ProjectId" />
+							}
+							<FileManagementComponent id="project.ProjectId" />
+						</Authorized>
+					</AuthorizeView>
+				</Content>
+			</Tab>
+			<Tab Title="Facturas">
+				<Content>
+					<div class="p-1 d-flex flex-column">
+						<AuthorizeView Roles="administrador,contabilidad">
+							<Authorized>
+								<div class="">
+									<button @onclick="ShowAddBill" class="btn btn-outline-success">
+										Agregar Factura
+									</button>
+								</div>
+							</Authorized>
+						</AuthorizeView>
+						<AuthorizeView>
+							<Authorized>
+								<div>
+									<BillTableComponent Bills="Bills.ToList()" />
+								</div>
+							</Authorized>
+						</AuthorizeView>
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Comentarios">
+				<Content>
+					<AuthorizeView>
+						<Authorized>
+							<div class="overflow-auto">
+								<h5>Comentarios</h5>
+								@if (!project.IsDeleted)
+								{
+									<CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+								}
+								<div class="d-flex flex-column overflow">
+									@foreach (var i in project.Commentaries)
+									{
+										<div class="mx-2 my-1 p-2 border rounded">
+											<label>@i.CreationDate.ToLongDateString() - @i.Author</label>
+											<p>@i.CommentaryText</p>
+										</div>
+									}
+								</div>
+							</div>
+						</Authorized>
+					</AuthorizeView>
+				</Content>
+			</Tab>
+		</Tabs>
+	</div>
+</div>
 
 
 

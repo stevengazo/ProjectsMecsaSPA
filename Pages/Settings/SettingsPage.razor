@@ -3,44 +3,47 @@
 
 <h2>Configuracion</h2>
 
-
-<Tabs EnableFadeEffect="true" NavStyle="NavStyle.VerticalPills">
-	<Tab Title="Usuarios" Active="true">
-		<Content>
-			<div class="border rounded m-1 p-1">
-				<UsersTableComponent />
-			</div>
-		</Content>
-	</Tab>
-	<Tab Title="Companias" Active="true">
-		<Content>
-			<div class="border rounded  m-1 p-1">
-				<CompanyList />
-			</div>
-		</Content>
-	</Tab>
-	<Tab Title="Tipos de Servicios">
-		<Content>
-			<div class="border rounded  m-1 p-1">
-				<ServiceTypeList />
-			</div>
-		</Content>
-	</Tab>
-	<Tab Title="Etapas Kanban">
-		<Content>
-			<div class="border rounded  m-1 p-1">
-				<StateList />
-			</div>
-		</Content>
-	</Tab>
-	<Tab Title="Servicios y Base de Datos">
-		<Content>
-			<div class="border rounded  m-1 p-1">
-				<AppSettingsConfig />
-			</div>
-		</Content>
-	</Tab>
-</Tabs>
+<AuthorizeView Roles="administrador">
+	<Authorized>
+		<Tabs EnableFadeEffect="true" NavStyle="NavStyle.VerticalPills">
+			<Tab Title="Usuarios" Active="true">
+				<Content>
+					<div class="border rounded m-1 p-1">
+						<UsersTableComponent />
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Companias" Active="true">
+				<Content>
+					<div class="border rounded  m-1 p-1">
+						<CompanyList />
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Tipos de Servicios">
+				<Content>
+					<div class="border rounded  m-1 p-1">
+						<ServiceTypeList />
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Etapas Kanban">
+				<Content>
+					<div class="border rounded  m-1 p-1">
+						<StateList />
+					</div>
+				</Content>
+			</Tab>
+			<Tab Title="Servicios y Base de Datos">
+				<Content>
+					<div class="border rounded  m-1 p-1">
+						<AppSettingsConfig />
+					</div>
+				</Content>
+			</Tab>
+		</Tabs>
+	</Authorized>
+</AuthorizeView>
 
 @code {
 

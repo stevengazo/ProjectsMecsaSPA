@@ -3,51 +3,42 @@
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject Bitrix24ClientService bitrix24;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 
 <Offcanvas @ref="offcanvas" />
 
-<AuthorizeView Roles="administrador,ingeniero,asistente">
+<AuthorizeView Roles="administrador,ingeniero,asistente,vendedor">
 	<Authorized>
-		<div class="d-flex flex-row  align-items-center justify-content-between h-50  mb-3  ">
-			<h2>
-				Compania
-			</h2>
-			<select class="form-control h-50 w-25" @onchange="ChangeCompany">
-				@foreach (var company in Companies)
+			<div class="row overflow-scroll">
+				@foreach (var Obj in ProjectLists)
 				{
-					<option value="@company.CompanyId">@company.CompanyName</option>
+					<div class="col h-100">
+						<h5>@Obj.Key.StateName</h5>
+						<SortableList class="h-100"
+						TItem="Project"
+						Name="@($"{Obj.Key.StateName}")"
+						Data="@Obj.Value"
+						Context="project"
+						OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
+						OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
+							<ItemTemplate>
+								<div class="card-body" @onclick="() => HandleProjectView(project)">
+									<div class="d-flex justify-content-between">
+										<label style="font-size:16px;"><b>@project.Title</b></label>
+										<label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
+									</div>
+									<div class="d-flex flex-column mt-2">
+										<label style="font-size:14px;"><i>@project.Type?.Name</i></label>
+										<label style="font-size:12px;"><i>Tarea @project.TaskNumber</i></label>
+									</div>
+								</div>
+							</ItemTemplate>
+						</SortableList>
+					</div>
 				}
-			</select>
-		</div>
-		<div class="row overflow-scroll">
-			@foreach (var Obj in ProjectLists)
-			{
-				<div class="col h-100">
-					<h5>@Obj.Key.StateName</h5>
-					<SortableList class="h-100"
-					TItem="Project"
-					Name="@($"{Obj.Key.StateName}")"
-					Data="@Obj.Value"
-					Context="project"
-					OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
-					OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
-						<ItemTemplate>
-							<div class="card-body" @onclick="() => HandleProjectView(project)">
-								<div class="d-flex justify-content-between">
-									<label style="font-size:16px;"><b>@project.Title</b></label>
-									<label style="font-size:14px;" class="text-muted">@project.ProjectId</label>
-								</div>
-								<div class="d-flex flex-column mt-2">
-									<label style="font-size:14px;"><i>@project.Type?.Name</i></label>
-									<label style="font-size:12px;"><i>Tarea @project.TaskNumber</i></label>
-								</div>
-							</div>
-						</ItemTemplate>
-					</SortableList>
-				</div>
-			}
-		</div>
+			</div>
 	</Authorized>
 	<NotAuthorized>
 		<ErrorViewComponent />
@@ -55,17 +46,25 @@
 </AuthorizeView>
 
 
-
 @code {
 	private Offcanvas offcanvas = default!;
 	public List<State> States { get; set; } = new();
 	public Dictionary<State, List<Project>> ProjectLists { get; set; } = new();
 	public List<Company> Companies { get; set; } = new();
+	private bool IsVendedor = false;
 
-	protected override void OnInitialized()
+	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
+			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			var user = authState.User;
+
+			if (user.Identity.IsAuthenticated)
+			{
+				IsVendedor = user.IsInRole("vendedor");
+			}
+
 			Companies = db.Company.ToList();
 			// Cargar estados
 			States = db.States.Where(i => !i.IsDeleted).OrderBy(e=>e.OrderPriority).ToList();
@@ -177,24 +176,25 @@
 
 		try
 		{
-			var TargetState = GetState(NameState);
-			var ProjectTemp = GetProject(TargetState, args.OldIndex);
-
-			ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
-			var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
-			if (args.NewIndex < size)
+			if (!IsVendedor)
 			{
-				ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
-			}
-			else
-			{
-				ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
-			}
+				var TargetState = GetState(NameState);
+				var ProjectTemp = GetProject(TargetState, args.OldIndex);
 
+				ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.RemoveAt(args.OldIndex);
+				var size = ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Count;
+				if (args.NewIndex < size)
+				{
+					ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(args.NewIndex, ProjectTemp);
+				}
+				else
+				{
+					ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Add(ProjectTemp);
+				}
+			}
 		}
 		catch (Exception r)
 		{
-
 			throw r;
 		}
 
@@ -202,24 +202,27 @@
 
 	private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)
 	{
-		var TargetState = GetState(args.ToListName);
-		var OriginState = GetState(args.FromListName);
+		if (!IsVendedor)
+		{
+			var TargetState = GetState(args.ToListName);
+			var OriginState = GetState(args.FromListName);
 
-		var ProjectTemp = GetProject(OriginState, args.OldIndex);
+			var ProjectTemp = GetProject(OriginState, args.OldIndex);
 
-		/// Delete  Project
-		ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
-		/// Insert Project
-		ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
+			/// Delete  Project
+			ProjectLists.Where(i => i.Key == OriginState).FirstOrDefault().Value.Remove(ProjectTemp);
+			/// Insert Project
+			ProjectLists.Where(i => i.Key == TargetState).FirstOrDefault().Value.Insert(0, ProjectTemp);
 
-		ProjectTemp.StateId = TargetState.StateId;
+			ProjectTemp.StateId = TargetState.StateId;
 
-		ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
+			ProjectTemp.IsCompleted = (TargetState.StateName == "Finalizado") ? true : false;
 
-		db.Projects.Update(ProjectTemp);
-		await db.SaveChangesAsync();
+			db.Projects.Update(ProjectTemp);
+			await db.SaveChangesAsync();
 
-		SendBitrix24Commentary(ProjectTemp, TargetState.StateName);
+			SendBitrix24Commentary(ProjectTemp, TargetState.StateName);
+		}
 
 
 	}
