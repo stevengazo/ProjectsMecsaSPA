@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 @inject ProjectsDBContext db
-
+@inject FileStorageService FileStorageService
 
 
 
@@ -14,9 +14,9 @@
             <!-- Encabezado del componente -->
             <h4 class="text-start h-100 align-content-center">Cargar Nuevo Archivo</h4>
         </div>
-            
+
         <div class="d-flex flex-row gap-2 w-50">
-            <InputFile OnChange="LoadFile" accept=".pdf" class="form-control w-100 " />
+            <InputFile OnChange="LoadFile" class="form-control w-100 " />
             <!-- Botón de carga de archivos -->
             <button @onclick="AddFile" class="btn btn-outline-info" disabled="@(!canUpload || isLoading)">
                 @if (isLoading)
@@ -34,7 +34,7 @@
         </div>
     </div>
     <!-- Mensaje de estado de la carga -->
-    
+
 </div>
 <label class="text-info p-1 text-end">@uploadMessage</label>
 
@@ -50,7 +50,7 @@
     int MaxSize = (13 * 1024 * 1024);       // Tamaño máximo permitido para el archivo (13MB)
 
     //[Parameter]
-  //  public EventCallback OnUpdated { get; set; }
+    //  public EventCallback OnUpdated { get; set; }
 
 
 
@@ -61,11 +61,13 @@
         {
             try
             {
+
                 // Crear modelo de archivo para enviar al servicio
                 var fileModel = new FileModel
                     {
                         FileName = _File.Name,           // Nombre del archivo
-                        Size = _File.Size,           // Tamaño del archivo en bytes
+                        Size = new byte(),           // Tamaño del archivo en bytes
+                        FilePath= "",
                         ContentType = _File.ContentType, // Tipo MIME del archivo
                         Content = fileContent,           // Contenido del archivo en bytes
                         Creation = DateTime.Now
@@ -75,7 +77,13 @@
                 isLoading = true;  // Inicia el indicador de carga
 
                 db.Files.Add(fileModel);
-                db.SaveChangesAsync();
+                await db.SaveChangesAsync();
+				await FileStorageService.GenerateFilesDirectoryAsync(id);
+                fileModel.FilePath = await FileStorageService.UploadFilesAsync(id,  _File);
+                db.Files.Update(fileModel); 
+				await db.SaveChangesAsync();
+
+
 
                 // Actualizar mensaje de estado
                 uploadMessage = $"Archivo '{fileModel.FileName}' Cargado!";
@@ -109,7 +117,7 @@
         _File = e.File; // Obtener el archivo seleccionado por el usuario
 
         // Verificar si el archivo es un PDF y si su tamaño es válido
-        if (_File.ContentType == "application/pdf" && _File.Size <= MaxSize)
+        if ( _File.Size <= MaxSize)
         {
             try
             {
@@ -121,19 +129,19 @@
             catch (Exception)
             {
                 // Manejar errores al cargar el archivo
-                uploadMessage = "Error loading file.";
+                uploadMessage = "Error cargando el archivo";
                 canUpload = false;
                 return;
             }
 
             // Actualizar estado para permitir la carga del archivo
             canUpload = true;
-            uploadMessage = $"File Name: {_File.Name}, File Size: {_File.Size} bytes, File Type: {_File.ContentType}";
+            uploadMessage = $"Archivo: {_File.Name}, Tamaño: {_File.Size} bytes, Tipo: {_File.ContentType}";
         }
         else
         {
             // Mensaje cuando se selecciona un archivo no válido
-            uploadMessage = "Invalid file. Please upload a PDF file smaller than 13MB.";
+            uploadMessage = "Archivo invalido, excede la capacidad. Limite de carga de 13MB.Invalid file.";
             canUpload = false;
         }
     }
