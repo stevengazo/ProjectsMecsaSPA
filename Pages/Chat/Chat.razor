@@ -1,57 +1,84 @@
 ﻿@page "/chat"
 @inject ChatService ChatService
 
-
-<di>
-    <h3 class="mb-4">Chat</h3>
-
-    <div class="form-group mt-1">
-        <input class="form-control" @bind="userName" placeholder="Enter your name" />
-    </div>
-
-    <div class="form-group mt-1">
-        <select class="form-control" @bind="groupName" placeholder="Enter room name" >
-            <option value="Ingeniería">Ingeniería</option>
-            <option value="Ingeniería">Proyectos & Contabilidad</option>
-        </select>
-    </div>
-    <button class="btn btn-primary" @onclick="JoinRoom">Join Room</button>
-    <button class="btn btn-secondary" @onclick="LeaveRoom">Leave Room</button>
-
-    <div class="mt-4">
-        <h4>Active Rooms:</h4>
-        <ul class="list-group">
-            @foreach (var room in activeRooms)
-            {
-                <li class="list-group-item @((room == selectedRoom) ? "active" : "")" @onclick="() => SelectRoom(room)">
-                    @room
-                </li>
-            }
-        </ul>
-    </div>
-
-</di>
-
-<div class="container mt-4 border rounded p-1">
-    
-    <div class="w-100 d-flex flex-row">
-       
-            <textarea class="form-control form-control-sm m-1" @bind="message" placeholder="Ingrese su mensaje"></textarea>
-               <button class="btn btn-outline-success btn-sm m-1" @onclick="SendMessage">Enviar</button>
-    </div>
-
-    
-    <div class="mt-4">
-        <h4>Messages in @selectedRoom:</h4>
-        <ul class="list-group">
-            @foreach (var msg in messages)
-            {
-                @if (msg.Room == selectedRoom)
+<div class="container-fluid">
+    <div class="row">
+        <!-- Lateral izquierdo: Lista de salas -->
+        <div class="col-md-4 bg-light p-3 rounded shadow" style="max-width: 25%;">
+            <h5 class="text-center mb-3">Salas Activas</h5>
+            <ul class="list-group">
+                @foreach (var room in activeRooms)
                 {
-                    <li class="list-group-item">@msg.Content</li>
+                    <li class="list-group-item @((room == selectedRoom) ? "bg-primary text-white" : "")"
+                        @onclick="() => SelectRoom(room)" style="cursor: pointer;">
+                        @room
+                    </li>
                 }
-            }
-        </ul>
+            </ul>
+        </div>
+
+        <!-- Lateral derecho: Chat -->
+        <div class="col-md-8 bg-white p-3 rounded shadow" style="max-width: 75%;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Chat - @selectedRoom</h4>
+                <div>
+                    <button class="btn btn-outline-secondary" @onclick="LeaveRoom">Abandonar</button>
+                </div>
+            </div>
+
+            <!-- Mostrar usuarios activos -->
+            <div class="mb-3">
+                <h5>Personas en esta sala:</h5>
+                <ul class="list-group">
+                    @foreach (var user in activeUsers)
+                    {
+                        <li class="list-group-item">@user</li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Input para el nombre y grupo -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <input class="form-control" @bind="userName" placeholder="Tu nombre" />
+                </div>
+                <div class="col-md-6">
+                    <select class="form-control" @bind="groupName">
+                        <option value="Ingeniería">Ingeniería</option>
+                        <option value="Proyectos & Contabilidad">Proyectos & Contabilidad</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botones Unirse y Abandonar -->
+            <div class="d-flex justify-content-between">
+                <button class="btn btn-success" @onclick="JoinRoom">Unirse</button>
+                <button class="btn btn-secondary" @onclick="LeaveRoom">Salir</button>
+            </div>
+
+            <!-- Área para mensajes -->
+            <div class="chat-messages mt-4" style="height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;">
+                <ul class="list-unstyled">
+                    @foreach (var msg in messages)
+                    {
+                        @if (msg.Room == selectedRoom)
+                        {
+                            <li class="mb-3">
+                                <strong>@msg.User</strong>
+                                <p class="bg-light p-2 rounded" style="display: inline-block;">@msg.Content</p>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+
+            <!-- Enviar mensaje -->
+            <div class="d-flex mt-3">
+                <textarea class="form-control" @bind="message" placeholder="Escribe un mensaje..." rows="3"></textarea>
+                <button class="btn btn-primary ms-2" @onclick="SendMessage" style="align-self: flex-start;">Enviar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -62,13 +89,13 @@
     private string selectedRoom;
     private List<Message> messages = new List<Message>();
     private List<string> activeRooms = new List<string>();
+    private List<string> activeUsers = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
         ChatService.OnReceiveMessage((user, room, msg) =>
         {
-            // Add the message to the list
-            messages.Add(new Message { User = user, Room = room, Content = $"{user} in {room}: {msg}" });
+            messages.Add(new Message { User = user, Room = room, Content = $"{msg}" });
             if (room == selectedRoom)
             {
                 InvokeAsync(StateHasChanged);
@@ -79,6 +106,16 @@
         {
             activeRooms = updatedRooms.ToList();
             InvokeAsync(StateHasChanged);
+        });
+
+        // Suscribirse a la actualización de los usuarios activos
+        ChatService.OnUpdateActiveUsers((room, users) =>
+        {
+            if (room == selectedRoom)
+            {
+                activeUsers = users;
+                InvokeAsync(StateHasChanged);
+            }
         });
 
         await ChatService.StartAsync();

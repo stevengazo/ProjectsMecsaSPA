@@ -40,6 +40,8 @@ namespace ProjectsMecsaSPA.Services
             }
             _rooms[roomName].Add(user);
             await _hubConnection.InvokeAsync("JoinRoom", roomName, user);
+            // Notificar sobre la lista de usuarios actualizada
+            await NotifyUserListUpdated(roomName);
         }
 
         public async Task LeaveRoom(string roomName, string user)
@@ -53,6 +55,18 @@ namespace ProjectsMecsaSPA.Services
                 }
             }
             await _hubConnection.InvokeAsync("LeaveRoom", roomName, user);
+            // Notificar sobre la lista de usuarios actualizada
+            await NotifyUserListUpdated(roomName);
+        }
+
+        // Método para notificar a los clientes sobre la lista de usuarios actualizada
+        private async Task NotifyUserListUpdated(string roomName)
+        {
+            if (_rooms.ContainsKey(roomName))
+            {
+                var users = _rooms[roomName].ToList();
+                await _hubConnection.SendAsync("UpdateActiveUsers", roomName, users);
+            }
         }
 
         public async Task<IEnumerable<string>> GetActiveRooms()
@@ -70,7 +84,10 @@ namespace ProjectsMecsaSPA.Services
             _hubConnection.On("UpdateActiveRooms", handler);
         }
 
+        // Recibir la lista de usuarios activos para cada sala
+        public void OnUpdateActiveUsers(Action<string, List<string>> handler)
+        {
+            _hubConnection.On("UpdateActiveUsers", handler);
+        }
     }
 }
-
-
