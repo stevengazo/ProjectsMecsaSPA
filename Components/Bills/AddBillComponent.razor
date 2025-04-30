@@ -198,7 +198,7 @@
         bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
         bill.Currency = CurrencyType;
         bill.ProjectId = ProjectId;
-		db = DbContextFactory.CreateDbContext();
+        db = DbContextFactory.CreateDbContext();
         db.Bill.Add(bill);
         await db.SaveChangesAsync();
         await UploadFiles();
@@ -209,9 +209,9 @@
 				LastEditionDate = DateTime.Now,
 				BillDate = DateTime.Now
 			};
-		IsLoading = false;
-		files.Clear();
-		this.StateHasChanged();
+        IsLoading = false;
+        files.Clear();
+        this.StateHasChanged();
 
 
         await OnAdded.InvokeAsync(null);
@@ -235,39 +235,55 @@
         }
         catch (Exception ef)
         {
-			Console.WriteLine(ef.Message);
+            Console.WriteLine(ef.Message);
         }
     }
 
     async Task UploadFiles()
     {
-        await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
-        foreach(var i in files)
+       try
         {
-            BillFile tmpBill = new BillFile();
-            tmpBill.FileName = i.Name;
-            tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
-            tmpBill.FileExtension = Path.GetExtension(i.Name);
-            tmpBill.Creation	= DateTime.Now;
-            tmpBill.BillId = bill.BillId;
-            tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId,tmpBill.FileName, tmpBill.FilePath);
-            db.BillFiles.Add(tmpBill);
-            await db.SaveChangesAsync();
+            await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
+            foreach (var i in files)
+            {
+                BillFile tmpBill = new BillFile();
+                tmpBill.FileName = i.Name;
+                tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+                tmpBill.FileExtension = Path.GetExtension(i.Name);
+                tmpBill.Creation = DateTime.Now;
+                tmpBill.BillId = bill.BillId;
+                tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId, tmpBill.FileName, tmpBill.FilePath);
+                db.BillFiles.Add(tmpBill);
+                await db.SaveChangesAsync();
+            }
+            files.Clear();
         }
-        files.Clear();
+        catch (Exception efe)
+        {
+			Console.WriteLine(efe.Message);
+            
+        }
     }
 
     async Task<string> TaskUploadFileToBitrixAsync(int folderId,string Name,string pathFile )
     {
-        byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
-        var response =await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
+        try{
+            if (SendData)
+            {
+                byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
+                var response = await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
 
-        if(response != null)
-        {
-            var ResponseObject = JsonConvert.DeserializeObject<BitrixFileResponse>(response);
-            return ResponseObject.result.ID.ToString();    
-		 }	
-		return "";
+                if (response != null)
+                {
+                    var ResponseObject = JsonConvert.DeserializeObject<BitrixFileResponse>(response);
+                    return ResponseObject.result.ID.ToString();
+                }
+            }
+            return "";
+       }catch(Exception afs){
+			Console.WriteLine(afs.Message);
+			return "";
+       }
 	}
 
 	async Task OnChange(InputFileChangeEventArgs e)

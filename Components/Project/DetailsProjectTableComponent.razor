@@ -11,307 +11,318 @@
 
 @if (IsEditing)
 {
-    <EditForm Model="project" OnValidSubmit="Update">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+	<EditForm Model="project" OnValidSubmit="Update">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
 
-        <table class="table table-hover border">
-            <tbody>
-                <tr>
-                    <th>Número Proyecto</th>
-                    <td>@project.ProjectId</td>
-                </tr>
-                <tr>
-                    <th>Titulo</th>
-                    <td>
-                        <InputText @bind-Value="project.Title" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Title)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Descripción</th>
-                    <td>
-                        <InputText @bind-Value="project.Description" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Description)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Tarea</th>
-                    <td>
-                        <InputText @bind-Value="project.TaskNumber" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.TaskNumber)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Cliente</th>
-                    <td>
+		<table class="table table-hover border">
+			<tbody>
+				<tr>
+					<th>Número Proyecto</th>
+					<td>@project.ProjectId</td>
+				</tr>
+				<tr>
+					<th>Titulo</th>
+					<td>
+						<InputText @bind-Value="project.Title" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.Title)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Descripción</th>
+					<td>
+						<InputText @bind-Value="project.Description" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.Description)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Tarea</th>
+					<td>
+						<InputText @bind-Value="project.TaskNumber" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.TaskNumber)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Cliente</th>
+					<td>
 
 
-                        <AutoComplete @bind-Value="customerName"
-                        TItem="Customer"
-                        class="text-danger"
-                        DataProvider="CustomersDataProvider"
-                        PropertyName="Name"
-                        Placeholder="Search a customer..."
-                        OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+						<AutoComplete @bind-Value="customerName"
+									  TItem="Customer"
+									  class="text-danger"
+									  DataProvider="CustomersDataProvider"
+									  PropertyName="Name"
+									  Placeholder="Search a customer..."
+									  OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
 
-                    </td>
-                </tr>
-                <tr>
-                    <th>Ubicación</th>
-                    <td>
-                        <InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Ubication)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <label for="Province">Provincia</label>
-                    </th>
-                    <th>
-                        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
-                            <option value="San José">San Jose</option>
-                            <option value="Heredia">Heredia</option>
-                            <option value="Alajuela">Alajuela</option>
-                            <option value="Cartago">Cartago</option>
-                            <option value="Puntarenas">Puntarenas</option>
-                            <option value="Guanacaste">Guanacaste</option>
-                            <option value="Limón">Limón</option>
-                        </InputSelect>
-                        <ValidationMessage For="@(() => project.Province)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Ubicación</th>
+					<td>
+						<InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.Ubication)" />
+					</td>
+				</tr>
+				<tr>
+					<th>
+						<label for="Province">Provincia</label>
+					</th>
+					<th>
+						<InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+							<option value="San José">San Jose</option>
+							<option value="Heredia">Heredia</option>
+							<option value="Alajuela">Alajuela</option>
+							<option value="Cartago">Cartago</option>
+							<option value="Puntarenas">Puntarenas</option>
+							<option value="Guanacaste">Guanacaste</option>
+							<option value="Limón">Limón</option>
+						</InputSelect>
+						<ValidationMessage For="@(() => project.Province)" />
 
-                    </th>
-                </tr>
-                <tr>
-                    <th>Monto</th>
-                    <td>
-                        <InputNumber @bind-Value="project.Amount" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Amount)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Creación</th>
-                    <td>
-                        <InputDate @bind-Value="project.CreationDate" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.CreationDate)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Estado</th>
-                    <td>
-                        <InputSelect @bind-Value="project.StateId" class="form-control form-control-sm">
-                            <option value="">Seleccionar estado</option>
-                            @foreach (var item in States)
-                            {
-                                <option value="@item.Key">@item.Value</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => project.StateId)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Tipo Proyecto</th>
-                    <InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
-                        <option value="">Seleccionar un tipo</option>
-                        @foreach (var item in types)
-                        {
-                            <option value="@item.Key">@item.Value</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="@(() => project.TypeId)" />
-                </tr>
-                <tr>
-                    <th>Orden de Compra</th>
-                    <td>
-                        <InputText @bind-Value="project.OC" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OC)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Fecha Orden Compra</th>
-                    <td>
-                        <InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OCDate)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Número de Oferta</th>
-                    <td>
-                        <InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OfferId)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Compañia</th>
-                    <td>
-                        <InputSelect @bind-Value="project.CompanyId" class="form-control form-control-sm">
-                            @foreach (var item in companies )
-                            {
-                                <option value="@item.CompanyId">@item.CompanyName</option>
-                            }
-                        </InputSelect>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vendedor</th>
-                    <td>
-                        <InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
-                            @foreach (var item in sellers)
-                            {
-                                <option value="@item.SellerId">@item.SellerName</option>
-                            }
-                        </InputSelect>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
-        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
+					</th>
+				</tr>
+				<tr>
+					<th>Monto</th>
+					<td>
+						<InputNumber @bind-Value="project.Amount" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.Amount)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Creación</th>
+					<td>
+						<InputDate @bind-Value="project.CreationDate" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.CreationDate)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Estado</th>
+					<td>
+						<InputSelect @bind-Value="project.StateId" class="form-control form-control-sm">
+							<option value="">Seleccionar estado</option>
+							@foreach (var item in States)
+							{
+								<option value="@item.Key">@item.Value</option>
+							}
+						</InputSelect>
+						<ValidationMessage For="@(() => project.StateId)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Tipo Proyecto</th>
+					<InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
+						<option value="">Seleccionar un tipo</option>
+						@foreach (var item in types)
+						{
+							<option value="@item.Key">@item.Value</option>
+						}
+					</InputSelect>
+					<ValidationMessage For="@(() => project.TypeId)" />
+				</tr>
+				<tr>
+					<th>Orden de Compra</th>
+					<td>
+						<InputText @bind-Value="project.OC" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.OC)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Fecha Orden Compra</th>
+					<td>
+						<InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.OCDate)" />
+					</td>
+				</tr>
+				<tr>
+					<div class=" form-floating mt-1 mb-1">
+						<InputNumber id="TypeOfChange" class="form-control" @bind-Value="project.TypeOfChange" />
+						<label class="form-label">Tipo Cambio</label>
+					</div>
+					<ValidationMessage For="@(() => project.TypeOfChange)" />
+				</tr>
+				<tr>
+					<th>Número de Oferta</th>
+					<td>
+						<InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
+						<ValidationMessage For="@(() => project.OfferId)" />
+					</td>
+				</tr>
+				<tr>
+					<th>Compañia</th>
+					<td>
+						<InputSelect @bind-Value="project.CompanyId" class="form-control form-control-sm">
+							@foreach (var item in companies)
+							{
+								<option value="@item.CompanyId">@item.CompanyName</option>
+							}
+						</InputSelect>
+					</td>
+				</tr>
+				<tr>
+					<th>Vendedor</th>
+					<td>
+						<InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
+							@foreach (var item in sellers)
+							{
+								<option value="@item.SellerId">@item.SellerName</option>
+							}
+						</InputSelect>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
+		<button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
 
-    </EditForm>
+	</EditForm>
 }
 else
 {
-    <table class="table  table-hover border table-striped">
-        <tbody>
-            <tr>
-                <th>Número Proyecto</th>
-                <td>@project.ProjectId</td>
-            </tr>
-            <tr>
-                <th>Titulo Proyecto</th>
-                <td>@project.Title</td>
-            </tr>
-            <tr>
-                <th>Descripción</th>
-                <td>@project.Description</td>
-            </tr>
-            <tr>
-                <th>Número Tarea</th>
-                <td>
-                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
-                        @project.TaskNumber
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <th>Cliente</th>
-                <td>
-                    <a href="/customers/@project.CustomerId" class="btn btn-sm btn-outline-success">
-                        @project.Customer?.Name
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <th>Ubicación</th>
-                <td>@project.Ubication</td>
-            </tr>
-            <tr>
-                <th>Monto</th>
-                <td>@project.Amount.ToString("N2")</td>
-            </tr>
-            <tr>
-                <th>Fecha Registro</th>
-                <td>@project.CreationDate.ToLongDateString()</td>
-            </tr>
-            <tr>
-                <th>Oferta</th>
-                <td>@project.OfferId</td>
-            </tr>
-            <tr>
-                <th>Estado del Proyecto</th>
-                <td>@project.State?.StateName</td>
-            </tr>
-            <tr>
-                <th>Tipo de Proyecto</th>
-                <td>@project.Type?.Name</td>
-            </tr>
-            <tr>
-                <th>Orden de Compra</th>
-                <td>@project.OC</td>
-            </tr>
-            <tr>
-                <th>Fecha Orden de Compra</th>
-                <td>@project.OCDate.ToLongDateString()</td>
-            </tr>
-            <tr>
-                <th>Compañia</th>
-                <td>@project.Company.CompanyName</td>
-            </tr>
-            <tr>
-                <th>Vendedor</th>
-                <td>@project.Seller.SellerName</td>
-            </tr>
-            <tr>
-                <th>Estado Facturación Proyecto</th>
-                <td>
-                    @if (project.Isfactured)
-                    {
-                        <label>Facturado</label>
-                    }
-                    else
-                    {
-                        <label>Pendiente de Completar facturación</label>
-                    }
-                </td>
-            </tr>
-            <tr>
-                <th>¿Proyecto Completado?</th>
-                <td>
-                    @if (project.IsCompleted)
-                    {
-                        <label>Proyecto Completo operativamente</label>
-                    }
-                    else
-                    {
-                        <label>Proyecto Incompleto (Revise la etapa y anotaciones)</label>
-                    }
-                </td>
-            </tr>
-        </tbody>
-    </table>
+	<table class="table  table-hover border table-striped">
+		<tbody>
+			<tr>
+				<th>Número Proyecto</th>
+				<td>@project.ProjectId</td>
+			</tr>
+			<tr>
+				<th>Titulo Proyecto</th>
+				<td>@project.Title</td>
+			</tr>
+			<tr>
+				<th>Descripción</th>
+				<td>@project.Description</td>
+			</tr>
+			<tr>
+				<th>Número Tarea</th>
+				<td>
+					<a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+						@project.TaskNumber
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<th>Cliente</th>
+				<td>
+					<a href="/customers/@project.CustomerId" class="btn btn-sm btn-outline-success">
+						@project.Customer?.Name
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<th>Ubicación</th>
+				<td>@project.Ubication</td>
+			</tr>
+			<tr>
+				<th>Monto</th>
+				<td>@project.Amount.ToString("N2")</td>
+			</tr>
+			<tr>
+				<th>Fecha Registro</th>
+				<td>@project.CreationDate.ToLongDateString()</td>
+			</tr>
+			<tr>
+				<th>Oferta</th>
+				<td>@project.OfferId</td>
+			</tr>
+			<tr>
+				<th>Estado del Proyecto</th>
+				<td>@project.State?.StateName</td>
+			</tr>
+			<tr>
+				<th>Tipo de Proyecto</th>
+				<td>@project.Type?.Name</td>
+			</tr>
+			<tr>
+				<th>Orden de Compra</th>
+				<td>@project.OC</td>
+			</tr>
+			<tr>
+				<th>Monto Tipo de Cambio</th>
+				<td>@project.TypeOfChange</td>
+			</tr>
+			<tr>
+				<th>Fecha Orden de Compra</th>
+				<td>@project.OCDate.ToLongDateString()</td>
+			</tr>
+			<tr>
+				<th>Compañia</th>
+				<td>@project.Company.CompanyName</td>
+			</tr>
+			<tr>
+				<th>Vendedor</th>
+				<td>@project.Seller.SellerName</td>
+			</tr>
+			<tr>
+				<th>Estado Facturación Proyecto</th>
+				<td>
+					@if (project.Isfactured)
+					{
+						<label>Facturado</label>
+					}
+					else
+					{
+						<label>Pendiente de Completar facturación</label>
+					}
+				</td>
+			</tr>
+			<tr>
+				<th>¿Proyecto Completado?</th>
+				<td>
+					@if (project.IsCompleted)
+					{
+						<label>Proyecto Completo operativamente</label>
+					}
+					else
+					{
+						<label>Proyecto Incompleto (Revise la etapa y anotaciones)</label>
+					}
+				</td>
+			</tr>
+		</tbody>
+	</table>
 
-    <div class="d-flex flex-row gap-2">
-        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
-            <Authorized>
+	<div class="d-flex flex-row gap-2">
+		<AuthorizeView Roles="administrador,ingeniero,contabilidad">
+			<Authorized>
 
-                <div>
-                    @if (!project.IsDeleted)
-                    {
-                        <button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
-                    }
-                </div>
-                <div>
-                    @if (!project.Isfactured)
-                    {
-                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
-                    }
-                    @if (project.Isfactured)
-                    {
-                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
-                    }
-                </div>
-                <div>
-                    @if (!project.IsCompleted)
-                    {
-                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
-                    }
-                    @if (project.IsCompleted)
-                    {
-                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
-                    }
-                </div>
+				<div>
+					@if (!project.IsDeleted)
+					{
+						<button class="btn btn-sm btn-outline-info" @onclick="StartEdit">Editar Proyecto</button>
+					}
+				</div>
+				<div>
+					@if (!project.Isfactured)
+					{
+						<button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
+					}
+					@if (project.Isfactured)
+					{
+						<button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
+					}
+				</div>
+				<div>
+					@if (!project.IsCompleted)
+					{
+						<button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
+					}
+					@if (project.IsCompleted)
+					{
+						<button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
+					}
+				</div>
 
 
-            </Authorized>
-        </AuthorizeView>
-        <div>
-            <button class="btn btn-sm btn-outline-warning" @onclick="Download">
-                <Icon Name="IconName.Download"></Icon> Descargar Información
-            </button>
+			</Authorized>
+		</AuthorizeView>
+		<div>
+			<button class="btn btn-sm btn-outline-warning" @onclick="Download">
+				<Icon Name="IconName.Download"></Icon> Descargar Información
+			</button>
 
-        </div>
-    </div>
+		</div>
+	</div>
 
 
 
@@ -319,139 +330,139 @@ else
 
 @code {
 
-    #region Parameters
+	#region Parameters
 
-    [Parameter]
-    public Project project { get; set; }
-    private bool IsEditing = false;
+	[Parameter]
+	public Project project { get; set; }
+	private bool IsEditing = false;
 
-    private string? customerName;
+	private string? customerName;
 
-    CultureInfo AmountCulture;
+	CultureInfo AmountCulture;
 
-    private Dictionary<int, string> customers = new();
-    private Dictionary<int, string> types = new();
-    private Dictionary<int, string> filteredCustomers = new();
-    private Dictionary<int, string> States = new();
-    List<Seller> sellers = new();
-    List<Company> companies = new();
+	private Dictionary<int, string> customers = new();
+	private Dictionary<int, string> types = new();
+	private Dictionary<int, string> filteredCustomers = new();
+	private Dictionary<int, string> States = new();
+	List<Seller> sellers = new();
+	List<Company> companies = new();
 
-    private string searchCustomer = "";
+	private string searchCustomer = "";
 
-    #endregion
+	#endregion
 
-    #region Methods
+	#region Methods
 
-    protected override async Task OnInitializedAsync()
-    {
-        AmountCulture = new CultureInfo(project.CurrencyType);
-        companies = db.Company.ToList();
-        sellers = db.Seller
-        .Where(e => e.IsActive)
-        .OrderBy(e => e.SellerName)
-        .ToList();
-        await LoadDataAsync();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		AmountCulture = new CultureInfo(project.CurrencyType);
+		companies = db.Company.ToList();
+		sellers = db.Seller
+		.Where(e => e.IsActive)
+		.OrderBy(e => e.SellerName)
+		.ToList();
+		await LoadDataAsync();
+	}
 
-    private async Task LoadDataAsync()
-    {
-        customers = await db.Customers.ToDictionaryAsync(e => e.CustomerId, r => r.Name);
-        types = await db.Types.ToDictionaryAsync(e => e.TypeId, r => r.Name);
-        filteredCustomers = customers; // Inicialmente, todos los clientes están disponibles
-        States = await db.States
-            .Where(i => !i.IsDeleted)
-            .OrderByDescending(e => e.StateName)
-            .ToDictionaryAsync(e => e.StateId, r => r.StateName);
-    }
+	private async Task LoadDataAsync()
+	{
+		customers = await db.Customers.ToDictionaryAsync(e => e.CustomerId, r => r.Name);
+		types = await db.Types.ToDictionaryAsync(e => e.TypeId, r => r.Name);
+		filteredCustomers = customers; // Inicialmente, todos los clientes están disponibles
+		States = await db.States
+			.Where(i => !i.IsDeleted)
+			.OrderByDescending(e => e.StateName)
+			.ToDictionaryAsync(e => e.StateId, r => r.StateName);
+	}
 
-    private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
-    {
-        var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
-        return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
-    }
+	private async Task<AutoCompleteDataProviderResult<Customer>> CustomersDataProvider(AutoCompleteDataProviderRequest<Customer> request)
+	{
+		var customersf = db.Customers.Where(w => w.Name.Contains(request.Filter.Value));
+		return await Task.FromResult(new AutoCompleteDataProviderResult<Customer> { Data = customersf, TotalCount = customersf.Count() });
+	}
 
-    private void OnAutoCompleteChanged(Customer customer)
-    {
-        if (customer != null)
-        {
-            customerName = customer.Name;
-            project.Customer = customer;
-            project.CustomerId = customer.CustomerId;
-        }
-    }
+	private void OnAutoCompleteChanged(Customer customer)
+	{
+		if (customer != null)
+		{
+			customerName = customer.Name;
+			project.Customer = customer;
+			project.CustomerId = customer.CustomerId;
+		}
+	}
 
-    private void StartEdit()
-    {
-        IsEditing = true;
-        customerName = project.Customer.Name;
-    }
+	private void StartEdit()
+	{
+		IsEditing = true;
+		customerName = project.Customer.Name;
+	}
 
-    private void CancelEdit()
-    {
-        IsEditing = false;
-    }
+	private void CancelEdit()
+	{
+		IsEditing = false;
+	}
 
-    private async Task Update()
-    {
-        try
-        {
-            var dbtmp = DbContextFactory.CreateDbContext();
-            if (project != null)
-            {
-                // Desvincula relaciones si es necesario
-                project.Seller = dbtmp.Seller.FirstOrDefault(e => e.SellerId == project.SellerId);
-                project.State = dbtmp.States.FirstOrDefault(e => e.StateId == project.StateId);
-                project.Customer = dbtmp.Customers.FirstOrDefault(e => e.CustomerId == project.CustomerId);
-                project.Type = dbtmp.Types.FirstOrDefault(e => e.TypeId == project.TypeId);
-                dbtmp.Projects.Update(project);
-                await dbtmp.SaveChangesAsync();
+	private async Task Update()
+	{
+		try
+		{
+			var dbtmp = DbContextFactory.CreateDbContext();
+			if (project != null)
+			{
+				// Desvincula relaciones si es necesario
+				project.Seller = dbtmp.Seller.FirstOrDefault(e => e.SellerId == project.SellerId);
+				project.State = dbtmp.States.FirstOrDefault(e => e.StateId == project.StateId);
+				project.Customer = dbtmp.Customers.FirstOrDefault(e => e.CustomerId == project.CustomerId);
+				project.Type = dbtmp.Types.FirstOrDefault(e => e.TypeId == project.TypeId);
+				dbtmp.Projects.Update(project);
+				await dbtmp.SaveChangesAsync();
 
-                // Recargar el objeto desde la base de datos
-                project = await dbtmp.Projects
-                    .Include(p => p.Customer)
-                    .Include(p => p.State)
-                    .Include(p => p.Type)
-                    .FirstOrDefaultAsync(p => p.ProjectId == project.ProjectId);
+				// Recargar el objeto desde la base de datos
+				project = await dbtmp.Projects
+					.Include(p => p.Customer)
+					.Include(p => p.State)
+					.Include(p => p.Type)
+					.FirstOrDefaultAsync(p => p.ProjectId == project.ProjectId);
 
-                IsEditing = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            // Manejar el error de actualización aquí
-            Console.WriteLine($"Error al actualizar el proyecto: {ex.Message}");
-        }
-    }
+				IsEditing = false;
+			}
+		}
+		catch (Exception ex)
+		{
+			// Manejar el error de actualización aquí
+			Console.WriteLine($"Error al actualizar el proyecto: {ex.Message}");
+		}
+	}
 
-    private async Task UpdateIsComplete(bool state)
-    {
-        var dbtmp = DbContextFactory.CreateDbContext();
-        project.IsCompleted = state;
-        dbtmp.Projects.Update(project);
-        dbtmp.SaveChanges();
-    }
+	private async Task UpdateIsComplete(bool state)
+	{
+		var dbtmp = DbContextFactory.CreateDbContext();
+		project.IsCompleted = state;
+		dbtmp.Projects.Update(project);
+		dbtmp.SaveChanges();
+	}
 
-    private async Task UpdateIsFactured(bool state)
-    {
-        var dbtmp = DbContextFactory.CreateDbContext();
-        project.Isfactured = state;
-        dbtmp.Projects.Update(project);
-        dbtmp.SaveChanges();
-    }
+	private async Task UpdateIsFactured(bool state)
+	{
+		var dbtmp = DbContextFactory.CreateDbContext();
+		project.Isfactured = state;
+		dbtmp.Projects.Update(project);
+		dbtmp.SaveChanges();
+	}
 
-    private async Task Download()
-    {
-        project.Bills = db.Bill.Where(e => e.ProjectId == project.ProjectId).ToList();
-        var data = await PDFGenerate.PDFProjectReport(project);
-        // Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
-        string pdfBase64 = Convert.ToBase64String(data);
+	private async Task Download()
+	{
+		project.Bills = db.Bill.Where(e => e.ProjectId == project.ProjectId).ToList();
+		var data = await PDFGenerate.PDFProjectReport(project);
+		// Convertir los bytes del PDF a una cadena base64 para pasarlos a JavaScript
+		string pdfBase64 = Convert.ToBase64String(data);
 
-        // Invocar una función JavaScript para iniciar la descarga del PDF
-        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyecto {project.Title} {DateTime.Now.ToShortTimeString()}.pdf");
-
-
-    }
+		// Invocar una función JavaScript para iniciar la descarga del PDF
+		await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyecto {project.Title} {DateTime.Now.ToShortTimeString()}.pdf");
 
 
-    #endregion
+	}
+
+
+	#endregion
 }

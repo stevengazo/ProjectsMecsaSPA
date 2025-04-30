@@ -14,9 +14,16 @@
 	</div>
 	@if (ValidInputs.EnableDate)
 	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<input type="month" @bind="searchMonth" class="form-control" />
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableDate =false" Class="btn-link btn-sm btn-outline-danger" />
+		<div class="col-md-2 mb-2 d-flex flex-column">
+			<div class="d-flex align-items-center mb-1">
+				<label class="form-label me-2">Inicio</label>
+				<input type="date" @bind="searchDateStart" class="form-control" />
+			</div>
+			<div class="d-flex align-items-center mb-1">
+				<label class="form-label me-2">Final</label>
+				<input type="date" @bind="searchDateEnd" class="form-control" />
+			</div>
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableDate = false" class="btn-link btn-sm btn-outline-danger align-self-end mt-1" />
 		</div>
 	}
 
@@ -30,7 +37,7 @@
 					<option value="@state.Key">@state.Value</option>
 				}
 			</select>
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
 		</div>
 	}
 
@@ -44,47 +51,44 @@
 					<option value="@type.Key">@type.Value</option>
 				}
 			</select>
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
 		</div>
 	}
-
 
 	@if (ValidInputs.EnableSeller)
 	{
 		<div class="col-md-2 mb-2 d-flex align-items-center">
-
 			<select @bind="searchSellerId" class="form-control">
-				<option value="">Seleccionar tipo</option>
+				<option value="">Seleccionar vendedor</option>
 				@foreach (var type in Sellers)
 				{
 					<option value="@type.Key">@type.Value</option>
 				}
 			</select>
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableSeller = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableSeller = false" class="btn-link btn-sm btn-outline-danger ms-2" />
 		</div>
 	}
 
 	@if (ValidInputs.EnableCompany)
 	{
 		<div class="col-md-2 mb-2 d-flex align-items-center">
-
 			<select @bind="searchCompanyId" class="form-control">
-				<option value="">Seleccionar tipo</option>
+				<option value="">Seleccionar empresa</option>
 				@foreach (var type in Companies)
 				{
 					<option value="@type.CompanyId">@type.CompanyName</option>
 				}
 			</select>
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableCompany = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCompany = false" class="btn-link btn-sm btn-outline-danger ms-2" />
 		</div>
 	}
 
 	@if (ValidInputs.EnableTask)
 	{
 		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<Tooltip Class="me-4" Title="Tooltip Left" Placement="TooltipPlacement.Left">Tarea</Tooltip>
-			<input type="number" min="0" @bind="searchTask"  class="form-control" />
-			<Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableTask = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+			<Tooltip Class="me-2" Title="Tarea" Placement="TooltipPlacement.Left" />
+			<input type="number" min="0" @bind="searchTask" class="form-control" />
+			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableTask = false" class="btn-link btn-sm btn-outline-danger ms-2" />
 		</div>
 	}
 
@@ -102,7 +106,7 @@
 		@if (!ValidInputs.EnableDate)
 		{
 			<button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-success me-2">
-				Mes <Icon Name="IconName.Calendar2Date" />
+				Fecha <Icon Name="IconName.Calendar2Date" />
 			</button>
 		}
 
@@ -185,7 +189,8 @@
 	private List<Project> projects = new();
 	private string searchName = string.Empty;
 	private int searchProjectId;
-	private DateTime searchMonth = DateTime.Today;
+	private DateTime searchDateStart = DateTime.Today;
+	private DateTime searchDateEnd = DateTime.Today;
 	private int? searchStateId;
 	private int? searchTypeId;
 	private int? searchSellerId;
@@ -242,7 +247,8 @@
 	{
 		searchName = string.Empty;
 		searchProjectId = 0;
-		searchMonth = DateTime.Today;
+		searchDateStart = DateTime.Today;
+		searchDateEnd = DateTime.Today;
 		searchStateId = null;
 		searchTypeId = null;
 		searchSellerId = null;
@@ -279,11 +285,9 @@
 				canSearch = true;
 			}
 
-			if (searchMonth != default && ValidInputs.EnableDate)
+			if (searchDateStart != default && ValidInputs.EnableDate)
 			{
-				var startDate = new DateTime(searchMonth.Year, searchMonth.Month, 1);
-				var endDate = startDate.AddMonths(1);
-				query = query.Where(p => p.CreationDate >= startDate && p.CreationDate < endDate);
+				query = query.Where(p => p.CreationDate >= searchDateStart && p.CreationDate < searchDateEnd);
 				canSearch = true;
 			}
 
