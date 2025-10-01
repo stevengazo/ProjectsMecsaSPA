@@ -84,31 +84,31 @@
         try
         {
             return
-     db.Projects
-     .Include(e => e.Type)
-     .Include(e => e.Commentaries)
-     .Include(e => e.Customer)
-     .Include(e => e.State)
-     .Include(e => e.Seller)
-     .OrderByDescending(e => e.ProjectId)
-     .Where(i => !i.IsDeleted &&
-         i.StateId == stateId
-         && i.RequiredCoordination
-         && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
+                 db.Projects
+                 .Include(e => e.Type)
+                 .Include(e => e.Commentaries)
+                 .Include(e => e.Customer)
+                 .Include(e => e.State)
+                 .Include(e => e.Seller)
+                 .OrderByDescending(e => e.ProjectId)
+                 .Where(i => !i.IsDeleted &&
+                     i.StateId == stateId
+                     && i.RequiredCoordination ==true
+                     && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
         }
         catch (ObjectDisposedException e)
         {
             Console.WriteLine(e.Message);
 
             return
-      db.Projects
-      .Include(e => e.Type)
-      .Include(e => e.Commentaries)
-      .Include(e => e.Customer)
-      .Include(e => e.State)
-      .Include(e => e.Seller)
-      .OrderByDescending(e => e.ProjectId)
-      .Where(i => !i.IsDeleted && i.StateId == stateId && i.RequiredCoordination && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+                  db.Projects
+                  .Include(e => e.Type)
+                  .Include(e => e.Commentaries)
+                  .Include(e => e.Customer)
+                  .Include(e => e.State)
+                  .Include(e => e.Seller)
+                  .OrderByDescending(e => e.ProjectId)
+                  .Where(i => !i.IsDeleted && i.StateId == stateId && i.RequiredCoordination == true && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
 
 
         }

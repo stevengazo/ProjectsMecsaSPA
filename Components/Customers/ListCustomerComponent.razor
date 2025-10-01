@@ -1,0 +1,104 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+@if (customers != null && customers.Any())
+{
+    <table class="table table-striped mt-3 table-hover">
+        <thead>
+            <tr>
+                <th>
+                    <label @onclick="() => SortByColumn(nameof(Customer.Name))">Nombre</label>
+                </th>
+                <th>
+                    <label @onclick="() => SortByColumn(nameof(Customer.Type))">Tipo</label>
+                </th>
+                <th>
+                    <label @onclick="() => SortByColumn(nameof(Customer.DNI))">DNI</label>
+                </th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in customers)
+            {
+                <tr>
+                    <td>@customer.Name</td>
+                    <td>@customer.Type</td>
+                    <td>@customer.DNI</td>
+                    <td>
+                        <a href="/customers/@customer.CustomerId" class="btn btn-sm btn-outline-info">
+                            Ver
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No se encontraron clientes.</p>
+}
+
+<Pagination ActivePageNumber="@CurrentPage"
+            TotalPages="@TotalPages"
+            DisplayPages="5"
+            FirstLinkIcon="IconName.ChevronDoubleLeft"
+            PreviousLinkIcon="IconName.ChevronLeft"
+            NextLinkIcon="IconName.ChevronRight"
+            LastLinkIcon="IconName.ChevronDoubleRight"
+            PageChanged="LoadCustomers" />
+
+@code {
+    private List<Customer> customers = new();
+    private int PageSize = 30;
+    private int CurrentPage = 1;
+    private int TotalPages = 1;
+    private string SortColumn = nameof(Customer.Name);
+    private bool SortAscending = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCustomers(1);
+    }
+
+    private async Task LoadCustomers(int page)
+    {
+        CurrentPage = page;
+
+        using var db = DbContextFactory.CreateDbContext();
+
+        var query = db.Customers.AsQueryable();
+
+        // Ordenamiento dinámico
+        query = SortColumn switch
+        {
+            nameof(Customer.Name) => SortAscending ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name),
+            nameof(Customer.Type) => SortAscending ? query.OrderBy(c => c.Type) : query.OrderByDescending(c => c.Type),
+            nameof(Customer.DNI) => SortAscending ? query.OrderBy(c => c.DNI) : query.OrderByDescending(c => c.DNI),
+            _ => query.OrderBy(c => c.CustomerId)
+        };
+
+        var totalRecords = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+        customers = await query
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+    }
+
+    private async Task SortByColumn(string column)
+    {
+        if (SortColumn == column)
+        {
+            SortAscending = !SortAscending;
+        }
+        else
+        {
+            SortColumn = column;
+            SortAscending = true;
+        }
+
+        await LoadCustomers(CurrentPage);
+    }
+}

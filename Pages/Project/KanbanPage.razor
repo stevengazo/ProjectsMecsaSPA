@@ -109,6 +109,8 @@
 		.Include(e => e.Seller)
 		.OrderByDescending(e => e.ProjectId)
 		.Where(i => !i.IsDeleted &&
+			 !i.RequiredCoordination
+			 &&
 			i.StateId == stateId
 			&& (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
 		}
@@ -124,7 +126,8 @@
 			.Include(e => e.State)
 			.Include(e => e.Seller)
 			.OrderByDescending(e => e.ProjectId)
-			.Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+			.Where(i => !i.IsDeleted && i.StateId == stateId &&
+			 i.RequiredCoordination && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
 		}
 
 		catch (Exception e)
@@ -145,7 +148,10 @@
 		.Include(e => e.State)
 		.Include(e => e.Seller)
 		.OrderByDescending(e => e.ProjectId)
-		.Where(i => !i.IsDeleted &&
+		.Where(i => !i.IsDeleted 
+			&&
+			 i.RequiredCoordination
+			&&
 			i.StateId == stateId && i.CompanyId == companyId
 			&& (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
 		}
@@ -161,7 +167,11 @@
 			.Include(e => e.State)
 			.Include(e => e.Seller)
 			.OrderByDescending(e => e.ProjectId)
-			.Where(i => !i.IsDeleted && i.CompanyId ==companyId && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+			.Where(i => !i.IsDeleted 
+				&&
+			 i.RequiredCoordination
+				
+				&& i.CompanyId ==companyId && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
 		}
 
 		catch (Exception e)

@@ -1,4 +1,7 @@
-﻿@page "/project-edit"
+﻿
+
+
+@page "/project-edit"
 @inject ProjectsDBContext db
 @inject IJSRuntime JS
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
@@ -109,6 +112,16 @@
                         <ValidationMessage For="@(() => project.StateId)" />
                     </td>
                 </tr>
+                <div class="form-group mt-2 mb-2">
+                    <div class="form-check">
+                        <InputCheckbox id="RequiredCoordination" class="form-check-input" @bind-Value="project.RequiredCoordination" />
+                        <label class="form-check-label" for="RequiredCoordination">
+                            Requiere Coordinación
+                        </label>
+                    </div>
+                    <ValidationMessage For="@(() => project.RequiredCoordination)" class="text-danger" />
+                </div>
+
                 <tr>
                     <th>Tipo Proyecto</th>
                     <InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
