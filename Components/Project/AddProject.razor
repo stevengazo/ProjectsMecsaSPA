@@ -100,6 +100,14 @@
 			</div>
 			<ValidationMessage For="@(() => project.StateId)" />
 		</div>
+		<!--OC-->
+		<div class="form-group">
+			<div class=" form-floating mt-1 mb-1">
+				<InputCheckbox id="RequiredCoordination" class="form-control" @bind-Value="project.RequiredCoordination" />
+				<label class="form-label" for="RequiredCoordination">Requiere Coordinación</label>
+			</div>
+			<ValidationMessage For="@(() => project.RequiredCoordination)" />
+		</div>
 		<!--Amount-->
 		<div class="form-group">
 			<div class=" form-floating mt-1 mb-1">
