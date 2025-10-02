@@ -33,7 +33,7 @@
                 <Tab Title="Todos">
                     <Content>
                         <div class="p-1">
-                            <InfiniteScrollProjects @ref="infiniteScrollProjects" />
+                           
                         </div>
                     </Content>
                 </Tab>
@@ -58,7 +58,6 @@
 
 @code {
     private Offcanvas offcanvas = default!;
-    private InfiniteScrollProjects infiniteScrollProjects = default!;
     private string? message;
     List<ToastMessage> messages = new List<ToastMessage>();
 
@@ -81,11 +80,8 @@
 
     private async Task HandleProjectAdded()
     {
-        // Solicitar al componente InfiniteScrollProjects que vuelva a cargar los datos
-        if (infiniteScrollProjects != null)
-        {
-
-            await infiniteScrollProjects.RefreshProjectsAsync();
+       
+ 
             await offcanvas.HideAsync();
             messages.Add(new()
                 {

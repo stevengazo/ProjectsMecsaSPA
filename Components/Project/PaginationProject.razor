@@ -1,0 +1,69 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>N</th>
+            <th>Titulo</th>
+            <th>Cliente</th>
+            <th>Vendedor</th>
+            <th>Estado</th>
+            <th>OC</th>
+            <th>Compañia</th>
+            <th>Tipo</th>
+            <th>Creación</th>
+            <th>Monto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (projects != null && projects.Any())
+        {
+            int index = (CurrentPage - 1) * PageSize;
+            foreach (var project in projects)
+            {
+                <tr>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="11" class="text-center">No hay proyectos disponibles</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private List<Project> projects = new();
+    private int CurrentPage { get; set; } = 1;
+    private int PageSize { get; set; } = 10;
+    private int TotalPages { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        try
+        {
+            using(var db = DbContextFactory.CreateDbContext())
+            {
+                projects = db.Projects.ToList();
+
+            }
+
+      
+
+
+        }
+        catch (Exception f)
+        {
+            throw f;
+        }
+    }
+}

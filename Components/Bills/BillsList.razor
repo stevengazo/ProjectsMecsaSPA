@@ -1,0 +1,77 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h3>BillsList</h3>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Proyecto Id</th>
+            <th>Tarea</th>
+            <th>Fecha</th>
+            <th>Proyecto</th>
+            <th>Autor</th>
+            <th>Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bill in bills)
+        {
+            <tr>
+                <td>
+                    <a href="/projects/@bill.Project?.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+                        @bill.Project?.ProjectId
+                    </a>
+                </td>
+                <td>
+                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/"
+                       class="btn btn-sm btn-outline-success" target="_blank">
+                        @bill.Project?.TaskNumber
+                    </a>
+                </td>
+                <td>@bill.BillDate.ToShortDateString()</td>
+                <td>@bill.Project?.Title</td>
+                <td>@bill.Author</td>
+                <td>@bill.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<Pagination ActivePageNumber="@CurrentPage"
+            TotalPages="@TotalPages"
+            DisplayPages="5"
+            FirstLinkIcon="IconName.ChevronDoubleLeft"
+            PreviousLinkIcon="IconName.ChevronLeft"
+            NextLinkIcon="IconName.ChevronRight"
+            LastLinkIcon="IconName.ChevronDoubleRight"
+            PageChanged="Load" />
+
+@code {
+    private List<Bill> bills = new();
+    private int PageSize = 50;// cantidad de facturas por página
+    private int CurrentPage = 1;
+    private int TotalPages = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load(CurrentPage);
+    }
+
+    private async Task Load(int pageNumber)
+    {
+        CurrentPage = pageNumber;
+
+        using var db = await DbContextFactory.CreateDbContextAsync();
+
+        var totalRecords = await db.Bill.CountAsync();
+        TotalPages = (int)Math.Ceiling(totalRecords / (double)PageSize);
+
+        bills = await db.Bill
+            .AsNoTracking()
+            .Include(e => e.Project)
+            .OrderByDescending(e => e.BillDate)
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+    }
+}
