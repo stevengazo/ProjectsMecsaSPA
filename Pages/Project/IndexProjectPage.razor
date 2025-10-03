@@ -7,12 +7,12 @@
 
 <div class="d-flex flex-row justify-content-between">
     <h3>Proyectos</h3>
-            <AuthorizeView Roles="administrador,ingeniero">
-                <Authorized>
+    <AuthorizeView Roles="administrador,ingeniero">
+        <Authorized>
             <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
         </Authorized>
-   </AuthorizeView>
-               
+    </AuthorizeView>
+
 
 </div>
 <div class="mt-3 bg-success text-white bg-opacity-75">
@@ -33,14 +33,14 @@
                 <Tab Title="Todos">
                     <Content>
                         <div class="p-1">
-                         
+                            <PaginationProjectsComponents />
                         </div>
                     </Content>
                 </Tab>
                 <Tab Title="No requieren coordinación">
                     <Content>
                         <div class="p-1">
-                         <SalesList />
+                            <SalesList />
                         </div>
                     </Content>
                 </Tab>
@@ -80,15 +80,15 @@
 
     private async Task HandleProjectAdded()
     {
-       
- 
-            await offcanvas.HideAsync();
-            messages.Add(new()
-                {
-                    Message = "Proyecto Agregado",
-                    Type = ToastType.Success
-                });
-        }
+
+
+        await offcanvas.HideAsync();
+        messages.Add(new()
+        {
+            Message = "Proyecto Agregado",
+            Type = ToastType.Success
+        });
     }
+}
 
 }
