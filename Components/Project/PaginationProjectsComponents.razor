@@ -16,7 +16,6 @@ else
                 <th>N</th>
                 <th>Titulo</th>
                 <th>Cliente</th>
-           
                 <th>Estado</th>
                 <th>OC</th>
                 <th>Compañia</th>
@@ -67,7 +66,7 @@ else
                     .Include(p => p.Customer)
                     .Include(p => p.Type)
                     .Include(p => p.Company)
-                    .OrderByDescending(p => p.CreationDate) // importante: ordenamiento para consistencia
+                    .OrderByDescending(p => p.ProjectId) // importante: ordenamiento para consistencia
                     .Skip((currentPageNumber - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
