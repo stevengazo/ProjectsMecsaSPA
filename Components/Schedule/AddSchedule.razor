@@ -1,0 +1,87 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject APICarServices CarServices
+
+<div  >
+
+    <EditForm Model="newSchedule" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row g-3">
+
+            <!-- Inicio -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Fecha de Inicio</label>
+                <InputDate @bind-Value="newSchedule.Start" class="form-control" />
+            </div>
+
+            <!-- Fin -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Fecha de Fin</label>
+                <InputDate @bind-Value="newSchedule.End" class="form-control" />
+            </div>
+
+            <!-- Notas -->
+            <div class="col-12">
+                <label class="form-label fw-semibold">Notas</label>
+                <InputTextArea @bind-Value="newSchedule.Notes" class="form-control" rows="3" />
+            </div>
+
+            <!-- Vehículos -->
+            <div class="col-12">
+                <label class="form-label fw-semibold">Vehículo</label>
+                <InputSelect @bind-Value="newSchedule.Car" class="form-select">
+                    <option value="">Seleccione un vehículo</option>
+                    @foreach (var item in cars)
+                    {
+                        <option value="@item.CarId">@item.Brand @item.Model (@item.Plate)</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <!-- Botón -->
+            <div class="col-12 text-end mt-3">
+                <button class="btn btn-primary px-4 py-2">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+            </div>
+
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+
+    private List<Car> cars = new();
+    private ProjectsDBContext _dbContext;
+
+    private Schedule newSchedule = new()
+    {
+        Start = DateTime.Now,
+        End = DateTime.Now.AddDays(1)
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        newSchedule.ProjectId = ProjectId;
+        _dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var d = await CarServices.GetCarsAsync();
+        cars = d.OrderBy(c => c.Brand).ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _dbContext.Schedules.Add(newSchedule);
+        await _dbContext.SaveChangesAsync();
+
+        newSchedule = new Schedule()
+        {
+            Start = DateTime.Now,
+            End = DateTime.Now.AddDays(1),
+            ProjectId = ProjectId
+        };
+    }
+}

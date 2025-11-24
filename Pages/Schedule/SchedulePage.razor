@@ -1,0 +1,61 @@
+﻿@page "/schedule"
+
+
+<h3>Cronograma</h3>
+
+
+<GanttDiagram Tasks="Schedules" />
+
+
+
+
+
+@code {
+
+    private List<Schedule> Schedules = new List<Schedule>
+{
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 1),
+        End = new DateTime(2024, 1, 5),
+        ProjectId = 4
+    },
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 3),
+        End = new DateTime(2024, 1, 10),
+        ProjectId = 4
+    },
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 6),
+        End = new DateTime(2024, 1, 12),
+        ProjectId = 4
+    },
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 8),
+        End = new DateTime(2024, 1, 15),
+        ProjectId = 4
+    },
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 2),
+        End = new DateTime(2024, 1, 8),
+        ProjectId = 4
+    },
+    new Schedule
+    {
+        TaskName = "Planejamento",
+        Start = new DateTime(2024, 1, 9),
+        End = new DateTime(2024, 1, 14),
+        ProjectId = 4
+    },
+};
+
+}

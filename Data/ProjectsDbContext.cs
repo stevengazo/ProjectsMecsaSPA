@@ -17,6 +17,12 @@ namespace ProjectsMecsaSPA.Data
         public DbSet<BillFile> BillFiles { get; set; }
         public DbSet<Company> Company { get; set; }
 
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<SchDev> Schedule_Device { get; set; }
+        public DbSet<SchEmpl> Schedule_Employee { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
+
         public ProjectsDBContext(DbContextOptions contextOptions) : base(contextOptions)
         {
         }

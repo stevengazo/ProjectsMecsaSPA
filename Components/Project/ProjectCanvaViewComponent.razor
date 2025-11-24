@@ -90,8 +90,6 @@
     </table>
 </div>
 
-
-
 <div class="my-3">
     <h5>
         Acciones
@@ -106,17 +104,42 @@
 
 <AuthorizeView Roles="administrador,ingeniero,asistente">
     <Authorized>
-        <div class="border rounded rounded-md shadow p-1 my-3">
-            <h5>
-                Comentarios
-            </h5>
-            <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-        </div>
+
+        <Tabs>
+            <Tab Title="Agregar Comentario" Icon="CommentDots">
+                <Content>
+                    <div class="border rounded rounded-md shadow p-1 my-3">
+                        <h5>
+                            Comentarios
+                        </h5>
+                        <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                    </div>
+                </Content>
+               </Tab>
+               <Tab  Title="Cronograma" >
+                   <Content>
+                                              <div class="border rounded rounded-md shadow p-1 my-3">
+                           <h5>
+                               Cronograma del Proyecto
+                           </h5>
+                           <AddSchedule ProjectId="project.ProjectId" />
+                           <ProjectScheduleViewComponent ProjectId="project.ProjectId" />
+                       </div
+                   </Content>
+               </Tab>
+        </Tabs>
+
+
+
+
+
 
     </Authorized>
     <NotAuthorized>
     </NotAuthorized>
 </AuthorizeView>
+
+
 
 
 

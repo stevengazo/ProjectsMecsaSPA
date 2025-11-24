@@ -1,0 +1,77 @@
+﻿@page "/calendar"
+
+<h3>Calendar</h3>
+
+<div class="calendar-container">
+    <div class="calendar-header">
+        <button @onclick="PrevMonth">◀</button>
+        <span>@CurrentMonth.ToString("MMMM yyyy")</span>
+        <button @onclick="NextMonth">▶</button>
+    </div>
+
+    <div class="calendar-grid">
+        @foreach (var day in WeekDays)
+        {
+            <div class="calendar-day-name">@day</div>
+        }
+
+        @foreach (var day in DaysInMonth)
+        {
+            <div class="calendar-day @(day.Date == DateTime.Today ? "today" : "")">
+                @day.Day
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DateTime CurrentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+
+    private List<DateTime> DaysInMonth = new();
+    private string[] WeekDays = new[] { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
+
+    protected override void OnInitialized()
+    {
+        LoadCalendar();
+    }
+
+    void LoadCalendar()
+    {
+        DaysInMonth.Clear();
+
+        // Asegurar que el mes inicia en lunes
+        var first = CurrentMonth;
+        int offset = ((int)first.DayOfWeek + 6) % 7; // convertir domingo=0 a domingo=6
+
+        // Días del mes anterior para completar calendario
+        for (int i = 0; i < offset; i++)
+        {
+            DaysInMonth.Add(first.AddDays(-(offset - i)));
+        }
+
+        // Días del mes actual
+        int days = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
+        for (int d = 1; d <= days; d++)
+        {
+            DaysInMonth.Add(new DateTime(CurrentMonth.Year, CurrentMonth.Month, d));
+        }
+
+        // Completar la última semana
+        while (DaysInMonth.Count % 7 != 0)
+        {
+            DaysInMonth.Add(DaysInMonth.Last().AddDays(1));
+        }
+    }
+
+    void PrevMonth()
+    {
+        CurrentMonth = CurrentMonth.AddMonths(-1);
+        LoadCalendar();
+    }
+
+    void NextMonth()
+    {
+        CurrentMonth = CurrentMonth.AddMonths(1);
+        LoadCalendar();
+    }
+}

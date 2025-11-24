@@ -1,18 +1,19 @@
-using System.Net.NetworkInformation;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using ProjectsMecsaSPA.Areas.Identity;
 using ProjectsMecsaSPA.Data;
 using ProjectsMecsaSPA.Hubs;
 using ProjectsMecsaSPA.Model;
 using ProjectsMecsaSPA.Services;
 using ProjectsMecsaSPA.Utilities;
-using Microsoft.Extensions.FileProviders;
+using System.Net.NetworkInformation;
 using static ProjectsMecsaSPA.Components.Config.AppSettingsConfig;
-using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,16 @@ builder.Services.AddSignalR(options =>
 });
 
 #endregion
+
+
+#region API Connections
+builder.Services.AddHttpClient<APICarServices>(client =>
+{
+    client.BaseAddress = new Uri("https://checarsv2.stevengazo.co.cr/api/");
+});
+
+#endregion
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(UsersConnection));
