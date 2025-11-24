@@ -8,7 +8,7 @@
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
         public string Notes { get; set; }
-        public string CarPlate { get; set; }
+        public string CarPlate { get; set; } = "";
 
         public string Car { get; set; }
         public bool Draft { get; set; }

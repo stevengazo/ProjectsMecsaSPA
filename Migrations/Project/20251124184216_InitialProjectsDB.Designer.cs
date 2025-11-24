@@ -12,7 +12,7 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Project
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20251124153243_InitialProjectsDB")]
+    [Migration("20251124184216_InitialProjectsDB")]
     partial class InitialProjectsDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -532,6 +532,9 @@ namespace ProjectsMecsaSPA.Migrations.Project
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("DependencyId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Draft")
                         .HasColumnType("bit");
 
@@ -547,6 +550,10 @@ namespace ProjectsMecsaSPA.Migrations.Project
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ScheduleId");
 

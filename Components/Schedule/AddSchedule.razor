@@ -74,14 +74,22 @@
 
     private async Task HandleValidSubmit()
     {
-        _dbContext.Schedules.Add(newSchedule);
-        await _dbContext.SaveChangesAsync();
-
-        newSchedule = new Schedule()
+       try
         {
-            Start = DateTime.Now,
-            End = DateTime.Now.AddDays(1),
-            ProjectId = ProjectId
-        };
+            _dbContext.Schedules.Add(newSchedule);
+            await _dbContext.SaveChangesAsync();
+
+            newSchedule = new Schedule()
+            {
+                Start = DateTime.Now,
+                End = DateTime.Now.AddDays(1),
+                ProjectId = ProjectId
+            };
+        }
+        catch (Exception f)
+        {
+            
+            throw f;
+        }
     }
 }

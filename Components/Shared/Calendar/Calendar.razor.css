@@ -37,3 +37,53 @@
         border-color: #0078ff;
         font-weight: bold;
     }
+
+.calendar-container {
+    max-width: 700px;
+    margin: auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    font-weight: bold;
+}
+
+.calendar-day {
+    border: 1px solid #ddd;
+    min-height: 85px;
+    padding: 3px;
+    font-size: 14px;
+    position: relative;
+    background: #fafafa;
+}
+
+.today {
+    background: #e0f2ff;
+    border-color: #0094ff;
+}
+
+.day-number {
+    font-weight: bold;
+}
+
+.schedule-item {
+    background: #1e88e5;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-top: 2px;
+}

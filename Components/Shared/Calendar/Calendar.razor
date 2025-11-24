@@ -1,4 +1,4 @@
-﻿@page "/calendar"
+﻿@using ProjectsMecsaSPA.Model
 
 <h3>Calendar</h3>
 
@@ -10,6 +10,7 @@
     </div>
 
     <div class="calendar-grid">
+
         @foreach (var day in WeekDays)
         {
             <div class="calendar-day-name">@day</div>
@@ -17,33 +18,79 @@
 
         @foreach (var day in DaysInMonth)
         {
+            // schedules que coinciden dentro del rango Start–End
+            var daySchedules = SchedulesForMonth
+            .Where(s => day.Date >= s.Start.Date && day.Date <= s.End.Date)
+            .ToList();
+
             <div class="calendar-day @(day.Date == DateTime.Today ? "today" : "")">
-                @day.Day
+
+                <div class="day-number">@day.Day</div>
+
+                @if (daySchedules.Any())
+                {
+                    <div class="schedules">
+                        @foreach (var sch in daySchedules)
+                        {
+                            <div class="schedule-item">
+                                @sch.TaskName
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         }
     </div>
 </div>
 
 @code {
-    private DateTime CurrentMonth = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    // Schedules recibidos desde afuera (padre)
+    [Parameter]
+    public List<Schedule> Schedules { get; set; } = new();
 
+    private DateTime CurrentMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     private List<DateTime> DaysInMonth = new();
-    private string[] WeekDays = new[] { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
+
+    // Schedules filtrados únicamente del mes visible
+    private List<Schedule> SchedulesForMonth = new();
+
+    private readonly string[] WeekDays =
+        { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
 
     protected override void OnInitialized()
     {
         LoadCalendar();
+        FilterSchedules();
+    }
+
+    // Se llama cuando cambian los parámetros que vienen del padre
+    protected override void OnParametersSet()
+    {
+        FilterSchedules();
+        StateHasChanged();
+    }
+
+    void FilterSchedules()
+    {
+        // Filtra sólo los schedules del mes visible en el calendario
+        SchedulesForMonth = Schedules
+            .Where(s =>
+                s.Start.Month == CurrentMonth.Month ||
+                s.End.Month == CurrentMonth.Month ||
+                // caso: schedule cruza dos meses
+                (s.Start < CurrentMonth.AddMonths(1) && s.End > CurrentMonth)
+            )
+            .ToList();
     }
 
     void LoadCalendar()
     {
         DaysInMonth.Clear();
 
-        // Asegurar que el mes inicia en lunes
         var first = CurrentMonth;
-        int offset = ((int)first.DayOfWeek + 6) % 7; // convertir domingo=0 a domingo=6
+        int offset = ((int)first.DayOfWeek + 6) % 7; // lunes=0
 
-        // Días del mes anterior para completar calendario
+        // Días previos
         for (int i = 0; i < offset; i++)
         {
             DaysInMonth.Add(first.AddDays(-(offset - i)));
@@ -56,7 +103,7 @@
             DaysInMonth.Add(new DateTime(CurrentMonth.Year, CurrentMonth.Month, d));
         }
 
-        // Completar la última semana
+        // Completar última fila
         while (DaysInMonth.Count % 7 != 0)
         {
             DaysInMonth.Add(DaysInMonth.Last().AddDays(1));
@@ -67,11 +114,13 @@
     {
         CurrentMonth = CurrentMonth.AddMonths(-1);
         LoadCalendar();
+        FilterSchedules();
     }
 
     void NextMonth()
     {
         CurrentMonth = CurrentMonth.AddMonths(1);
         LoadCalendar();
+        FilterSchedules();
     }
 }

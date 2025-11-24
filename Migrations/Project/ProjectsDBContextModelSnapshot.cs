@@ -530,6 +530,9 @@ namespace ProjectsMecsaSPA.Migrations.Project
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("DependencyId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Draft")
                         .HasColumnType("bit");
 
@@ -545,6 +548,10 @@ namespace ProjectsMecsaSPA.Migrations.Project
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ScheduleId");
 
