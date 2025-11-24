@@ -60,7 +60,7 @@ namespace ProjectsMecsaSPA.Services
             }
         }
 
-        public async Task SendTaskCommentAsync(int taskId, string message, int userId)
+        public async Task SendTaskCommentAsync(int taskId, string message, int userId= 362)
         {
             var requestBody = new
             {

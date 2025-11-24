@@ -229,7 +229,7 @@
                 if (bill.TaskNumber != 0)
                 {
                     string Message = $"\nInformacion Ingresada en App de Proyectos \nMonto: {bill.Amount.ToString("n2")} \nMoneda: {bill.Currency} \nCreacion: {bill.BillDate} \nProyectoId: {bill.ProjectId} \nDescripcion: {bill.Note}\nTarea: {bill.TaskNumber}";
-                    await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 107, files);
+                    await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 252, files);
                 }
             }
         }

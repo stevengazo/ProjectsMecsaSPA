@@ -173,7 +173,7 @@ else
 
         if (confirmation)
         {
-            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{ item.Amount}", 107);
+            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{item.Amount}", 252);
 			await OnDelete.InvokeAsync(item);
         }
         else
