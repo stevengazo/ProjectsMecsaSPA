@@ -1,6 +1,6 @@
 ﻿@using ProjectsMecsaSPA.Model
 
-<h3>Calendar</h3>
+
 
 <div class="calendar-container">
     <div class="calendar-header">
@@ -10,7 +10,6 @@
     </div>
 
     <div class="calendar-grid">
-
         @foreach (var day in WeekDays)
         {
             <div class="calendar-day-name">@day</div>
@@ -18,7 +17,6 @@
 
         @foreach (var day in DaysInMonth)
         {
-            // schedules que coinciden dentro del rango Start–End
             var daySchedules = SchedulesForMonth
             .Where(s => day.Date >= s.Start.Date && day.Date <= s.End.Date)
             .ToList();
@@ -32,8 +30,21 @@
                     <div class="schedules">
                         @foreach (var sch in daySchedules)
                         {
-                            <div class="schedule-item">
-                                @sch.TaskName
+                            <div class="schedule-item"
+                                 @onclick="() => OnScheduleClick(sch)"
+                                 style="cursor:pointer">
+                                @if (!string.IsNullOrEmpty(@sch.TaskName))
+                                {
+
+                                    @sch.ProjectId
+                                    <label> - </label>
+
+                                    @sch.Project?.Title
+                                }
+                                else
+                                {
+                                    <label> Sin titulo</label>
+                                }
                             </div>
                         }
                     </div>
@@ -42,16 +53,29 @@
         }
     </div>
 </div>
+<Offcanvas @ref="offcanvas" title="Detalle">
+    <BodyTemplate>
+        <CalendarCanva SelectedSchedule="SelectedSchedule"  OnHideOffcanvas="OnHideOffcanvasClick" />
+    </BodyTemplate>
+</Offcanvas>
+
+
 
 @code {
-    // Schedules recibidos desde afuera (padre)
+
+    private Offcanvas offcanvas = default!;
+
+    // Únicamente Schedule seleccionado
+    private Schedule? SelectedSchedule;
+
+    private async Task OnHideOffcanvasClick()
+        => await offcanvas.HideAsync();
+
     [Parameter]
     public List<Schedule> Schedules { get; set; } = new();
 
     private DateTime CurrentMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     private List<DateTime> DaysInMonth = new();
-
-    // Schedules filtrados únicamente del mes visible
     private List<Schedule> SchedulesForMonth = new();
 
     private readonly string[] WeekDays =
@@ -63,47 +87,41 @@
         FilterSchedules();
     }
 
-    // Se llama cuando cambian los parámetros que vienen del padre
     protected override void OnParametersSet()
     {
         FilterSchedules();
         StateHasChanged();
     }
 
-    void FilterSchedules()
+    private void FilterSchedules()
     {
-        // Filtra sólo los schedules del mes visible en el calendario
         SchedulesForMonth = Schedules
             .Where(s =>
                 s.Start.Month == CurrentMonth.Month ||
                 s.End.Month == CurrentMonth.Month ||
-                // caso: schedule cruza dos meses
                 (s.Start < CurrentMonth.AddMonths(1) && s.End > CurrentMonth)
             )
             .ToList();
     }
 
-    void LoadCalendar()
+    private void LoadCalendar()
     {
         DaysInMonth.Clear();
 
         var first = CurrentMonth;
-        int offset = ((int)first.DayOfWeek + 6) % 7; // lunes=0
+        int offset = ((int)first.DayOfWeek + 6) % 7;
 
-        // Días previos
         for (int i = 0; i < offset; i++)
         {
             DaysInMonth.Add(first.AddDays(-(offset - i)));
         }
 
-        // Días del mes actual
         int days = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
         for (int d = 1; d <= days; d++)
         {
             DaysInMonth.Add(new DateTime(CurrentMonth.Year, CurrentMonth.Month, d));
         }
 
-        // Completar última fila
         while (DaysInMonth.Count % 7 != 0)
         {
             DaysInMonth.Add(DaysInMonth.Last().AddDays(1));
@@ -122,5 +140,11 @@
         CurrentMonth = CurrentMonth.AddMonths(1);
         LoadCalendar();
         FilterSchedules();
+    }
+
+    private async Task OnScheduleClick(Schedule sch)
+    {
+        SelectedSchedule = sch;
+        await offcanvas.ShowAsync();
     }
 }

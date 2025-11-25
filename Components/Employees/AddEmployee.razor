@@ -1,0 +1,57 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<EditForm Model="employee" OnSubmit="HandleOnsummit">
+    <div class="card shadow-sm p-4">
+        <h4 class="mb-3 text-primary">Nuevo Empleado</h4>
+
+        <div class="row g-3">
+
+            <!-- Nombre -->
+            <div class="col-md-6">
+                <label class="form-label" for="FirstName">Nombre:</label>
+                <InputText id="FirstName" class="form-control" @bind-Value="employee.FirstName" />
+            </div>
+
+            <!-- Apellido -->
+            <div class="col-md-6">
+                <label class="form-label" for="LastName">Apellido:</label>
+                <InputText id="LastName" class="form-control" @bind-Value="employee.LastName" />
+            </div>
+
+            <!-- Posición -->
+            <div class="col-md-6">
+                <label class="form-label" for="Position">Posición:</label>
+                <InputSelect id="Position" class="form-select" @bind-Value="employee.Position">
+                    <option value="">Seleccione una posición</option>
+                    <option value="Tecnico">Técnico</option>
+                    <option value="Operativo">Operativo</option>
+                </InputSelect>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="col-md-6">
+                <label class="form-label" for="PhoneNumber">Número:</label>
+                <InputText id="PhoneNumber" class="form-control" @bind-Value="employee.PhoneNumber" />
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary px-4">
+                Guardar
+            </button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    Employee employee = new();
+
+    private async Task HandleOnsummit()
+    {
+        using var db = DbContextFactory.CreateDbContext();
+        db.Employees.Add(employee);
+        await db.SaveChangesAsync();
+
+        employee = new Employee();
+    }
+}

@@ -1,0 +1,133 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+
+@if (SelectedSchedule is not null)
+{
+    <div class="p-2">
+
+        <!-- #region General -->
+
+        <div class="mb-3 d-flex  justify-content-between">
+            <h4 class="mb-1 text-primary">
+                Proyecto @SelectedSchedule.Project?.Title
+            </h4>
+            <Badge Color="BadgeColor.Primary" class="text-sm" VisuallyHiddenText="Visually hidden text for Primary">
+                Número: @SelectedSchedule.ProjectId
+            </Badge>
+        </div>
+
+        <div class="d-flex flex-row gap-2 my-2 mt-2 justify-content-start">
+            <a href="/projects/@SelectedSchedule.ProjectId"
+               class="btn btn-sm btn-outline-info">
+                <Icon Name="IconName.Eye"></Icon> Ver Proyecto
+            </a>
+            <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@SelectedSchedule.Project.TaskNumber/"
+               class="btn btn-sm btn-outline-success"
+               target="_blank">
+                Ver Tarea
+            </a>
+        </div>
+
+        <div class="card shadow-sm mb-3 p-2">
+            <h5 class="card-title text-primary">
+                @SelectedSchedule.TaskName
+            </h5>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <b>Inicio:</b> @SelectedSchedule.Start.ToString("dd/MM/yyyy")
+                        </td>
+                        <td>
+                            <b>Fin:</b> @SelectedSchedule.End.ToString("dd/MM/yyyy")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                         <b>
+                                Vehiculo
+                         </b>   
+                        </td>
+                        <td>
+                            @SelectedSchedule.Car
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            @if (!string.IsNullOrWhiteSpace(SelectedSchedule.Notes))
+            {
+                <p class="mt-2">
+                    <b>Notas:</b><br />
+                    @SelectedSchedule.Notes
+                </p>
+            }
+        </div>
+        <!-- #endregion -->
+        <!-- #region Employees -->
+
+
+
+       @foreach (var i in EmployeesBySchedule)
+        {
+            @i.Employee.FirstName
+        }
+
+        <!-- #endregion -->
+
+    </div>
+}
+else
+{
+    <div class="text-muted p-3">
+        No hay schedule seleccionado.
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public Schedule SelectedSchedule { get; set; }
+
+    [Parameter]
+    public EventCallback OnHideOffcanvas { get; set; }
+
+    private List<SchDev> DevicesBySchedule = new();
+
+    private List<SchEmpl> EmployeesBySchedule = new();  
+
+   
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+
+        try
+        {
+            using (var dbContext = await DbContextFactory.CreateDbContextAsync())
+            {
+                if(SelectedSchedule is null)
+                {
+                    return;
+                }
+                DevicesBySchedule = await dbContext.Schedule_Device.Where(sd => sd.ScheduleId == SelectedSchedule.ScheduleId).ToListAsync();
+
+                EmployeesBySchedule = await dbContext.Schedule_Employee.Where(se => se.ScheduleId == SelectedSchedule.ScheduleId).ToListAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading related data: {ex.Message}");
+        }
+
+    }
+
+    private async Task OnHide()
+    {
+        if (OnHideOffcanvas.HasDelegate)
+        {
+            await OnHideOffcanvas.InvokeAsync();
+        }
+    }
+}
