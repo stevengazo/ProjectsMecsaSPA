@@ -112,7 +112,9 @@
     private async Task LoadEmployees()
     {
         using var db = DbContextFactory.CreateDbContext();
-        employees = await db.Employees.ToListAsync();
+        employees = await db.Employees
+                            .Where(e => !e.Deleted)
+                            .ToListAsync();
     }
 
     private void EditEmployee(Employee emp)
@@ -144,13 +146,14 @@
 
     private async Task DeleteEmployee(int id)
     {
-        throw new NotImplementedException();
+        
         using var db = DbContextFactory.CreateDbContext();
         var emp = await db.Employees.FindAsync(id);
 
         if (emp is not null)
         {
-            db.Employees.Remove(emp);
+            emp.Deleted = true;
+            db.Employees.Update(emp);
             await db.SaveChangesAsync();
         }
 

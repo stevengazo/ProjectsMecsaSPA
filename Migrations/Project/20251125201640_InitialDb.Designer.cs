@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Project
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20251124184216_InitialProjectsDB")]
-    partial class InitialProjectsDB
+    [Migration("20251125201640_InitialDb")]
+    partial class InitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -240,6 +240,9 @@ namespace ProjectsMecsaSPA.Migrations.Project
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"), 1L, 1);
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

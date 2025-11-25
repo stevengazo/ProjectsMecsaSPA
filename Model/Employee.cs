@@ -7,6 +7,7 @@
         public string LastName { get; set; }
         public string Position { get; set; }
         public string PhoneNumber { get; set; }
+        public bool Deleted { get; set; }   
         public ICollection<SchEmpl> SchEmpls { get; set; }  
     }
 }
