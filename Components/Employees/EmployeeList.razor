@@ -144,6 +144,7 @@
 
     private async Task DeleteEmployee(int id)
     {
+        throw new NotImplementedException();
         using var db = DbContextFactory.CreateDbContext();
         var emp = await db.Employees.FindAsync(id);
 

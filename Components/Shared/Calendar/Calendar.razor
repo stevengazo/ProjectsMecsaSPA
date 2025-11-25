@@ -33,17 +33,33 @@
                             <div class="schedule-item"
                                  @onclick="() => OnScheduleClick(sch)"
                                  style="cursor:pointer">
-                                @if (!string.IsNullOrEmpty(@sch.TaskName))
+                                <div>
+                                    <h5>
+                                        @sch.ProjectId
+                                        - @sch.Project?.Title
+                                    </h5>
+                                </div>
+                                <label>
+                                    Vehiculo: @sch.Car
+                                </label>
+
+                                @if (sch.SchEmpls.Count == 0)
                                 {
-
-                                    @sch.ProjectId
-                                    <label> - </label>
-
-                                    @sch.Project?.Title
+                                    <br />
+                                    <label> Personal</label>
                                 }
                                 else
                                 {
-                                    <label> Sin titulo</label>
+
+                                    <label> Empleados Asignados</label>
+                                    <hr />
+                                    @foreach (var emp in sch.SchEmpls)
+                                    {
+                                        <label>
+                                            @emp.Employee?.FirstName -  @emp.Employee?.Position
+                                        </label>
+                                        <br />
+                                    }
                                 }
                             </div>
                         }
@@ -53,9 +69,9 @@
         }
     </div>
 </div>
-<Offcanvas @ref="offcanvas" title="Detalle">
+<Offcanvas @ref="offcanvas" title="Detalle del Cronograma">
     <BodyTemplate>
-        <CalendarCanva SelectedSchedule="SelectedSchedule"  OnHideOffcanvas="OnHideOffcanvasClick" />
+        <CalendarCanva SelectedSchedule="SelectedSchedule" OnHideOffcanvas="OnHideOffcanvasClick" />
     </BodyTemplate>
 </Offcanvas>
 

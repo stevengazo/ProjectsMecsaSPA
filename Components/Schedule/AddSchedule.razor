@@ -1,48 +1,51 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject APICarServices CarServices
-
-<div  >
+<div class="p-3">
 
     <EditForm Model="newSchedule" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="row g-3">
+        <div class="row gy-3">
 
             <!-- Inicio -->
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Fecha de Inicio</label>
-                <InputDate @bind-Value="newSchedule.Start" class="form-control" />
+                <label class="form-label">Fecha de Inicio</label>
+                <InputDate @bind-Value="newSchedule.Start" class="form-control form-control-sm" />
             </div>
 
             <!-- Fin -->
             <div class="col-md-6">
-                <label class="form-label fw-semibold">Fecha de Fin</label>
-                <InputDate @bind-Value="newSchedule.End" class="form-control" />
+                <label class="form-label">Fecha de Fin</label>
+                <InputDate @bind-Value="newSchedule.End" class="form-control form-control-sm" />
             </div>
 
             <!-- Notas -->
             <div class="col-12">
-                <label class="form-label fw-semibold">Notas</label>
-                <InputTextArea @bind-Value="newSchedule.Notes" class="form-control" rows="3" />
+                <label class="form-label">Notas</label>
+                <InputTextArea @bind-Value="newSchedule.Notes"
+                               class="form-control form-control-sm"
+                               rows="3" />
             </div>
 
-            <!-- Vehículos -->
+            <!-- Vehículo -->
             <div class="col-12">
-                <label class="form-label fw-semibold">Vehículo</label>
-                <InputSelect @bind-Value="newSchedule.Car" class="form-select">
+                <label class="form-label">Vehículo</label>
+                <InputSelect @bind-Value="newSchedule.Car" class="form-select form-select-sm">
                     <option value="">Seleccione un vehículo</option>
                     @foreach (var item in cars)
                     {
-                        <option value="@item.Brand @item.Model (@item.Plate)">@item.Brand @item.Model (@item.Plate)</option>
+                        <option value="@($"{item.Brand} {item.Model} ({item.Plate})")">
+                            @item.Brand @item.Model (@item.Plate)
+                        </option>
                     }
                 </InputSelect>
             </div>
 
             <!-- Botón -->
-            <div class="col-12 text-end mt-3">
-                <button class="btn btn-primary px-4 py-2">
-                    <i class="bi bi-save"></i> Guardar
+            <div class="col-12 text-end mt-2">
+                <button class="btn btn-primary btn-sm px-3">
+                    Guardar
                 </button>
             </div>
 

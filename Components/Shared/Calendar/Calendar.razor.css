@@ -81,15 +81,15 @@
     font-weight: bold;
 }
 .schedules {
-    padding: 2px;
     height: auto;
 }
 
 .schedule-item {
     background: #1e88e5;
     color: white;
-    padding: 2px 2px;
+    padding: 4px;
     border-radius: 4px;
     font-size: 11px;
     margin-top: 2px;
+    text-align: left;
 }
