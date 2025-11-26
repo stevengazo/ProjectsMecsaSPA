@@ -32,6 +32,21 @@
                        class="form-control form-control-sm shadow-sm" />
         </div>
 
+        <!-- Proyecto -->
+        <div class="col-12">
+            <label class="form-label fw-semibold">Proyecto</label>
+            <InputSelect @bind-Value="NewSchedule.ProjectId"
+                         class="form-select form-select-sm shadow-sm">
+                <option value="">Seleccione un vehículo</option>
+                @foreach (var item in Projects)
+                {
+                    <option value="@item.Key">
+                       @item.Value
+                    </option>
+                }
+            </InputSelect>
+        </div>
+
         <!-- Notas -->
         <div class="col-12">
             <label class="form-label fw-semibold">Notas</label>
@@ -108,6 +123,8 @@
     private List<Car> cars = new();
     private ProjectsDBContext _dbContext;
 
+    private Dictionary<int, string> Projects = new();
+
     private Schedule NewSchedule { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
@@ -116,6 +133,13 @@
 
         var d = await CarServices.GetCarsAsync();
         cars = d.OrderBy(c => c.Brand).ToList();
+
+
+        Projects = await _dbContext.Projects
+            .AsNoTracking()
+            .Where(e => e.IsDeleted == false && e.CreationDate.Year == DateTime.Now.Year && !e.IsCompleted )
+            .OrderByDescending(p => p.ProjectId)
+            .ToDictionaryAsync(p => p.ProjectId, p => $"{p.ProjectId} - {p.Title}");
     }
 
     protected override async Task OnParametersSetAsync()
