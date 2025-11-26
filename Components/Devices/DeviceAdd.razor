@@ -1,0 +1,38 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<EditForm Model="newDevice" OnValidSubmit="HandleValidSubmit">
+    <div class="mb-3">
+        <label for="deviceName" class="form-label">Nombre</label>
+        <InputText id="deviceName" class="form-control" @bind-Value="newDevice.DeviceName" />
+    </div>
+    <div class="mb-3">
+        <label for="deviceName" class="form-label">Tipo</label>
+
+        <InputSelect id="deviceName" class="form-control" @bind-Value="newDevice.DeviceType">
+            <option value="">Seleccione</option>
+            <option value="Medicion">Equipo Medición</option>
+        </InputSelect>
+    </div>
+    <div class="mb-3">
+        <label for="deviceName" class="form-label">Serie</label>
+        <InputText id="deviceName" class="form-control" @bind-Value="newDevice.SerialNumber" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Device</button>
+
+
+</EditForm>
+@code {
+
+    private Device newDevice = new Device();
+
+
+
+    private async Task HandleValidSubmit()
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+        dbContext.Devices.Add(newDevice);
+        await dbContext.SaveChangesAsync();
+        newDevice = new Device(); // Reset the form
+    }
+}

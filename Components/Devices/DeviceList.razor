@@ -1,0 +1,56 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h3 class="mb-3">Lista de Dispositivos</h3>
+
+@if (isLoading)
+{
+    <p>Cargando dispositivos...</p>
+}
+else if (loadError is not null)
+{
+    <div class="alert alert-danger">
+        Ocurrió un error al cargar los dispositivos: @loadError
+    </div>
+}
+else if (devices is null || devices.Count == 0)
+{
+    <p>No hay dispositivos registrados.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var d in devices)
+        {
+            <li class="list-group-item d-flex justify-content-between">
+                <span>
+                    <strong>@d.DeviceName</strong><br />
+                    <small>@d.DeviceType — SN: @d.SerialNumber</small>
+                </span>
+            </li>
+        }
+    </ul>
+}
+
+@code
+{
+    private List<Device>? devices = new();
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            using var dbContext = DbContextFactory.CreateDbContext();
+            devices = await dbContext.Devices.ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

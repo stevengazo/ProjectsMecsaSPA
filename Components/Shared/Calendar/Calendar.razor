@@ -352,7 +352,7 @@
 
                 builder.AddMarkupContent(10, $@"
                     <h5>{sch.ProjectId} - {sch.Project?.Title}</h5>
-                    <label>Provincia: {sch.Car}</label>
+                    <label>Provincia: {sch.Project.Province}</label>
                     <label>Vehículo: {sch.Car}</label>
                     <hr/>
                     <h6>Empleados:</h6>
@@ -362,7 +362,16 @@
                 {
                     builder.AddMarkupContent(10, $"<label>{emp.Employee.FirstName} {emp.Employee.LastName}</label> <br/>");
                 }
+                builder.AddMarkupContent(10, $@"
+                  
+                    <hr/>
+                    <h6>Equipos:</h6>
 
+                ");
+                foreach (var Dev in sch.SchDevs)
+                {
+                    builder.AddMarkupContent(10, $"<label>{Dev.Device.DeviceName} {Dev.Device.SerialNumber}</label> <br/>");
+                }
                 builder.CloseElement();
             }
 

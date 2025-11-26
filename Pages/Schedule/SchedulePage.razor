@@ -20,10 +20,13 @@
     protected override async Task OnInitializedAsync()
     {
         Schedules = await db.Schedules
-        .Include(e => e.SchEmpls)
-            .ThenInclude(se => se.Employee)
-    .Include(e => e.Project)
-            .ToListAsync();
+                            .Where(e => e.Start.Year == DateTime.Now.Year)
+                            .Include(e => e.SchEmpls)
+                                .ThenInclude(se => se.Employee)
+                            .Include(e => e.Project)
+                            .Include(e=> e.SchDevs)
+                                .ThenInclude(e => e.Device)
+                            .ToListAsync();
     }
 
 
