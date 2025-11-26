@@ -2,46 +2,55 @@
 
 @if (SelectedSchedule is not null)
 {
-    <div class="p-2">
+    <div class="p-3">
 
-        <!-- #region GENERAL -->
-        <div class="d-flex justify-content-between align-items-center my-2">
-            <h4 class="mb-1 text-primary">
+        <!-- ========================================================= -->
+        <!-- 🔷 SECCIÓN GENERAL -->
+        <!-- ========================================================= -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h4 class="mb-0 text-primary">
                 Proyecto @SelectedSchedule.Project?.Title
             </h4>
-            <label class="italic text-sm text-secondary">
+            <span class="text-secondary fst-italic">
                 Número Proyecto: @SelectedSchedule.ProjectId
-            </label>
+            </span>
         </div>
 
-        <div class="d-flex justify-content-start align-items-center my-2">
-            <a href="/projects/@SelectedSchedule.ProjectId" class="btn btn-sm btn-outline-info mx-2">
-                Proyecto
+        <div class="d-flex align-items-center mb-3">
+            <a href="/projects/@SelectedSchedule.ProjectId"
+               class="btn btn-sm btn-outline-info me-2">
+                Ver Proyecto
             </a>
 
             <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@SelectedSchedule.Project.TaskNumber/"
-               class="btn btn-sm btn-outline-primary mx-2"
+               class="btn btn-sm btn-outline-primary me-2"
                target="_blank">
-                Tarea
+                Ver Tarea
             </a>
-            <button class="btn btn-sm btn-outline-success mx-2" @onclick="StartEditDates">
+
+            <button class="btn btn-sm btn-outline-success me-2"
+                    @onclick="StartEditDates">
                 Editar
             </button>
 
-            <button class="btn btn-sm btn-outline-danger mx-2" @onclick="DeleteSchedule">
+            <button class="btn btn-sm btn-outline-danger"
+                    @onclick="DeleteSchedule">
                 Borrar
             </button>
         </div>
 
         <hr />
 
-        <div class="my-2">
-            <h5 class="card-title text-primary">@SelectedSchedule.TaskName</h5>
+        <!-- ========================================================= -->
+        <!-- 🔷 DETALLES / EDICIÓN -->
+        <!-- ========================================================= -->
+        <div class="mb-3">
+            <h5 class="text-primary">@SelectedSchedule.TaskName</h5>
 
-            <!-- ⭐ MODO NORMAL -->
             @if (!editDates)
             {
-                <table class="table table-sm">
+                <!-- MODO NORMAL -->
+                <table class="table table-sm mb-3">
                     <tbody>
                         <tr>
                             <td><b>Inicio:</b> @SelectedSchedule.Start.ToString("dd/MM/yyyy")</td>
@@ -53,68 +62,64 @@
                         </tr>
                     </tbody>
                 </table>
-
-
             }
             else
             {
-                <!-- ⭐ MODO EDICIÓN -->
+                <!-- MODO EDICIÓN -->
                 <div class="border rounded p-3">
-                    <div class="row">
+
+                    <div class="mb-3">
                         <label class="form-label">Tarea:</label>
                         <input type="text" class="form-control"
                                @bind="TaskNameEdit" />
                     </div>
 
-
-                    <div class="row">
-                        <label class="form-label">Descripción</label>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción:</label>
                         <input type="text" class="form-control"
                                @bind="NotesEdit" />
                     </div>
 
-
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-6 mb-3">
                             <label class="form-label">Inicio</label>
                             <input type="date" class="form-control"
                                    @bind="editStart" />
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-6 mb-3">
                             <label class="form-label">Fin</label>
                             <input type="date" class="form-control"
                                    @bind="editEnd" />
                         </div>
-
                     </div>
 
-                    <div class="mt-3">
+                    <div>
                         <button class="btn btn-primary btn-sm" @onclick="SaveDates">Guardar</button>
                         <button class="btn btn-secondary btn-sm ms-2" @onclick="CancelEditDates">Cancelar</button>
                     </div>
-
                 </div>
             }
 
             @if (!string.IsNullOrWhiteSpace(SelectedSchedule.Notes))
             {
-                <p class="mt-3">
+                <div class="mt-3">
                     <b>Notas:</b><br />
                     @SelectedSchedule.Notes
-                </p>
+                </div>
             }
         </div>
 
-        <!-- #endregion -->
-
         <hr />
 
-        <!-- #region EMPLEADOS -->
-        <div class="d-flex justify-content-between align-items-center my-2">
-            <h5 class="text-primary">Empleados Asignados</h5>
+        <!-- ========================================================= -->
+        <!-- 🔷 EMPLEADOS -->
+        <!-- ========================================================= -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="text-primary mb-0">Empleados Asignados</h5>
 
-            <button class="btn btn-sm btn-primary" @onclick="() => showAddEmployee = true">
+            <button class="btn btn-sm btn-primary"
+                    @onclick="() => showAddEmployee = true">
                 Agregar Empleado
             </button>
         </div>
@@ -125,7 +130,7 @@
         }
         else
         {
-            <table class="table table-sm align-middle">
+            <table class="table table-sm align-middle mb-4">
                 <thead>
                     <tr>
                         <th>Empleado</th>
@@ -152,27 +157,38 @@
                 </tbody>
             </table>
         }
-        <!-- #endregion -->
-        <!-- #region MODAL AGREGAR EMPLEADO -->
-        <!-- #region Devices-->
-        <div class="d-flex justify-content-between align-items-center my-2">
-            <h5 class="text-primary">Equipos Asignados</h5>
+
+        <!-- ========================================================= -->
+        <!-- 🔷 DEVICES / EQUIPOS -->
+        <!-- ========================================================= -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="text-primary mb-0">Equipos Asignados</h5>
         </div>
 
-        @foreach (var i in SelectedSchedule.SchDevs)
+        @if (SelectedSchedule.SchDevs.Count == 0)
         {
-            <div>
-                <label>
-                    @i.Device.DeviceName
-                </label>
-                <button class="btn btn-sm btn-danger"
-                        @onclick="() => DeleteDevice(i.SchDevId)">
-                    Quitar
-                </button>
-            </div>
+            <p class="text-muted">No hay equipos asignados.</p>
+        }
+        else
+        {
+            @foreach (var d in SelectedSchedule.SchDevs)
+            {
+                <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
+                    <span>@d.Device.DeviceName</span>
+
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => DeleteDevice(d.SchDevId)">
+                        Quitar
+                    </button>
+                </div>
+            }
         }
 
-        <!-- #endregion -->
+
+
+        <!-- ========================================================= -->
+        <!-- 🔷 MODAL: AGREGAR EMPLEADO -->
+        <!-- ========================================================= -->
         @if (showAddEmployee)
         {
             <div class="modal fade show d-block" tabindex="-1"
@@ -207,7 +223,6 @@
                 </div>
             </div>
         }
-        <!-- #endregion -->
 
     </div>
 }
@@ -222,6 +237,11 @@ else
 
     [Parameter] public Schedule SelectedSchedule { get; set; }
     [Parameter] public EventCallback OnHideOffcanvas { get; set; }
+
+    [Parameter] public EventCallback<(int Id, bool Status)> OnChanged { get; set; }
+
+
+
 
     private List<SchEmpl> EmployeesBySchedule = new();
     private List<Employee> allEmployees = new();
@@ -269,28 +289,39 @@ else
 
     private async Task SaveDates()
     {
-        using var db = await DbContextFactory.CreateDbContextAsync();
-
-        var item = await db.Schedules
-            .FirstOrDefaultAsync(s => s.ScheduleId == SelectedSchedule.ScheduleId);
-
-        if (item != null)
+        try
         {
-            item.Start = editStart;
-            item.End = editEnd;
-            item.TaskName = TaskNameEdit;
-            item.Notes = NotesEdit;
+            using var db = await DbContextFactory.CreateDbContextAsync();
 
-            await db.SaveChangesAsync();
+            var item = await db.Schedules
+                .FirstOrDefaultAsync(s => s.ScheduleId == SelectedSchedule.ScheduleId);
 
-            // Actualizar UI
-            SelectedSchedule.Start = editStart;
-            SelectedSchedule.End = editEnd;
-            SelectedSchedule.TaskName = TaskNameEdit;
-            SelectedSchedule.Notes = NotesEdit;
+            if (item != null)
+            {
+                item.Start = editStart;
+                item.End = editEnd;
+                item.TaskName = TaskNameEdit;
+                item.Notes = NotesEdit;
+
+                await db.SaveChangesAsync();
+
+                // Actualizar UI
+                SelectedSchedule.Start = editStart;
+                SelectedSchedule.End = editEnd;
+                SelectedSchedule.TaskName = TaskNameEdit;
+                SelectedSchedule.Notes = NotesEdit;
+            }
+
+            editDates = false;
         }
-
-        editDates = false;
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error updating schedule dates: {e.Message}");
+        }
+        finally
+        {
+            Update(false);
+        }
     }
 
     //  Empleados
@@ -302,22 +333,34 @@ else
 
     private async Task AddEmployee()
     {
-        if (selectedEmployeeId == null)
-            return;
-
-        using var db = await DbContextFactory.CreateDbContextAsync();
-
-        var newRelation = new SchEmpl
+        try
         {
-            ScheduleId = SelectedSchedule.ScheduleId,
-            EmployeeId = selectedEmployeeId.Value
-        };
+            if (selectedEmployeeId == null)
+                return;
 
-        db.Schedule_Employee.Add(newRelation);
-        await db.SaveChangesAsync();
+            using var db = await DbContextFactory.CreateDbContextAsync();
 
-        await OnParametersSetAsync();
-        CloseAddEmployee();
+            var newRelation = new SchEmpl
+            {
+                ScheduleId = SelectedSchedule.ScheduleId,
+                EmployeeId = selectedEmployeeId.Value
+            };
+
+            db.Schedule_Employee.Add(newRelation);
+            await db.SaveChangesAsync();
+
+            await OnParametersSetAsync();
+            CloseAddEmployee();
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+        finally
+        {
+            Update(false);
+        }
     }
 
     private async Task DeleteEmployee(int schEmplId)
@@ -333,6 +376,8 @@ else
         }
 
         await OnParametersSetAsync();
+
+        Update(false);
     }
 
 
@@ -364,7 +409,11 @@ else
         finally
         {
             await OnHideOffcanvas.InvokeAsync();
+            Update(true);
         }
+
+
+
     }
 
     private async Task DeleteDevice(int schDevId)
@@ -377,5 +426,15 @@ else
             await db.SaveChangesAsync();
         }
         await OnParametersSetAsync();
+
+        Update(false);
+
     }
+
+
+    private async Task Update(bool isDeleted)
+    {
+        await OnChanged.InvokeAsync((SelectedSchedule.ScheduleId, isDeleted));
+    }
+
 }
