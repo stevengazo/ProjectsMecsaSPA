@@ -195,7 +195,9 @@
             var last = DaysInMonth.Last();
 
             SchedulesForView = Schedules
+            
                 .Where(s => s.End >= first && s.Start <= last)
+               
                 .ToList();
         }
         else

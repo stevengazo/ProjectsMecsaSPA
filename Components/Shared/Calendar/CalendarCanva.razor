@@ -28,7 +28,7 @@
                 Editar
             </button>
 
-            <button class="btn btn-sm btn-outline-danger mx-2">
+            <button class="btn btn-sm btn-outline-danger mx-2" @onclick="DeleteSchedule">
                 Borrar
             </button>
         </div>
@@ -335,6 +335,37 @@ else
         await OnParametersSetAsync();
     }
 
+
+    private async Task DeleteSchedule()
+    {
+        try
+        {
+            using var db = await DbContextFactory.CreateDbContextAsync();
+
+            var scheduleToDelete = await db.Schedules
+                .FirstOrDefaultAsync(s => s.ScheduleId == SelectedSchedule.ScheduleId);
+
+            var allDevicesSelected = db.Schedule_Device.Where(sd => sd.ScheduleId == SelectedSchedule.ScheduleId);
+            db.Schedule_Device.RemoveRange(allDevicesSelected);
+
+            var allEmployeseesSelected = db.Schedule_Employee.Where(se => se.ScheduleId == SelectedSchedule.ScheduleId);
+            db.Schedule_Employee.RemoveRange(allEmployeseesSelected);
+
+            db.Schedules.Remove(scheduleToDelete);
+            await db.SaveChangesAsync();
+
+            await OnParametersSetAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting device: {ex.Message}");
+        }
+
+        finally
+        {
+            await OnHideOffcanvas.InvokeAsync();
+        }
+    }
 
     private async Task DeleteDevice(int schDevId)
     {

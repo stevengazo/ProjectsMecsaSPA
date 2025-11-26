@@ -20,6 +20,7 @@
     protected override async Task OnInitializedAsync()
     {
         Schedules = await db.Schedules
+        .AsNoTracking()
                             .Where(e => e.Start.Year == DateTime.Now.Year)
                             .Include(e => e.SchEmpls)
                                 .ThenInclude(se => se.Employee)
