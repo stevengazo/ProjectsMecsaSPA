@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectsMecsaSPA.Data;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Project
+namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20251125201640_InitialDb")]
-    partial class InitialDb
+    partial class ProjectsDBContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -532,6 +530,10 @@ namespace ProjectsMecsaSPA.Migrations.Project
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
@@ -557,6 +559,9 @@ namespace ProjectsMecsaSPA.Migrations.Project
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("WeekendWork")
+                        .HasColumnType("bit");
 
                     b.HasKey("ScheduleId");
 

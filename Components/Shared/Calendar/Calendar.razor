@@ -280,40 +280,59 @@
 
             foreach (var sch in daySchedules)
             {
+                bool esDomingo = day.DayOfWeek == DayOfWeek.Sunday;
+                bool esSabado = day.DayOfWeek == DayOfWeek.Saturday;
+
+                // No mostrar nada el domingo
+                if (esDomingo)
+                    continue;
+
+                // Sábado: solo si tiene WeekendWork = true
+                if (esSabado && sch.WeekendWork == false)
+                    continue;
+
+                // Abrir contenedor
                 builder.OpenElement(7, "div");
                 builder.AddAttribute(8, "class", "schedule-item");
                 builder.AddAttribute(9, "onclick", EventCallback.Factory.Create(this, () => OnScheduleClick(sch)));
 
-                builder.AddMarkupContent(10, $@"
-                    <h5>{sch.ProjectId} - {sch.Project?.Title}</h5>
-                    <label>Provincia: {sch.Project.Province}</label>
-                    <label>Vehículo: {sch.Car}</label>
-                    <hr/>
-                    <h6>Empleados:</h6>
+                // Color
+                string bg = (esSabado && sch.WeekendWork)
+                    ? "orange"
+                    : sch.Color;
 
-                ");
+                builder.AddAttribute(10, "style", $"background-color:{bg};");
+
+                // Contenido
+                builder.AddMarkupContent(10, $@"
+                <h5>{sch.ProjectId} - {sch.Project?.Title}</h5>
+                <label>Provincia: {sch.Project.Province}</label>
+                <label>Vehículo: {sch.Car}</label>
+                <hr/>
+                <h6>Empleados:</h6>
+            ");
+
                 foreach (var emp in sch.SchEmpls)
                 {
-                    builder.AddMarkupContent(10, $"<label>{emp.Employee.FirstName} {emp.Employee.LastName}</label> <br/>");
+                    builder.AddMarkupContent(10, $"<label>{emp.Employee.FirstName} {emp.Employee.LastName}</label><br/>");
                 }
-                builder.AddMarkupContent(10, $@"
 
-                    <hr/>
-                    <h6>Equipos:</h6>
+                builder.AddMarkupContent(10, "<hr/><h6>Equipos:</h6>");
 
-                ");
-                foreach (var Dev in sch.SchDevs)
+                foreach (var dev in sch.SchDevs)
                 {
-                    builder.AddMarkupContent(10, $"<label>{Dev.Device.DeviceName} {Dev.Device.SerialNumber}</label> <br/>");
+                    builder.AddMarkupContent(10, $"<label>{dev.Device.DeviceName} {dev.Device.SerialNumber}</label><br/>");
                 }
-                builder.CloseElement();
+
+                builder.CloseElement(); // schedule-item
             }
 
-            builder.CloseElement();
+            builder.CloseElement(); // schedules
         }
 
-        builder.CloseElement();
+        builder.CloseElement(); // calendar-day
     };
+
 
 
     private async Task ScheduleChanged((int Id, bool Deleted) change)

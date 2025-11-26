@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ProjectsMecsaSPA.Migrations.Project
+namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class InitialDb : Migration
+    public partial class DbProjectsInitial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -297,6 +297,8 @@ namespace ProjectsMecsaSPA.Migrations.Project
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CarPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Car = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WeekendWork = table.Column<bool>(type: "bit", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Draft = table.Column<bool>(type: "bit", nullable: false),
                     Deleted = table.Column<bool>(type: "bit", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false)
