@@ -327,6 +327,8 @@
     private async Task AddSchedule(Schedule newObj)
     {
         Schedules.Add(newObj);
+        FilterSchedules();
+        StateHasChanged();
     }
 
     private async Task ScheduleChanged((int Id, bool Deleted) change)
