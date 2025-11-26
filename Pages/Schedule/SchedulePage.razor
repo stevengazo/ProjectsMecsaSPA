@@ -9,10 +9,6 @@
 
 <Calendar Schedules="Schedules" />
 
-
-
-
-
 @code {
 
     private List<Schedule> Schedules = new();
@@ -20,14 +16,14 @@
     protected override async Task OnInitializedAsync()
     {
         Schedules = await db.Schedules
-        .AsNoTracking()
-                            .Where(e => e.Start.Year == DateTime.Now.Year)
-                            .Include(e => e.SchEmpls)
+                                .AsNoTracking()
+                                .Where(e => e.Start.Year == DateTime.Now.Year)
+                                .Include(e => e.SchEmpls)
                                 .ThenInclude(se => se.Employee)
-                            .Include(e => e.Project)
-                            .Include(e=> e.SchDevs)
+                                .Include(e => e.Project)
+                                .Include(e=> e.SchDevs)
                                 .ThenInclude(e => e.Device)
-                            .ToListAsync();
+                                .ToListAsync();
     }
 
 

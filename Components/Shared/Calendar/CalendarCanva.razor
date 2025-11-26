@@ -3,10 +3,7 @@
 @if (SelectedSchedule is not null)
 {
     <div class="p-3">
-
-        <!-- ========================================================= -->
         <!-- 🔷 SECCIÓN GENERAL -->
-        <!-- ========================================================= -->
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h4 class="mb-0 text-primary">
                 Proyecto @SelectedSchedule.Project?.Title
@@ -19,13 +16,13 @@
         <div class="d-flex align-items-center mb-3">
             <a href="/projects/@SelectedSchedule.ProjectId"
                class="btn btn-sm btn-outline-info me-2">
-                Ver Proyecto
+                Proyecto
             </a>
 
             <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@SelectedSchedule.Project.TaskNumber/"
                class="btn btn-sm btn-outline-primary me-2"
                target="_blank">
-                Ver Tarea
+                Tarea
             </a>
 
             <button class="btn btn-sm btn-outline-success me-2"
@@ -41,9 +38,8 @@
 
         <hr />
 
-        <!-- ========================================================= -->
-        <!-- 🔷 DETALLES / EDICIÓN -->
-        <!-- ========================================================= -->
+        <!--  DETALLES / EDICIÓN -->
+
         <div class="mb-3">
             <h5 class="text-primary">@SelectedSchedule.TaskName</h5>
 
@@ -146,15 +142,13 @@
 
         <hr />
 
-        <!-- ========================================================= -->
         <!-- 🔷 EMPLEADOS -->
-        <!-- ========================================================= -->
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="text-primary mb-0">Empleados Asignados</h5>
+            <h5 class="text-primary mb-0">Empleados</h5>
 
-            <button class="btn btn-sm btn-primary"
+            <button class="btn btn-sm btn-outline-success"
                     @onclick="() => showAddEmployee = true">
-                Agregar Empleado
+                Agregar
             </button>
         </div>
 
@@ -181,7 +175,7 @@
                             <td>@se.Employee.Position</td>
                             <td>@se.Employee.PhoneNumber</td>
                             <td>
-                                <button class="btn btn-sm btn-danger"
+                                <button class="btn btn-sm btn-outline-danger"
                                         @onclick="() => DeleteEmployee(se.SchEmplId)">
                                     Quitar
                                 </button>
@@ -191,13 +185,10 @@
                 </tbody>
             </table>
         }
-
-        <!-- ========================================================= -->
-        <!-- 🔷 DEVICES / EQUIPOS -->
-        <!-- ========================================================= -->
+        <!--  DEVICES / EQUIPOS -->
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="text-primary mb-0">Equipos Asignados</h5>
-            <button class="btn btn-sm btn-primary"
+            <h5 class="text-primary mb-0">Equipos</h5>
+            <button class="btn btn-sm btn-outline-success"
                     @onclick="() => showAddDevice = true">
                 Agregar 
             </button>
@@ -209,23 +200,26 @@
         }
         else
         {
-            @foreach (var d in SelectedSchedule.SchDevs)
-            {
-                <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2">
-                    <span>@d.Device.DeviceName</span>
-
-                    <button class="btn btn-sm btn-danger"
-                            @onclick="() => DeleteDevice(d.SchDevId)">
-                        Quitar
-                    </button>
-                </div>
-            }
+            <table class="table table-sm align-middle mb-4">
+                <tbody>
+                    @foreach (var d in SelectedSchedule.SchDevs)
+                    {
+                        <tr>
+                            <td>@d.Device.DeviceName</td>
+                            <td>@d.Device.SerialNumber</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger ms-3"
+                                        @onclick="() => DeleteDevice(d.SchDevId)">
+                                    Quitar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
 
-
-        <!-- ========================================================= -->
         <!-- 🔷 MODAL: AGREGAR EQUIPO -->
-        <!-- ========================================================= -->
         @if (showAddDevice)
         {
             <div class="modal fade show d-block" tabindex="-1"

@@ -1,8 +1,109 @@
-﻿
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
+<div class="container my-3">
 
-<h3>ScheduleByProject</h3>
+    @if (Schedules.Count == 0)
+    {
+        <div class="alert alert-info">
+            No hay schedules para este proyecto.
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+
+            @foreach (var schedule in Schedules)
+            {
+                <div class="col-12">
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title text-primary mb-0">
+                                    @schedule.TaskName
+                                </h5>
+                                <span class="badge bg-secondary">
+                                    @schedule.Car
+                                </span>
+                            </div>
+
+                            <!-- Fechas -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <strong>Inicio:</strong> @schedule.Start.ToShortDateString()
+                                </div>
+                                <div class="col-6">
+                                    <strong>Fin:</strong> @schedule.End.ToShortDateString()
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <!-- Empleados -->
+                            <h6 class="text-primary">Empleados</h6>
+
+                            @if (schedule.SchEmpls.Count == 0)
+                            {
+                                <p class="text-muted">Sin empleados asignados.</p>
+                            }
+                            else
+                            {
+                                <ul class="list-group list-group-flush mb-3">
+                                    @foreach (var emp in schedule.SchEmpls)
+                                    {
+                                        <li class="list-group-item px-0">
+                                            @emp.Employee.FirstName @emp.Employee.LastName
+                                            <span class="text-muted">(@emp.Employee.Position)</span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+
+                            <hr />
+
+                            <!-- Dispositivos -->
+                            <h6 class="text-primary">Dispositivos</h6>
+
+                            @if (schedule.SchDevs.Count == 0)
+                            {
+                                <p class="text-muted">Sin dispositivos asignados.</p>
+                            }
+                            else
+                            {
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var dev in schedule.SchDevs)
+                                    {
+                                        <li class="list-group-item px-0">
+                                            @dev.Device.DeviceName
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
 
+    [Parameter] public int ProjectId { get; set; }
+    private List<Schedule> Schedules = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        Schedules = await dbContext.Schedules
+            .Where(e => e.ProjectId == ProjectId)
+            .Include(e => e.SchEmpls)
+                .ThenInclude(se => se.Employee)
+            .Include(e => e.Project)
+            .Include(e => e.SchDevs)
+                .ThenInclude(e => e.Device)
+            .ToListAsync();
+    }
 }

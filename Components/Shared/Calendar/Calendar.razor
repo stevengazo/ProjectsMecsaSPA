@@ -33,7 +33,6 @@
         {
             @foreach (var day in DaysInMonth)
             {
-
                 @RenderDay(day)
             }
         }
@@ -83,7 +82,11 @@
     }
 
     private async Task OnHideOffcanvasClick()
-        => await offcanvas.HideAsync();
+    {
+        FilterSchedules();
+        StateHasChanged();
+        await offcanvas.HideAsync();
+    }
 
     [Parameter]
     public List<Schedule> Schedules { get; set; } = new();

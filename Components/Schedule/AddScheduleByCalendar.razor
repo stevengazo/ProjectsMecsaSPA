@@ -1,5 +1,7 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject APICarServices CarServices
+
+
 <EditForm Model="NewSchedule" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -37,11 +39,11 @@
             <label class="form-label fw-semibold">Proyecto</label>
             <InputSelect @bind-Value="NewSchedule.ProjectId"
                          class="form-select form-select-sm shadow-sm">
-                <option value="">Seleccione un vehículo</option>
+                <option value="">Seleccione Proyecto</option>
                 @foreach (var item in Projects)
                 {
                     <option value="@item.Key">
-                       @item.Value
+                        @item.Value
                     </option>
                 }
             </InputSelect>
@@ -97,6 +99,7 @@
 
                 <option value="brown" style="background:#8b4513; color:#fff;">Café</option>
                 <option value="chocolate" style="background:#d2691e; color:#fff;">Chocolate</option>
+            
             </InputSelect>
         </div>
 
@@ -110,8 +113,6 @@
     </div>
 </EditForm>
 
-
-@SelectedDate.ToLongDateString()
 @code {
 
     [Parameter] public DateTime SelectedDate { get; set; }
@@ -137,7 +138,7 @@
 
         Projects = await _dbContext.Projects
             .AsNoTracking()
-            .Where(e => e.IsDeleted == false && e.CreationDate.Year == DateTime.Now.Year && !e.IsCompleted )
+            .Where(e => e.IsDeleted == false && e.CreationDate.Year == DateTime.Now.Year && !e.IsCompleted)
             .OrderByDescending(p => p.ProjectId)
             .ToDictionaryAsync(p => p.ProjectId, p => $"{p.ProjectId} - {p.Title}");
     }
@@ -169,14 +170,13 @@
         await _dbContext.SaveChangesAsync();
 
         var obj = await _dbContext.Schedules
-            .AsNoTracking()
-             .Include(e => e.SchEmpls)
-                                .ThenInclude(se => se.Employee)
-                            .Include(e => e.Project)
-                            .Include(e => e.SchDevs)
-                                .ThenInclude(e => e.Device)
-            .FirstOrDefaultAsync(s => s.ScheduleId == NewSchedule.ScheduleId);
-
+                                    .AsNoTracking()
+                                    .Include(e => e.SchEmpls)
+                                    .ThenInclude(se => se.Employee)
+                                    .Include(e => e.Project)
+                                    .Include(e => e.SchDevs)
+                                    .ThenInclude(e => e.Device)
+                                    .FirstOrDefaultAsync(s => s.ScheduleId == NewSchedule.ScheduleId);
         await OnChanged.InvokeAsync(obj);
         await OnHideOffcanvas.InvokeAsync();
     }
