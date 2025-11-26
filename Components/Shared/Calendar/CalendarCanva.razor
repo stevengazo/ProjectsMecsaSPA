@@ -278,7 +278,6 @@
                             <h5 class="modal-title">Agregar Empleado</h5>
                             <button class="btn-close" @onclick="CloseAddEmployee"></button>
                         </div>
-
                         <div class="modal-body">
                             <label class="form-label">Seleccione un empleado</label>
                             <select class="form-select" @bind="selectedEmployeeId">
@@ -291,12 +290,10 @@
                                 }
                             </select>
                         </div>
-
                         <div class="modal-footer">
                             <button class="btn btn-secondary" @onclick="CloseAddEmployee">Cancelar</button>
                             <button class="btn btn-primary" @onclick="AddEmployee">Agregar</button>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -317,8 +314,6 @@ else
     [Parameter] public EventCallback OnHideOffcanvas { get; set; }
 
     [Parameter] public EventCallback<(int Id, bool Status)> OnChanged { get; set; }
-
-
 
     private List<SchDev> DevicesBySchedule = new();
     private List<Device> allDevices = new();
@@ -365,6 +360,7 @@ else
 
         allDevices = await db.Devices.ToListAsync();
     }
+
     private void CloseAddDevice()
     {
         showAddDevice = false;
@@ -402,8 +398,6 @@ else
         }
     }
 
-
-    //  Acciones para edición de fechas
     private void StartEditDates()
     {
         editStart = SelectedSchedule.Start;
@@ -434,7 +428,7 @@ else
                 item.End = editEnd;
                 item.TaskName = TaskNameEdit;
                 item.Notes = NotesEdit;
-
+                item.Color = ColorEdit;
                 await db.SaveChangesAsync();
 
                 // Actualizar UI
@@ -457,7 +451,6 @@ else
         }
     }
 
-    //  Empleados
     private void CloseAddEmployee()
     {
         showAddEmployee = false;
@@ -513,7 +506,6 @@ else
       await  Update(false);
     }
 
-
     private async Task DeleteSchedule()
     {
         try
@@ -560,7 +552,6 @@ else
         Update(false);
 
     }
-
 
     private async Task Update(bool isDeleted)
     {

@@ -1,0 +1,150 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject APICarServices CarServices
+<EditForm Model="NewSchedule" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row gy-3 p-2">
+
+        <!-- Grupo: Fechas -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Fecha de Inicio</label>
+            <InputDate @bind-Value="NewSchedule.Start"
+                       class="form-control form-control-sm shadow-sm" />
+
+            <div class="form-check mt-2">
+                <InputCheckbox @bind-Value="NewSchedule.WeekendWork"
+                               class="form-check-input" />
+                <label class="form-check-label ms-1">Fin de semana</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Fecha de Fin</label>
+            <InputDate @bind-Value="NewSchedule.End"
+                       class="form-control form-control-sm shadow-sm" />
+        </div>
+
+        <!-- Tarea -->
+        <div class="col-12">
+            <label class="form-label fw-semibold">Tarea</label>
+            <InputText @bind-Value="NewSchedule.TaskName"
+                       class="form-control form-control-sm shadow-sm" />
+        </div>
+
+        <!-- Notas -->
+        <div class="col-12">
+            <label class="form-label fw-semibold">Notas</label>
+            <InputTextArea @bind-Value="NewSchedule.Notes"
+                           class="form-control form-control-sm shadow-sm"
+                           rows="3" />
+        </div>
+
+        <!-- Grupo: Vehículo + Color -->
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Vehículo</label>
+            <InputSelect @bind-Value="NewSchedule.Car"
+                         class="form-select form-select-sm shadow-sm">
+                <option value="">Seleccione un vehículo</option>
+                @foreach (var item in cars)
+                {
+                    <option value="@($"{item.Brand} {item.Model} ({item.Plate})")">
+                        @item.Brand @item.Model (@item.Plate)
+                    </option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label fw-semibold">Color</label>
+            <InputSelect @bind-Value="NewSchedule.Color"
+                         class="form-select form-select-sm shadow-sm color-select">
+
+                <option value="">Seleccione un Color</option>
+
+                <option value="gray" style="background:#808080; color:#fff;">Gris</option>
+                <option value="silver" style="background:#C0C0C0; color:#000;">Plateado</option>
+
+                <option value="red" style="background:#ff0000; color:#fff;">Rojo</option>
+                <option value="maroon" style="background:#800000; color:#fff;">Burdeos</option>
+
+                <option value="blue" style="background:#0000ff; color:#fff;">Azul</option>
+                <option value="skyblue" style="background:#87ceeb; color:#000;">Celeste</option>
+                <option value="navy" style="background:#000080; color:#fff;">Azul Marino</option>
+
+                <option value="green" style="background:#008000; color:#fff;">Verde</option>
+                <option value="lime" style="background:#00ff00; color:#000;">Verde Lima</option>
+                <option value="olive" style="background:#808000; color:#fff;">Oliva</option>
+
+                <option value="yellow" style="background:#ffff00; color:#000;">Amarillo</option>
+                <option value="gold" style="background:#ffd700; color:#000;">Dorado</option>
+                <option value="orange" style="background:#ffa500; color:#000;">Naranja</option>
+
+                <option value="brown" style="background:#8b4513; color:#fff;">Café</option>
+                <option value="chocolate" style="background:#d2691e; color:#fff;">Chocolate</option>
+            </InputSelect>
+        </div>
+
+        <!-- Botón -->
+        <div class="col-12 text-end mt-2">
+            <button class="btn btn-primary btn-sm px-4 shadow-sm">
+                Guardar
+            </button>
+        </div>
+
+    </div>
+</EditForm>
+
+
+@SelectedDate.ToLongDateString()
+@code {
+
+    [Parameter] public DateTime SelectedDate { get; set; }
+    [Parameter] public int ProjectId { get; set; }
+
+    [Parameter] public EventCallback OnHideOffcanvas { get; set; }
+    [Parameter] public EventCallback<Schedule> OnChanged { get; set; }
+
+    private List<Car> cars = new();
+    private ProjectsDBContext _dbContext;
+
+    private Schedule NewSchedule { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var d = await CarServices.GetCarsAsync();
+        cars = d.OrderBy(c => c.Brand).ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Crear SIEMPRE un nuevo Schedule al abrir el formulario
+        NewSchedule = new Schedule
+        {
+            ProjectId = ProjectId,
+            Start = SelectedDate,
+            End = SelectedDate,
+            WeekendWork = false
+        };
+
+        // Cargar vehículos si aún no están cargados
+        if (!cars.Any())
+        {
+            _dbContext = await DbContextFactory.CreateDbContextAsync();
+            var d = await CarServices.GetCarsAsync();
+            cars = d.OrderBy(c => c.Brand).ToList();
+        }
+    }
+
+
+    private async Task HandleValidSubmit()
+    {
+        _dbContext.Schedules.Add(NewSchedule);
+        await _dbContext.SaveChangesAsync();
+
+        await OnChanged.InvokeAsync(NewSchedule);
+        await OnHideOffcanvas.InvokeAsync();
+    }
+}
