@@ -57,6 +57,8 @@ namespace ProjectsMecsaSPA.Model
         public bool IsCompleted { get; set; }
         public bool Isfactured { get; set; }
 
+        public bool RequiredCoordination { get; set; } = true;
+
         [Required(ErrorMessage = "El vendedor es obligatorio.")]
         public int SellerId { get; set; }
 

@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20251126155046_DbProjectsInitial")]
-    partial class DbProjectsInitial
+    [Migration("20251127202128_ProjectsInitialDb")]
+    partial class ProjectsInitialDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -444,6 +444,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("RequiredCoordination")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");

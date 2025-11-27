@@ -443,6 +443,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("RequiredCoordination")
+                        .HasColumnType("bit");
+
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
 
