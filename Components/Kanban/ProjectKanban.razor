@@ -11,14 +11,14 @@
     {
         <div class="col h-100">
             <h5>@Obj.Key.StateName</h5>
-            <SortableList  class="h-100 bg-danger"
+            <SortableList class="h-100 bg-danger"
                           TItem="Project"
                           Name="@($"{Obj.Key.StateName}")"
                           Data="@Obj.Value"
                           Context="project"
                           OnUpdate="args => OnProjectListUpdate(args, Obj.Key.StateId,Obj.Key.StateName )"
                           OnRemove="args => OnProjectListRemove(args, Obj.Key.StateId)">
-                <ItemTemplate >
+                <ItemTemplate>
                     <div class="card-body" @onclick="() => HandleProjectView(project)">
                         <div class="d-flex justify-content-between">
                             <label style="font-size:16px;"><b>@project.Title</b></label>
@@ -44,7 +44,7 @@
     public List<State> States { get; set; } = new();
     public Dictionary<State, List<Project>> ProjectLists { get; set; } = new();
     [Parameter]
-    public bool CanEdit { get; set; } = false;  
+    public bool CanEdit { get; set; } = false;
 
 
     protected override void OnInitialized()
@@ -84,30 +84,31 @@
         try
         {
             return
-     db.Projects
-     .Include(e => e.Type)
-     .Include(e => e.Commentaries)
-     .Include(e => e.Customer)
-     .Include(e => e.State)
-     .Include(e => e.Seller)
-     .OrderByDescending(e => e.ProjectId)
-     .Where(i => !i.IsDeleted &&
-         i.StateId == stateId
-         && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
+                 db.Projects
+                 .Include(e => e.Type)
+                 .Include(e => e.Commentaries)
+                 .Include(e => e.Customer)
+                 .Include(e => e.State)
+                 .Include(e => e.Seller)
+                 .OrderByDescending(e => e.ProjectId)
+                 .Where(i => !i.IsDeleted &&
+                     i.StateId == stateId
+                     && i.RequiredCoordination ==true
+                     && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year) || (i.IsCompleted == false))).ToList();
         }
         catch (ObjectDisposedException e)
         {
             Console.WriteLine(e.Message);
 
             return
-      db.Projects
-      .Include(e => e.Type)
-      .Include(e => e.Commentaries)
-      .Include(e => e.Customer)
-      .Include(e => e.State)
-      .Include(e => e.Seller)
-      .OrderByDescending(e => e.ProjectId)
-      .Where(i => !i.IsDeleted && i.StateId == stateId && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
+                  db.Projects
+                  .Include(e => e.Type)
+                  .Include(e => e.Commentaries)
+                  .Include(e => e.Customer)
+                  .Include(e => e.State)
+                  .Include(e => e.Seller)
+                  .OrderByDescending(e => e.ProjectId)
+                  .Where(i => !i.IsDeleted && i.StateId == stateId && i.RequiredCoordination == true && (i.CreationDate >= (DateTime.Today.AddMonths(-2)) || (i.CreationDate.Year == DateTime.Today.Year))).ToList();
 
 
         }
@@ -122,7 +123,8 @@
 
     private void OnProjectListUpdate(SortableListEventArgs args, int stateId, string NameState)
     {
-        if(CanEdit){
+        if (CanEdit)
+        {
             try
             {
                 var TargetState = GetState(NameState);
@@ -150,7 +152,8 @@
 
     private async Task OnProjectListRemove(SortableListEventArgs args, int stateId)
     {
-        if(CanEdit){
+        if (CanEdit)
+        {
             var TargetState = GetState(args.ToListName);
             var OriginState = GetState(args.FromListName);
 
@@ -208,7 +211,8 @@
 
     private async Task SendBitrix24Commentary(Project project, string State)
     {
-        if(CanEdit){
+        if (CanEdit)
+        {
             bool IsValid = int.TryParse(project.TaskNumber, out int _task);
             if (project != null && IsValid)
             {

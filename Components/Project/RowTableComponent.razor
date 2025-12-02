@@ -60,12 +60,13 @@ else
         <td>@ProjectObj.Title</td>
         <td>
             <a target="_blank" href="/customers/@ProjectObj.CustomerId" class="text-decoration-none">
-                @ProjectObj.Customer.Name
+                @ProjectObj.Customer?.Name
             </a>
         </td>
-        <td>@ProjectObj.Seller?.SellerName</td>
+       
         <td>@ProjectObj.State?.StateName</td>
         <td>@ProjectObj.OC</td>
+        <td>@ProjectObj.Company?.CompanyName</td>
         <td>@ProjectObj.Type?.Name</td>
         <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
         <td>@ProjectObj.Amount.ToString("C")</td>

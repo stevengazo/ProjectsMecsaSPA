@@ -56,6 +56,7 @@ namespace ProjectsMecsaSPA.Model
         public bool IsDeleted { get; set; }
         public bool IsCompleted { get; set; }
         public bool Isfactured { get; set; }
+        public bool RequiredCoordination { get; set; } = true;
 
         public bool RequiredCoordination { get; set; } = true;
 

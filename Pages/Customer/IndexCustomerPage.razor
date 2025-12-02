@@ -24,12 +24,18 @@
 <AuthorizeView Roles="administrador,asistente,ingeniero,contabilidad,vendedor">
     <Authorized >
         <Tabs EnableFadeEffect="true">
-            <Tab Title="Todos" Active="true">
+            <Tab Title="Buscar" Active="true">
                 <Content>
                     <SearchCustomerComponent />
                 </Content>
             </Tab>
+            <Tab Title="Todos" >
+                <Content>
+                    <ListCustomerComponent />
+                </Content>
+            </Tab>
         </Tabs>
+ 
     </Authorized>
 </AuthorizeView>
 

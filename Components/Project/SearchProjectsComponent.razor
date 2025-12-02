@@ -168,6 +168,7 @@
 					<th>Vendedor</th>
 					<th>Estado</th>
 					<th>OC</th>
+					<th>Compañia</th>
 					<th>Tipo</th>
 					<th>Creación</th>
 					<th>Monto</th>
@@ -327,6 +328,7 @@
 					.Include(p => p.State)
 					.Include(p => p.Customer)
 					.Include(p => p.Type)
+					   .Include(p => p.Company)
 					.OrderByDescending(p => p.ProjectId)
 					.ToListAsync();
 
