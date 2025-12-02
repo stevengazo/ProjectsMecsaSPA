@@ -32,6 +32,7 @@
                                 .Include(e => e.SchEmpls)
                                 .ThenInclude(se => se.Employee)
                                 .Include(e => e.Project)
+                                .ThenInclude(e => e.Type)
                                 .Include(e => e.SchDevs)
                                 .ThenInclude(e => e.Device)
                                 .ToListAsync();
