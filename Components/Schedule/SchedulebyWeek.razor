@@ -1,0 +1,76 @@
+﻿@inject ProjectsDBContext db
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Empleado</th>
+            @foreach (var day in weekDays)
+            {
+                <th>@day.ToString("dddd")</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in employees)
+        {
+            // obtener schedules asociados al empleado
+            var itemsByEmployee = Schedules
+            .Where(s => s.SchEmpls.Any(se => se.EmployeeId == employee.EmployeeId))
+            .ToList();
+
+            <tr>
+                <td><strong>@employee.FirstName @employee.LastName</strong></td>
+
+                @foreach (var day in weekDays)
+                {
+                    // schedules que coinciden con este día
+                    var dayItems = itemsByEmployee
+                    .Where(s => s.Start.Date <= day.Date && s.End.Date >= day.Date)
+                    .ToList();
+
+                    <td>
+                        @if (dayItems.Count == 0)
+                        {
+                            <span>-</span>
+                        }
+                        else
+                        {
+                            @foreach (var sched in dayItems)
+                            {
+                                <div>@sched.Project?.Title</div>
+                            }
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<Schedule> Schedules { get; set; } = new();
+
+    private List<Employee> employees = new();
+    private List<DateTime> weekDays = new();
+
+    protected override void OnParametersSet()
+    {
+        // obtener empleados únicos
+        employees = Schedules
+           .SelectMany(s => s.SchEmpls.Select(se => se.Employee))
+           .Distinct()
+           .ToList();
+
+        // generar la semana actual (lunes -> domingo)
+        var today = DateTime.Today;
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        var monday = today.AddDays(-diff);
+
+        weekDays = Enumerable.Range(0, 7)
+                    .Select(i => monday.AddDays(i))
+                    .ToList();
+
+        base.OnParametersSet();
+    }
+}

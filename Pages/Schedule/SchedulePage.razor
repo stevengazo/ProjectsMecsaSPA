@@ -5,9 +5,20 @@
 
 
 <h3>Cronograma</h3>
+<Tabs>
+    <Tab Title="Vista de calendario">
+        <Content>
+            <Calendar Schedules="Schedules" />
+        </Content>
+    </Tab>
+    <Tab Title="Vista de lista">
+        <Content>
+            <SchedulebyWeek Schedules="Schedules" />
+        </Content>
+    </Tab>
+</Tabs>
 
 
-<Calendar Schedules="Schedules" />
 
 @code {
 
@@ -21,11 +32,8 @@
                                 .Include(e => e.SchEmpls)
                                 .ThenInclude(se => se.Employee)
                                 .Include(e => e.Project)
-                                .Include(e=> e.SchDevs)
+                                .Include(e => e.SchDevs)
                                 .ThenInclude(e => e.Device)
                                 .ToListAsync();
     }
-
-
-
 }

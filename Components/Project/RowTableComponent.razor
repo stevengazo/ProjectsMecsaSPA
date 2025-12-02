@@ -69,7 +69,7 @@ else
         <td>@ProjectObj.Company?.CompanyName</td>
         <td>@ProjectObj.Type?.Name</td>
         <td>@ProjectObj.CreationDate.ToString("MMM-yyyy")</td>
-        <td>@ProjectObj.Amount.ToString("C")</td>
+        <td>@ProjectObj.Amount.ToString("")</td>
         <td>
             <Tooltip Class="d-inline-block" Title="Ver Proyecto" role="button">
                 <a href="/projects/@ProjectObj.ProjectId" class="btn btn-sm btn-outline-info" target="_blank">
@@ -84,10 +84,8 @@ else
                             <Icon Name="IconName.PencilFill"></Icon>
                         </button>
                     </Tooltip>
- 
                 </Authorized>
             </AuthorizeView>
-
         </td>
         <td>
             <AuthorizeView Roles="administrador,ingeniero,contabilidad">
