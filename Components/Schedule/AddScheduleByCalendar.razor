@@ -138,7 +138,7 @@
 
         Projects = await _dbContext.Projects
             .AsNoTracking()
-            .Where(e => e.IsDeleted == false && e.CreationDate.Year == DateTime.Now.Year && !e.IsCompleted)
+            .Where(e => e.IsDeleted == false && e.CreationDate.Year == DateTime.Now.Year && !e.IsCompleted && e.RequiredCoordination)
             .OrderByDescending(p => p.ProjectId)
             .ToDictionaryAsync(p => p.ProjectId, p => $"{p.ProjectId} - {p.Title}");
     }

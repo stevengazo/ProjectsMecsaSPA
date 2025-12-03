@@ -99,7 +99,7 @@
         // Obtener empleados únicos
         employees = Schedules
            .SelectMany(s => s.SchEmpls.Select(se => se.Employee))
-           .Distinct()
+           .DistinctBy(e => e.EmployeeId)     
            .ToList();
 
         // Si es primera carga: calcular lunes actual
