@@ -4,86 +4,103 @@
 
 
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <button class="btn btn-outline-primary" @onclick="PrevWeek">⟨ Semana anterior</button>
+<div class="d-flex justify-content-start align-items-center mb-3">
+    <button class="btn btn-outline-primary m-1" @onclick="PrevWeek">⟨ Semana anterior</button>
+    <button class="btn btn-outline-primary m-1" @onclick="NextWeek">Semana siguiente ⟩</button>
+    <button class="btn btn-success m-1" @onclick="DownloadAsImage">
+        📸 Descargar
+    </button>
+</div>
 
+<div id="weekTable">
     <h4 class="mb-0">
         Semana del @CurrentMonday.ToString("dd MMM yyyy") al @CurrentMonday.AddDays(6).ToString("dd MMM yyyy")
     </h4>
-
-    <button class="btn btn-outline-primary" @onclick="NextWeek">Semana siguiente ⟩</button>
-</div>
-
-<table class="table table-bordered table-striped">
-    <thead class="table-light">
-        <tr>
-            <th>Empleado</th>
-            @foreach (var day in weekDays)
-            {
-                <th>@day.ToString("dddd")<br /><small>@day.ToString("dd/MM")</small></th>
-            }
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var employee in employees)
-        {
-            var itemsByEmployee = Schedules
-            .Where(s => s.SchEmpls.Any(se => se.EmployeeId == employee.EmployeeId))
-            .ToList();
-
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
             <tr>
-                <td><strong>@employee.FirstName @employee.LastName</strong>
-                    - @if (employee.Position.Equals("Tecnico"))
-                    {
-                        <label>Tecnico</label>
-                                        }
-                </td>
-
+                <th>Empleado</th>
                 @foreach (var day in weekDays)
                 {
-                    var dayItems = itemsByEmployee
-                    .Where(s => s.Start.Date <= day.Date && s.End.Date >= day.Date)
-                    .ToList();
+                    <th>@day.ToString("dddd")<br /><small>@day.ToString("dd/MM")</small></th>
+                }
+            </tr>
+        </thead>
 
-                    <td class="align-top">
-                        @if (dayItems.Count == 0)
+        <tbody>
+            @foreach (var employee in employees)
+            {
+                var itemsByEmployee = Schedules
+                .Where(s => s.SchEmpls.Any(se => se.EmployeeId == employee.EmployeeId))
+                .ToList();
+
+                <tr>
+                    <td>
+                        <strong>@employee.FirstName @employee.LastName</strong>
+                        - @if (employee.Position.Equals("Tecnico"))
                         {
-                            <span class="text-muted">-</span>
-                        }
-                        else
-                        {
-                            @foreach (var sched in dayItems)
-                            {
-                                <div class="mb-2 p-1 border-bottom small">
-
-                                    <div class="fw-bold">
-                                        @sched.Project?.ProjectId - @sched.Project?.Title
-                                    </div>
-
-                                    <div>
-                                        @sched.Project?.Province
-                                    </div>
-
-                                    <div>
-                                        @sched.Project?.Type?.Name
-                                    </div>
-
-                                    <div>
-                                        Vehículo: @sched.Car
-                                    </div>
-
-                                </div>
-                            }
+                            <label>Tecnico</label>
                         }
                     </td>
 
+                    @foreach (var day in weekDays)
+                    {
+                        var dayItems = itemsByEmployee
+                        .Where(s => s.Start.Date <= day.Date && s.End.Date >= day.Date)
+                        .ToList();
 
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+                        <td class="align-top">
+                            @if (dayItems.Count == 0)
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                            else
+                            {
+                                @foreach (var sched in dayItems)
+                                {
+                                    <div class="mb-2 p-2 border rounded shadow-sm small"
+                                         style="background-color: @(sched.Color ?? "#ffffff")">
+
+                                        <!-- Título del proyecto -->
+                                        <div class="fw-bold mb-1">
+                                            @sched.Project?.ProjectId - @sched.Project?.Title
+                                        </div>
+
+                                        <!-- Badges -->
+                                        <div class="d-flex flex-column gap-1">
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                @sched.Project?.Province
+                                            </Badge>
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                @sched.Project?.Type?.Name
+                                            </Badge>
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                Vehículo: @sched.Car
+                                            </Badge>
+
+                                        </div>
+
+                                    </div>
+
+                                }
+                            }
+                        </td>
+
+
+
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+
 
 @code {
     [Parameter]
@@ -148,5 +165,24 @@
         // Invocar una función JavaScript para iniciar la descarga del PDF
         await JS.InvokeVoidAsync("downloadpdf", pdfBase64, $"Calendario_{DateTime.Now:yyyyMMdd_HHmm}.jpg");
     }*/
+
+
+    private async Task DownloadAsImage()
+    {
+        // Capturar la tabla como imagen Base64
+        string? base64Image = await JS.InvokeAsync<string>("captureElementAsImage", "weekTable");
+
+        if (string.IsNullOrEmpty(base64Image))
+            return;
+
+        // Usar tu método de descarga
+        await JS.InvokeVoidAsync(
+            "downloadImage",
+            base64Image,
+            $"Calendario_{DateTime.Now:yyyyMMdd_HHmm}.png",
+            "image/png"
+        );
+    }
+
 
 }
