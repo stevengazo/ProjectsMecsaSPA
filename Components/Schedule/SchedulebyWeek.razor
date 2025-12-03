@@ -58,7 +58,7 @@
                             {
                                 @foreach (var sched in dayItems)
                                 {
-                                    <div class="mb-2 p-2 border rounded shadow-sm small"
+                                    <div class="mb-2 p-2 border rounded shadow-sm fs-5"
                                          style="background-color: @(sched.Color ?? "#ffffff")">
 
                                         <!-- Título del proyecto -->
@@ -67,7 +67,7 @@
                                         </div>
 
                                         <!-- Badges -->
-                                        <div class="d-flex flex-column gap-1">
+                                        <div class="d-flex text-md flex-column gap-1">
 
                                             <Badge Color="BadgeColor.Secondary">
                                                 @sched.Project?.Province
