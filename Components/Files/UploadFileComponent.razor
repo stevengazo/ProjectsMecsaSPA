@@ -3,40 +3,39 @@
 @inject FileStorageService FileStorageService
 
 
+<div class="my-2 p-2">
+    <div class="d-flex justify-content-between align-items-center">
 
-<div class=" my-2 p-2 align-middle  ">
-    <!-- Sección de carga de archivos -->
-    <div class="d-flex flex-row justify-content-between ">
-        <div class="d-flex flex-row gap-2 align-middle justify-content-center">
-            <div class=" bg-info h-100 h-100 p-2 rounded rounded-1 " >
-                <Icon Name="IconName.Upload" class="text-white"></Icon>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="bg-info p-2 rounded">
+                <Icon Name="IconName.Upload" class="text-white" />
             </div>
-            <!-- Encabezado del componente -->
-            <h4 class="text-start h-100 align-content-center">Cargar Nuevo Archivo</h4>
+            <h4 class="mb-0">Cargar Nuevo Archivo</h4>
         </div>
 
-        <div class="d-flex flex-row gap-2 w-50">
-            <InputFile OnChange="LoadFile" class="form-control w-100 " />
-            <!-- Botón de carga de archivos -->
-            <button @onclick="AddFile" class="btn btn-outline-info" disabled="@(!canUpload || isLoading)">
+        <div class="d-flex gap-2 w-50">
+            <InputFile OnChange="LoadFile" class="form-control" />
+
+            <button class="btn btn-outline-info"
+                    @onclick="AddFile"
+                    disabled="@(!canUpload || isLoading)">
                 @if (isLoading)
                 {
-                    <!-- Indicador de carga -->
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="spinner-border spinner-border-sm me-1" />
                     <span>Loading...</span>
                 }
                 else
                 {
-                    <!-- Texto del botón -->
                     <span>Subir</span>
                 }
             </button>
         </div>
-    </div>
-    <!-- Mensaje de estado de la carga -->
 
+    </div>
 </div>
-<label class="text-info p-1 text-end">@uploadMessage</label>
+
+<label class="text-info p-1 text-end d-block">@uploadMessage</label>
+
 
 @code {
     [Parameter]

@@ -18,7 +18,7 @@
 
 <div class="container">
     <div class="row">
-        <!-- Detalles del Proyecto -->
+        <!-- Detalles del Proyecto -->  
         <div class=" shadow p-1 border rounded ">
             <AuthorizeView>
                 <Authorized>
@@ -63,6 +63,7 @@
                             {
                                 <UploadFileComponent id="project.ProjectId" />
                             }
+                            <hr/>
                             <FileManagementComponent id="project.ProjectId" />
                         </Authorized>
                     </AuthorizeView>
@@ -79,15 +80,20 @@
                                 {
                                     <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
                                 }
-                                <div class="d-flex flex-column overflow">
+                                <hr/>
+                                <div class="d-flex flex-column gap-2 overflow-auto">
                                     @foreach (var i in project.Commentaries)
                                     {
-                                        <div class="mx-2 my-1 p-2 border rounded">
-                                            <label>@i.CreationDate.ToLongDateString() - @i.Author</label>
-                                            <p>@i.CommentaryText</p>
+                                        <div class="mx-2 p-2 border rounded bg-light">
+                                            <div class="small text-muted mb-1">
+                                                @i.CreationDate.ToLongDateString() · @i.Author
+                                            </div>
+                                            <p class="mb-0 fst-italic">@i.CommentaryText</p>
                                         </div>
                                     }
                                 </div>
+
+
                             </div>
                         </Authorized>
                     </AuthorizeView>
@@ -98,9 +104,7 @@
                 <Content>
                     <AuthorizeView>
                         <Authorized>
-
                             <ScheduleByProject ProjectId="_id" />
-
                         </Authorized>
                     </AuthorizeView>
                 </Content>
@@ -108,9 +112,6 @@
         </Tabs>
     </div>
 </div>
-
-
-
 
 @code {
     [Parameter]
@@ -131,16 +132,15 @@
         if (d)
         {
             project = db.Projects
-            .AsNoTracking()
-
-            .Include(e => e.State)
-            .Include(e => e.Type)
-            .Include(e => e.Company)
-            .Include(e => e.Customer)
-            .Include(e => e.Commentaries)
-            .Include(e => e.Seller)
-            .Include(e => e.Bills)
-            .FirstOrDefault(i => i.ProjectId == _id);
+                            .AsNoTracking()
+                            .Include(e => e.State)
+                            .Include(e => e.Type)
+                            .Include(e => e.Company)
+                            .Include(e => e.Customer)
+                            .Include(e => e.Commentaries)
+                            .Include(e => e.Seller)
+                            .Include(e => e.Bills)
+                            .FirstOrDefault(i => i.ProjectId == _id);
             project.Commentaries = project.Commentaries.OrderByDescending(i => i.CommentaryID).ToList();
 
             Bills = db.Bill
