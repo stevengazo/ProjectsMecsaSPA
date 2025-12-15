@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class ProjectsInitialDb : Migration
+    public partial class InitialProMig : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -225,6 +225,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     LastEditor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastEditionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BillDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

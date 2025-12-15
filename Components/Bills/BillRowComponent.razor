@@ -1,11 +1,10 @@
 ﻿@using System.Globalization
-@using ProjectsMecsaSPA.Components.Shared
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject Bitrix24ClientService Bitrix24Client
 
 
-<ProjectsMecsaSPA.Components.Shared.DeleteReasonDialog @ref="deleteDialog" />
+<DeleteReasonDialog @ref="deleteDialog" />
 <ConfirmDialog @ref="dialog" />
 @if (IsEditing)
 {

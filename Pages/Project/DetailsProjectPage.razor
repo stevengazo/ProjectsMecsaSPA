@@ -28,20 +28,7 @@
 		</div>
 	</div>
 	<div class="row mt-3 shadow p-1 mb-3 border rounded ">
-		<Tabs EnableFadeEffect="true">
-			<Tab Title="Archivos" Active="true">
-				<Content>
-					<AuthorizeView>
-						<Authorized>
-							@if (!project.IsDeleted)
-							{
-								<UploadFileComponent id="project.ProjectId" />
-							}
-							<FileManagementComponent id="project.ProjectId" />
-						</Authorized>
-					</AuthorizeView>
-				</Content>
-			</Tab>
+		<Tabs EnableFadeEffect="true" Active="true">
 			<Tab Title="Facturas">
 				<Content>
 					<div class="p-1 d-flex flex-column">
@@ -57,11 +44,25 @@
 						<AuthorizeView>
 							<Authorized>
 								<div>
-									<BillTableComponent Bills="Bills.Where(e=> !e.IsDeleted).ToList()" />
+									<BillTableComponent Bills="Bills.Where(e => !e.IsDeleted).ToList()" />
 								</div>
 							</Authorized>
 						</AuthorizeView>
 					</div>
+				</Content>
+			</Tab>
+
+			<Tab Title="Archivos" >
+				<Content>
+					<AuthorizeView>
+						<Authorized>
+							@if (!project.IsDeleted)
+							{
+								<UploadFileComponent id="project.ProjectId" />
+							}
+							<FileManagementComponent id="project.ProjectId" />
+						</Authorized>
+					</AuthorizeView>
 				</Content>
 			</Tab>
 			<Tab Title="Comentarios">
@@ -101,6 +102,8 @@
 					</AuthorizeView>
 				</Content>
 			</Tab>
+
+
 		</Tabs>
 	</div>
 </div>

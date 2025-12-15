@@ -56,6 +56,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<string>("DeletedReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("LastEditionDate")
                         .HasColumnType("datetime2");
 

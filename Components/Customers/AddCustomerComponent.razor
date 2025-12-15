@@ -5,36 +5,57 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mb-3">
-        <label for="name">
-            Nombre
-        </label>
-        <InputText id="name" @bind-Value="customer.Name" class="form-control" />
-        <ValidationMessage For="@(() => customer.Name)" />
+    <!-- ===================================== -->
+    <!-- INFORMACIÓN DEL CLIENTE -->
+    <!-- ===================================== -->
+    <h5 class="text-center fw-bold mb-4">Información del Cliente</h5>
+
+    <div class="p-2">
+        <div class="form-group mb-3">
+            <div class="form-floating">
+                <InputText id="Name"
+                           class="form-control shadow-sm"
+                           @bind-Value="customer.Name" />
+                <label for="Name">Nombre</label>
+            </div>
+            <ValidationMessage For="@(() => customer.Name)" class="text-danger small" />
+        </div>
+
+        <div class="form-group mb-3">
+            <div class="form-floating">
+                <InputNumber id="DNI"
+                             class="form-control shadow-sm"
+                             @bind-Value="customer.DNI" />
+                <label for="DNI">Cédula</label>
+            </div>
+            <ValidationMessage For="@(() => customer.DNI)" class="text-danger small" />
+        </div>
+
+        <div class="form-group mb-4">
+            <div class="form-floating">
+                <InputSelect id="Type"
+                             class="form-select shadow-sm"
+                             @bind-Value="customer.Type">
+                    <option value="">Seleccione</option>
+                    <option value="Publico">Público</option>
+                    <option value="Privado">Privado</option>
+                </InputSelect>
+                <label for="Type">Tipo de Cliente</label>
+            </div>
+            <ValidationMessage For="@(() => customer.Type)" class="text-danger small" />
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label for="dni">
-            Cédula
-        </label>
-        <InputNumber id="dni" @bind-Value="customer.DNI" class="form-control" />
-        <ValidationMessage For="@(() => customer.DNI)" />
+    <!-- ===================================== -->
+    <!-- ACCIONES -->
+    <!-- ===================================== -->
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-outline-success px-5">
+            Agregar Cliente
+        </button>
     </div>
-
-    <div class="mb-3">
-        <label for="type">
-            Tipo de Cliente
-        </label>
-        <InputSelect id="type" @bind-Value="customer.Type" class="form-select">
-            <option value="">Seleccione un tipo</option>
-            <option value="Publico">Público</option>
-            <option value="Privado">Privado</option>
-        </InputSelect>
-        <ValidationMessage For="@(() => customer.Type)" />
-    </div>
-
-    <button type="submit" class="btn btn-outline-success">Agregar</button>
 </EditForm>
+
 
 @code {
     [Parameter]
