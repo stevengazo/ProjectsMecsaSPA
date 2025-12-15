@@ -1,47 +1,82 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <EditForm Model="employee" OnSubmit="HandleOnsummit">
-    <div class="card shadow-sm p-4">
-        <h4 class="mb-3 text-primary">Nuevo Empleado</h4>
+    <div class="card shadow-sm border-0">
 
-        <div class="row g-3">
+        <!-- Header -->
+        <div class="card-header bg-white border-0 pb-0">
+            <h5 class="fw-semibold text-primary mb-0">
+                Nuevo Empleado
+            </h5>
+            <small class="text-muted">
+                Complete la información básica del colaborador
+            </small>
+        </div>
 
-            <!-- Nombre -->
-            <div class="col-md-6">
-                <label class="form-label" for="FirstName">Nombre:</label>
-                <InputText id="FirstName" class="form-control" @bind-Value="employee.FirstName" />
-            </div>
+        <!-- Body -->
+        <div class="card-body pt-4">
+            <div class="row g-4">
 
-            <!-- Apellido -->
-            <div class="col-md-6">
-                <label class="form-label" for="LastName">Apellido:</label>
-                <InputText id="LastName" class="form-control" @bind-Value="employee.LastName" />
-            </div>
+                <!-- Nombre -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="FirstName"
+                                   class="form-control"
+                                   placeholder="Nombre"
+                                   @bind-Value="employee.FirstName" />
+                        <label for="FirstName">Nombre</label>
+                    </div>
+                </div>
 
-            <!-- Posición -->
-            <div class="col-md-6">
-                <label class="form-label" for="Position">Posición:</label>
-                <InputSelect id="Position" class="form-select" @bind-Value="employee.Position">
-                    <option value="">Seleccione una posición</option>
-                    <option value="Tecnico">Técnico</option>
-                    <option value="Operativo">Operativo</option>
-                </InputSelect>
-            </div>
+                <!-- Apellido -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="LastName"
+                                   class="form-control"
+                                   placeholder="Apellido"
+                                   @bind-Value="employee.LastName" />
+                        <label for="LastName">Apellido</label>
+                    </div>
+                </div>
 
-            <!-- Teléfono -->
-            <div class="col-md-6">
-                <label class="form-label" for="PhoneNumber">Número:</label>
-                <InputText id="PhoneNumber" class="form-control" @bind-Value="employee.PhoneNumber" />
+                <!-- Posición -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect id="Position"
+                                     class="form-select"
+                                     @bind-Value="employee.Position">
+                            <option value="" selected disabled></option>
+                            <option value="Tecnico">Técnico</option>
+                            <option value="Operativo">Operativo</option>
+                        </InputSelect>
+                        <label for="Position">Posición</label>
+                    </div>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="PhoneNumber"
+                                   class="form-control"
+                                   placeholder="Teléfono"
+                                   @bind-Value="employee.PhoneNumber" />
+                        <label for="PhoneNumber">Teléfono</label>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <div class="mt-4 text-end">
+        <!-- Footer -->
+        <div class="card-footer bg-white border-0 text-end">
             <button type="submit" class="btn btn-primary px-4">
-                Guardar
+                Guardar Empleado
             </button>
         </div>
+
     </div>
 </EditForm>
+
 
 @code {
     Employee employee = new();

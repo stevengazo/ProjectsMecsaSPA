@@ -48,7 +48,7 @@
         </td>
         <td>
             <button class="btn btn-sm btn-danger" @onclick="()=>IsEditing=false">
-                Cancelar
+                <Icon Name="IconName.XCircle" Size="IconSize.x2"  />
             </button>
         </td>
     </tr>
@@ -86,21 +86,24 @@ else
                     </Tooltip>
                 </Authorized>
             </AuthorizeView>
-        </td>
-        <td>
+   
             <AuthorizeView Roles="administrador,ingeniero,contabilidad">
                 <Authorized>
                     @if (ProjectObj.IsDeleted)
                     {
+                         <Tooltip Class="d-inline-block" Title="Activar" role="button">
                         <button class="btn btn-sm btn-outline-success mx-1" @onclick="Enable">
                             <Icon Name="IconName.CheckCircle"></Icon>
                         </button>
+                        </Tooltip>
                     }
                     else
                     {
+                         <Tooltip Class="d-inline-block" Title="Eliminar" role="button">
                         <button class="btn btn-sm btn-outline-danger mx-1" @onclick="ShowConfirmationAsync">
                             <Icon Name="IconName.XCircle"></Icon>
                         </button>
+                        </Tooltip>
                     }
                 </Authorized>
             </AuthorizeView>

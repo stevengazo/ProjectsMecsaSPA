@@ -1,27 +1,70 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <EditForm Model="newDevice" OnValidSubmit="HandleValidSubmit">
-    <div class="mb-3">
-        <label for="deviceName" class="form-label">Nombre</label>
-        <InputText id="deviceName" class="form-control" @bind-Value="newDevice.DeviceName" />
+    <div class="card shadow-sm border-0">
+
+        <!-- Header -->
+        <div class="card-header bg-white border-0 pb-0">
+            <h5 class="fw-semibold text-primary mb-0">
+                Nuevo Dispositivo
+            </h5>
+            <small class="text-muted">
+                Registre la información básica del equipo
+            </small>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body pt-4">
+            <div class="row g-4">
+
+                <!-- Nombre -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="DeviceName"
+                                   class="form-control"
+                                   placeholder="Nombre del dispositivo"
+                                   @bind-Value="newDevice.DeviceName" />
+                        <label for="DeviceName">Nombre</label>
+                    </div>
+                </div>
+
+                <!-- Tipo -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect id="DeviceType"
+                                     class="form-select"
+                                     @bind-Value="newDevice.DeviceType">
+                            <option value="" selected disabled></option>
+                            <option value="Medicion">Equipo de Medición</option>
+                        </InputSelect>
+                        <label for="DeviceType">Tipo</label>
+                    </div>
+                </div>
+
+                <!-- Serie -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="SerialNumber"
+                                   class="form-control"
+                                   placeholder="Número de serie"
+                                   @bind-Value="newDevice.SerialNumber" />
+                        <label for="SerialNumber">Serie</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer bg-white border-0 text-end">
+            <button type="submit" class="btn btn-primary px-4">
+                Agregar Dispositivo
+            </button>
+        </div>
+
     </div>
-    <div class="mb-3">
-        <label for="deviceName" class="form-label">Tipo</label>
-
-        <InputSelect id="deviceName" class="form-control" @bind-Value="newDevice.DeviceType">
-            <option value="">Seleccione</option>
-            <option value="Medicion">Equipo Medición</option>
-        </InputSelect>
-    </div>
-    <div class="mb-3">
-        <label for="deviceName" class="form-label">Serie</label>
-        <InputText id="deviceName" class="form-control" @bind-Value="newDevice.SerialNumber" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Add Device</button>
-
-
 </EditForm>
+
 @code {
 
     private Device newDevice = new Device();

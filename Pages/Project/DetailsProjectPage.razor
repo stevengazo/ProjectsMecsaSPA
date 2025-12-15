@@ -8,192 +8,193 @@
 <h3 class="text-center">Detalles del Proyecto</h3>
 @if (project.IsDeleted)
 {
-	<h3 class="text-danger">
-		Este proyecto fue marcado como inactivo
-	</h3>
-	<p class="text-danger">
-		Este proyecto no aparecerá en la zona Kanban de planificación. Además no podrá ingresar nueva información
-	</p>
+    <h3 class="text-danger">
+        Este proyecto fue marcado como inactivo
+    </h3>
+    <p class="text-danger">
+        Este proyecto no aparecerá en la zona Kanban de planificación. Además no podrá ingresar nueva información
+    </p>
 }
 
 <div class="container">
-	<div class="row">
-		<!-- Detalles del Proyecto -->
-		<div class=" shadow p-1 border rounded ">
-			<AuthorizeView>
-				<Authorized>
-					<DetailsProjectTableComponent project="project" />
-				</Authorized>
-			</AuthorizeView>
-		</div>
-	</div>
-	<div class="row mt-3 shadow p-1 mb-3 border rounded ">
-		<Tabs EnableFadeEffect="true" Active="true">
-			<Tab Title="Facturas">
-				<Content>
-					<div class="p-1 d-flex flex-column">
-						<AuthorizeView Roles="administrador,contabilidad">
-							<Authorized>
-								<div class="">
-									<button @onclick="ShowAddBill" class="btn btn-outline-success">
-										Agregar Factura
-									</button>
-								</div>
-							</Authorized>
-						</AuthorizeView>
-						<AuthorizeView>
-							<Authorized>
-								<div>
-									<BillTableComponent Bills="Bills.Where(e => !e.IsDeleted).ToList()" />
-								</div>
-							</Authorized>
-						</AuthorizeView>
-					</div>
-				</Content>
-			</Tab>
+    <div class="row">
+        <!-- Detalles del Proyecto -->
+        <div class=" shadow p-1 border rounded ">
+            <AuthorizeView>
+                <Authorized>
+                    <DetailsProjectTableComponent project="project" />
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </div>
+    <div class="row mt-3 shadow p-1 mb-3 border rounded ">
+        <Tabs EnableFadeEffect="true" Active="true">
+            <!-- FACTURAS -->
+            <Tab Title="Facturas">
+                <Content>
+                    <div class="p-1 d-flex flex-column">
+                        <AuthorizeView Roles="administrador,contabilidad">
+                            <Authorized>
+                                <div class="">
+                                    <Tooltip Class="d-inline-block" Title="Agregar Nueva Factura" role="button">
+                                        <button @onclick="ShowAddBill" class="btn btn-outline-success">
+                                            <Icon Name="IconName.DatabaseAdd"></Icon> Factura
+                                        </button>
+                                    </Tooltip>
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+                        <AuthorizeView>
+                            <Authorized>
+                                <div>
+                                    <BillTableComponent Bills="Bills.Where(e => !e.IsDeleted).ToList()" />
+                                </div>
+                            </Authorized>
+                        </AuthorizeView>
+                    </div>
+                </Content>
+            </Tab>
+            <!-- Detalles del Archivos -->
+            <Tab Title="Archivos">
+                <Content>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (!project.IsDeleted)
+                            {
+                                <UploadFileComponent id="project.ProjectId" />
+                            }
+                            <FileManagementComponent id="project.ProjectId" />
+                        </Authorized>
+                    </AuthorizeView>
+                </Content>
+            </Tab>
+            <!-- Detalles del comentarios -->
+            <Tab Title="Comentarios">
+                <Content>
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="overflow-auto">
+                                <h5>Comentarios</h5>
+                                @if (!project.IsDeleted)
+                                {
+                                    <CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
+                                }
+                                <div class="d-flex flex-column overflow">
+                                    @foreach (var i in project.Commentaries)
+                                    {
+                                        <div class="mx-2 my-1 p-2 border rounded">
+                                            <label>@i.CreationDate.ToLongDateString() - @i.Author</label>
+                                            <p>@i.CommentaryText</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
+                </Content>
+            </Tab>
+            <!-- Detalles del Cronograma -->
+            <Tab Title="Cronograma">
+                <Content>
+                    <AuthorizeView>
+                        <Authorized>
 
-			<Tab Title="Archivos" >
-				<Content>
-					<AuthorizeView>
-						<Authorized>
-							@if (!project.IsDeleted)
-							{
-								<UploadFileComponent id="project.ProjectId" />
-							}
-							<FileManagementComponent id="project.ProjectId" />
-						</Authorized>
-					</AuthorizeView>
-				</Content>
-			</Tab>
-			<Tab Title="Comentarios">
-				<Content>
-					<AuthorizeView>
-						<Authorized>
-							<div class="overflow-auto">
-								<h5>Comentarios</h5>
-								@if (!project.IsDeleted)
-								{
-									<CommentaryAddComponent ProjectId="project.ProjectId" OnAdded="UpdateCommentaries" />
-								}
-								<div class="d-flex flex-column overflow">
-									@foreach (var i in project.Commentaries)
-									{
-										<div class="mx-2 my-1 p-2 border rounded">
-											<label>@i.CreationDate.ToLongDateString() - @i.Author</label>
-											<p>@i.CommentaryText</p>
-										</div>
-									}
-								</div>
-							</div>
-						</Authorized>
-					</AuthorizeView>
-				</Content>
-			</Tab>
-
-
-			<Tab Title="Cronograma">
-				<Content>
-					<AuthorizeView>
-						<Authorized>
-							
                             <ScheduleByProject ProjectId="_id" />
 
-						</Authorized>
-					</AuthorizeView>
-				</Content>
-			</Tab>
-
-
-		</Tabs>
-	</div>
+                        </Authorized>
+                    </AuthorizeView>
+                </Content>
+            </Tab>
+        </Tabs>
+    </div>
 </div>
 
 
 
 
 @code {
-	[Parameter]
-	public string id { get; set; }
+    [Parameter]
+    public string id { get; set; }
 
-	public Project project = new();
+    public Project project = new();
 
-	public List<Bill> Bills = new();
+    public List<Bill> Bills = new();
 
-	public int _id;
+    public int _id;
 
-	private Offcanvas offcanvas = default!;
+    private Offcanvas offcanvas = default!;
 
-	protected override async Task OnInitializedAsync()
-	{
-		base.OnInitializedAsync();
-		var d = int.TryParse(id, out _id);
-		if (d)
-		{
-			project = db.Projects
-			.AsNoTracking()
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        var d = int.TryParse(id, out _id);
+        if (d)
+        {
+            project = db.Projects
+            .AsNoTracking()
 
-			.Include(e => e.State)
-			.Include(e => e.Type)
-			.Include(e => e.Company)
-			.Include(e => e.Customer)
-			.Include(e => e.Commentaries)
-			.Include(e => e.Seller)
-			.Include(e => e.Bills)
-			.FirstOrDefault(i => i.ProjectId == _id);
-			project.Commentaries = project.Commentaries.OrderByDescending(i => i.CommentaryID).ToList();
+            .Include(e => e.State)
+            .Include(e => e.Type)
+            .Include(e => e.Company)
+            .Include(e => e.Customer)
+            .Include(e => e.Commentaries)
+            .Include(e => e.Seller)
+            .Include(e => e.Bills)
+            .FirstOrDefault(i => i.ProjectId == _id);
+            project.Commentaries = project.Commentaries.OrderByDescending(i => i.CommentaryID).ToList();
 
-			Bills = db.Bill
-			.Include(e => e.BillFiles)
-							.AsNoTracking()
-							.Where(i => i.ProjectId == project.ProjectId)
-							.ToList();
+            Bills = db.Bill
+            .Include(e => e.BillFiles)
+                            .AsNoTracking()
+                            .Where(i => i.ProjectId == project.ProjectId)
+                            .ToList();
 
-		}
-	}
+        }
+    }
 
-	public async Task UpdateCommentaries()
-	{
-		project.Commentaries = db.Comments.AsNoTracking().Where(i => i.ProjectId == project.ProjectId).ToList();
-	}
+    public async Task UpdateCommentaries()
+    {
+        project.Commentaries = db.Comments.AsNoTracking().Where(i => i.ProjectId == project.ProjectId).ToList();
+    }
 
-	public async Task UpdateBills()
-	{
-		Bills = db.Bill
-				.Include(e => e.BillFiles)
-				.AsNoTracking()
-				.Where(i => i.ProjectId == project.ProjectId)
-				.ToList();
-	}
-	public async Task ShowAddBill()
-	{
+    public async Task UpdateBills()
+    {
+        Bills = db.Bill
+                .Include(e => e.BillFiles)
+                .AsNoTracking()
+                .Where(i => i.ProjectId == project.ProjectId)
+                .ToList();
+    }
+    public async Task ShowAddBill()
+    {
 
-		var parameters = new Dictionary<string, object>
-		{
+        var parameters = new Dictionary<string, object>
+        {
 
-			{ nameof(AddBillComponent.OnAdded), EventCallback.Factory.Create(this, RefreshBills) },
-			{ "ProjectId", project.ProjectId },
-			{ "FolderId", project.FolderIDB24},
-			{ "CurrencyType", project.CurrencyType }
-		};
+            { nameof(AddBillComponent.OnAdded), EventCallback.Factory.Create(this, RefreshBills) },
+            { "ProjectId", project.ProjectId },
+            { "FolderId", project.FolderIDB24},
+            { "CurrencyType", project.CurrencyType }
+        };
 
-		// Mostrar el componente AddProject dentro del Offcanvas
-		// El primer parámetro es el título del Offcanvas
-		// El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
-		await offcanvas.ShowAsync<AddBillComponent>("Agregar Información de Factura", parameters);
-	}
+        // Mostrar el componente AddProject dentro del Offcanvas
+        // El primer parámetro es el título del Offcanvas
+        // El segundo parámetro es el diccionario de parámetros que contiene el EventCallback
+        await offcanvas.ShowAsync<AddBillComponent>("Agregar Información de Factura", parameters);
+    }
 
-	public async Task RefreshBills()
-	{
-		await offcanvas.HideAsync();
-		StateHasChanged();
-		project.Bills.Clear();
-		project.Bills = db.Bill.AsNoTracking().Where(i => i.ProjectId == _id).ToList();
-		Bills = db.Bill
-				.Include(e => e.BillFiles)
-				.AsNoTracking()
-				.Where(i => i.ProjectId == project.ProjectId)
-				.ToList();
-		StateHasChanged();
+    public async Task RefreshBills()
+    {
+        await offcanvas.HideAsync();
+        StateHasChanged();
+        project.Bills.Clear();
+        project.Bills = db.Bill.AsNoTracking().Where(i => i.ProjectId == _id).ToList();
+        Bills = db.Bill
+                .Include(e => e.BillFiles)
+                .AsNoTracking()
+                .Where(i => i.ProjectId == project.ProjectId)
+                .ToList();
+        StateHasChanged();
 
-	}
+    }
 }

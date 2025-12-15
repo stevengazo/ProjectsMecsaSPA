@@ -7,13 +7,8 @@
     <strong>Monto Facturado: </strong> @Bills.Sum(e => e.Amount).ToString("N2")
 </h6>
 
-<div>
-    <h3>
-        TES
-    </h3>
-    <DeleteReasonDialog @ref="deleteDialog" />
 
-</div>
+<DeleteReasonDialog @ref="deleteDialog" />
 
 <table class="table table-hover">
     <thead>

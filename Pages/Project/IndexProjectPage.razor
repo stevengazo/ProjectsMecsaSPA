@@ -9,7 +9,11 @@
     <h3>Proyectos</h3>
     <AuthorizeView Roles="administrador,ingeniero">
         <Authorized>
-            <button class="btn btn-outline-success" @onclick="ShowEmployeeComponent">Crear Proyecto</button>
+            <Tooltip Class="d-inline-block" Title="Agregar un nuevo proyecto" role="button">
+                <button class="btn btn-sm btn-outline-success" @onclick="ShowEmployeeComponent">
+                    <Icon Name="IconName.DatabaseFillAdd" />Proyecto
+                </button>
+            </Tooltip>
         </Authorized>
     </AuthorizeView>
 

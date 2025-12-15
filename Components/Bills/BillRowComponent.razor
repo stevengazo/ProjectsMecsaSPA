@@ -10,7 +10,7 @@
     <tr>
         <td>
             <EditForm Model="item">
-                <InputText @bind-Value="item.BillNumber" class="form-control form-control-sm" ></InputText>
+                <InputText @bind-Value="item.BillNumber" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
@@ -34,7 +34,7 @@
             </EditForm>
         </td>
         <td>
-            <button class="btn btn-outline-danger btn-sm" @onclick="()=>IsEditing=false">
+            <button class="btn btn-outline-danger btn-sm" @onclick="() => IsEditing = false">
                 Cancelar
             </button>
             <button class="btn btn-outline-success  btn-sm" @onclick="Update">
@@ -63,20 +63,29 @@ else
             @item.Note
         </td>
         <td>
-            <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
-                Archivos
-            </button>
+
+            <Tooltip Class="" Title="Mostrar Archivos" Placement="TooltipPlacement.Top">
+                <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
+                    <Icon Name="IconName.Files"></Icon>
+                </button>
+            </Tooltip>
+       
+
             <AuthorizeView Roles="administrador,ingeniero,contabilidad">
                 <Authorized>
-                    <button class="btn btn-outline-success" @onclick="()=>IsEditing=true">
-                        Editar
-                    </button>
-                    <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
-                        Borrar
-                    </button>
+                    <Tooltip Class="" Title="Editar Factura" Placement="TooltipPlacement.Top">
+                        <button class="btn btn-outline-success" @onclick="() => IsEditing = true">
+                            <Icon Name="IconName.Pencil"></Icon>
+                        </button>
+                    </Tooltip>
+
+                    <Tooltip Class="" Title="Eliminar Factura" Placement="TooltipPlacement.Top">
+                        <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
+                            <Icon Name="IconName.Trash"></Icon>
+                        </button>
+                    </Tooltip>
                 </Authorized>
             </AuthorizeView>
-           
         </td>
     </tr>
     <tr>

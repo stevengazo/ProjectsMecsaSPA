@@ -6,379 +6,411 @@
 
 <!-- Contenedor para los filtros de búsqueda -->
 <div class="row mb-3">
-	<div class="col-md-2 mb-2">
-		<input type="text" @bind="searchName" placeholder="Buscar por nombre" class="form-control" />
-	</div>
-	<div class="col-md-2 mb-2">
-		<input type="number" min="0" @bind="searchProjectId" placeholder="Buscar por número de proyecto" class="form-control" />
-	</div>
-	@if (ValidInputs.EnableDate)
-	{
-		<div class="col-md-2 mb-2 d-flex flex-column">
-			<div class="d-flex align-items-center mb-1">
-				<label class="form-label me-2">Inicio</label>
-				<input type="date" @bind="searchDateStart" class="form-control" />
-			</div>
-			<div class="d-flex align-items-center mb-1">
-				<label class="form-label me-2">Final</label>
-				<input type="date" @bind="searchDateEnd" class="form-control" />
-			</div>
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableDate = false" class="btn-link btn-sm btn-outline-danger align-self-end mt-1" />
-		</div>
-	}
+    <div class="col-md-2 mb-2">
+        <input type="text" @bind="searchName" placeholder="Buscar por nombre" class="form-control" />
+    </div>
+    <div class="col-md-2 mb-2">
+        <input type="number" min="0" @bind="searchProjectId" placeholder="Buscar por número de proyecto" class="form-control" />
+    </div>
+    @if (ValidInputs.EnableDate)
+    {
+        <div class="col-md-2 mb-2 d-flex flex-column">
+            <div class="d-flex align-items-center mb-1">
+                <label class="form-label me-2">Inicio</label>
+                <input type="date" @bind="searchDateStart" class="form-control" />
+            </div>
+            <div class="d-flex align-items-center mb-1">
+                <label class="form-label me-2">Final</label>
+                <input type="date" @bind="searchDateEnd" class="form-control" />
+            </div>
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableDate = false" class="btn btn-sm btn-outline-danger align-self-end mt-1" />
+        </div>
+    }
 
-	@if (ValidInputs.EnableState)
-	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<select @bind="searchStateId" class="form-control">
-				<option value="">Seleccionar estado</option>
-				@foreach (var state in StatesOfProjects)
-				{
-					<option value="@state.Key">@state.Value</option>
-				}
-			</select>
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
-		</div>
-	}
+    @if (ValidInputs.EnableState)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <select @bind="searchStateId" class="form-control">
+                <option value="">Seleccionar estado</option>
+                @foreach (var state in StatesOfProjects)
+                {
+                    <option value="@state.Key">@state.Value</option>
+                }
+            </select>
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
 
-	@if (ValidInputs.EnableType)
-	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<select @bind="searchTypeId" class="form-control">
-				<option value="">Seleccionar tipo</option>
-				@foreach (var type in TypesOfProjects)
-				{
-					<option value="@type.Key">@type.Value</option>
-				}
-			</select>
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
-		</div>
-	}
+    @if (ValidInputs.EnableType)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <select @bind="searchTypeId" class="form-control">
+                <option value="">Seleccionar tipo</option>
+                @foreach (var type in TypesOfProjects)
+                {
+                    <option value="@type.Key">@type.Value</option>
+                }
+            </select>
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
 
-	@if (ValidInputs.EnableSeller)
-	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<select @bind="searchSellerId" class="form-control">
-				<option value="">Seleccionar vendedor</option>
-				@foreach (var type in Sellers)
-				{
-					<option value="@type.Key">@type.Value</option>
-				}
-			</select>
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableSeller = false" class="btn-link btn-sm btn-outline-danger ms-2" />
-		</div>
-	}
+    @if (ValidInputs.EnableSeller)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <select @bind="searchSellerId" class="form-control">
+                <option value="">Seleccionar vendedor</option>
+                @foreach (var type in Sellers)
+                {
+                    <option value="@type.Key">@type.Value</option>
+                }
+            </select>
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableSeller = false" class="btn btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
 
-	@if (ValidInputs.EnableCompany)
-	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<select @bind="searchCompanyId" class="form-control">
-				<option value="">Seleccionar empresa</option>
-				@foreach (var type in Companies)
-				{
-					<option value="@type.CompanyId">@type.CompanyName</option>
-				}
-			</select>
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCompany = false" class="btn-link btn-sm btn-outline-danger ms-2" />
-		</div>
-	}
+    @if (ValidInputs.EnableCompany)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <select @bind="searchCompanyId" class="form-control">
+                <option value="">Seleccionar empresa</option>
+                @foreach (var type in Companies)
+                {
+                    <option value="@type.CompanyId">@type.CompanyName</option>
+                }
+            </select>
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCompany = false" class="btn btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
 
-	@if (ValidInputs.EnableTask)
-	{
-		<div class="col-md-2 mb-2 d-flex align-items-center">
-			<Tooltip Class="me-2" Title="Tarea" Placement="TooltipPlacement.Left" />
-			<input type="number" min="0" @bind="searchTask" class="form-control" />
-			<Icon Name="IconName.X" @onclick="() => ValidInputs.EnableTask = false" class="btn-link btn-sm btn-outline-danger ms-2" />
-		</div>
-	}
-
-
+    @if (ValidInputs.EnableTask)
+    {
+        <div class="col-md-2 mb-2 d-flex align-items-center">
+            <Tooltip Class="me-2" Title="Tarea" Placement="TooltipPlacement.Left" />
+            <input type="number" min="0" @bind="searchTask" class="form-control" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableTask = false" class="btn btn-sm btn-outline-danger ms-2" />
+        </div>
+    }
 
 
-	<div class="col mb-2 d-flex flex-row">
-		@if (!ValidInputs.EnableState)
-		{
-			<button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success me-2">
-				Estado <Icon Name="IconName.Check" />
-			</button>
-		}
+   <!---Opciones  -->
 
-		@if (!ValidInputs.EnableDate)
-		{
-			<button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-success me-2">
-				Fecha <Icon Name="IconName.Calendar2Date" />
-			</button>
-		}
+    <div class="col mb-2 d-flex flex-row">
+        @if (!ValidInputs.EnableState)
+        {
+            <Tooltip Title="Estado" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-outline-success me-2">
+                     <Icon Name="IconName.Check" />
+                </button>
+            </Tooltip>
+      
+        }
 
-		@if (!ValidInputs.EnableType)
-		{
-			<button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success me-2">
-				Tipo <Icon Name="IconName.Type" />
-			</button>
-		}
-		@if (!ValidInputs.EnableSeller)
-		{
-			<button @onclick="() => ValidInputs.EnableSeller = true" class="btn btn-sm btn-success me-2">
-				Vendedor <Icon Name="IconName.People" />
-			</button>
-		}
-		@if (!ValidInputs.EnableCompany)
-		{
-			<button @onclick="() => ValidInputs.EnableCompany = true" class="btn btn-sm btn-success me-2">
-				Compania <Icon Name="IconName.Building" />
-			</button>
-		}
-		@if (!ValidInputs.EnableTask)
-		{
-			<button @onclick="() => ValidInputs.EnableTask = true" class="btn btn-sm btn-success me-2">
-				Tarea <Icon Name="IconName.SortNumericUp" />
-			</button>
-		}
-	</div>
+        @if (!ValidInputs.EnableDate)
+        {
+            <Tooltip  Title="Fecha" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-outline-success me-2">
+                   <Icon Name="IconName.Calendar2Date" />
+                </button>
+            </Tooltip>
+
+        }
+
+        @if (!ValidInputs.EnableType)
+        {
+            <Tooltip Title="Tipo de Proyecto" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm  btn-outline-success me-2">
+                    <Icon Name="IconName.Type" />
+                </button>
+            </Tooltip>
+
+        }
+        @if (!ValidInputs.EnableSeller)
+        {
+            <Tooltip Title="Vendedor" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableSeller = true" class="btn btn-sm  btn-outline-success me-2">
+                    <Icon Name="IconName.People" />
+                </button>
+            </Tooltip>
+   
+        }
+        @if (!ValidInputs.EnableCompany)
+        {
+            <Tooltip Title="Compañia" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableCompany = true" class="btn btn-sm  btn-outline-success me-2">
+                    <Icon Name="IconName.Building" />
+                </button>
+            </Tooltip>
+
+        }
+        @if (!ValidInputs.EnableTask)
+        {
+            <Tooltip Title="Número de Tarea" Placement="TooltipPlacement.Top">
+                <button @onclick="() => ValidInputs.EnableTask = true" class="btn btn-sm  btn-outline-success me-2">
+                    <Icon Name="IconName.SortNumericUp" />
+                </button>
+            </Tooltip>
+        }
+    </div>
 </div>
 
-<div class="row mb-3">
-	<div class="col-md-2 d-flex align-items-end mb-2">
-		<button @onclick="ApplyFiltersAsync" class="btn btn-primary w-100">Buscar</button>
-	</div>
-	<div class="col-md-2 d-flex align-items-end mb-2">
-		<button @onclick="DownloadReportAsync" class="btn btn-outline-warning w-100">Descargar</button>
-	</div>
-	<div class="col-md-2 d-flex align-items-end mb-2">
-		<button @onclick="ClearFilters" class="btn btn-secondary w-100">Limpiar</button>
-	</div>
+<div class="row mb-3 g-2 align-items-end">
+    <div class="col-md-2 col-sm-4">
+        <button @onclick="ApplyFiltersAsync"
+                class="btn btn-outline-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-1">
+            <Icon Name="IconName.Search" />
+            <span>Buscar</span>
+        </button>
+    </div>
+
+    <div class="col-md-2 col-sm-4">
+        <button @onclick="DownloadReportAsync"
+                class="btn btn-outline-warning btn-sm w-100 d-flex align-items-center justify-content-center gap-1">
+            <Icon Name="IconName.Download" />
+            <span>Descargar</span>
+        </button>
+    </div>
+
+    <div class="col-md-2 col-sm-4">
+        <button @onclick="ClearFilters"
+                class="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center gap-1">
+            <Icon Name="IconName.Circle" />
+            <span>Limpiar</span>
+        </button>
+    </div>
 </div>
+
 
 <!-- Contenedor para la tabla de proyectos -->
 <div>
-	@if (Searching)
-	{
-		<div class="d-flex justify-content-center">
-			<Spinner Type="SpinnerType.Border" />
-		</div>
-	}
-	else
-	{
-		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th>N</th>
-					<th>Titulo</th>
-					<th>Cliente</th>
-					<th>Vendedor</th>
-					<th>Estado</th>
-					<th>OC</th>
-					<th>Compañia</th>
-					<th>Tipo</th>
-					<th>Creación</th>
-					<th>Monto</th>
-					<th>Acciones</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var project in projects)
-				{
-					<RowTableComponent ProjectObj="project" />
-				}
-			</tbody>
-		</table>
-	}
+    @if (Searching)
+    {
+        <div class="d-flex justify-content-center">
+            <Spinner Type="SpinnerType.Border" />
+        </div>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>N</th>
+                    <th>Titulo</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <th>Estado</th>
+                    <th>OC</th>
+                    <th>Compañia</th>
+                    <th>Tipo</th>
+                    <th>Creación</th>
+                    <th>Monto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var project in projects)
+                {
+                    <RowTableComponent ProjectObj="project" />
+                }
+            </tbody>
+        </table>
+    }
 </div>
 
 @code {
-	private bool Searching = false;
-	private List<Project> projects = new();
-	private string searchName = string.Empty;
-	private int searchProjectId;
-	private DateTime searchDateStart = DateTime.Today;
-	private DateTime searchDateEnd = DateTime.Today;
-	private int? searchStateId;
-	private int? searchTypeId;
-	private int? searchSellerId;
-	private int? searchCompanyId;
-	private int? searchTask;
+    private bool Searching = false;
+    private List<Project> projects = new();
+    private string searchName = string.Empty;
+    private int searchProjectId;
+    private DateTime searchDateStart = DateTime.Today;
+    private DateTime searchDateEnd = DateTime.Today;
+    private int? searchStateId;
+    private int? searchTypeId;
+    private int? searchSellerId;
+    private int? searchCompanyId;
+    private int? searchTask;
 
-	private Dictionary<int, string> TypesOfProjects = new();
-	private Dictionary<int, string> StatesOfProjects = new();
-	private List<Company> Companies = new();
+    private Dictionary<int, string> TypesOfProjects = new();
+    private Dictionary<int, string> StatesOfProjects = new();
+    private List<Company> Companies = new();
 
-	private SearchInputs ValidInputs = new();
-	private string? message;
-	List<ToastMessage> messages = new List<ToastMessage>();
+    private SearchInputs ValidInputs = new();
+    private string? message;
+    List<ToastMessage> messages = new List<ToastMessage>();
 
-	Dictionary<int, string> Sellers = new();
+    Dictionary<int, string> Sellers = new();
 
-	private async Task LoadSellers()
-	{
-		using (var d = DbContextFactory.CreateDbContext())
-		{
-			Sellers = d.Seller
-			.AsNoTracking()
-			.Where(e => e.IsActive)
-			.OrderBy(d => d.SellerName)
-			.ToDictionary(d => d.SellerId, d => d.SellerName);
-		}
-	}
+    private async Task LoadSellers()
+    {
+        using (var d = DbContextFactory.CreateDbContext())
+        {
+            Sellers = d.Seller
+            .AsNoTracking()
+            .Where(e => e.IsActive)
+            .OrderBy(d => d.SellerName)
+            .ToDictionary(d => d.SellerId, d => d.SellerName);
+        }
+    }
 
-	// Cargar los proyectos iniciales
-	protected override async Task OnInitializedAsync()
-	{
-		LoadSellers();
-		using (var d = DbContextFactory.CreateDbContext())
-		{
-			Companies = d.Company.AsNoTracking().ToList();
-			TypesOfProjects = d.Types
-				.AsNoTracking()
-				.ToDictionary(e => e.TypeId, e => e.Name);
-			StatesOfProjects = d.States
-				.AsNoTracking()
-				.ToDictionary(e => e.StateId, e => e.StateName);
-		}
-		//  await LoadProjectsAsync();
-	}
+    // Cargar los proyectos iniciales
+    protected override async Task OnInitializedAsync()
+    {
+        LoadSellers();
+        using (var d = DbContextFactory.CreateDbContext())
+        {
+            Companies = d.Company.AsNoTracking().ToList();
+            TypesOfProjects = d.Types
+                .AsNoTracking()
+                .ToDictionary(e => e.TypeId, e => e.Name);
+            StatesOfProjects = d.States
+                .AsNoTracking()
+                .ToDictionary(e => e.StateId, e => e.StateName);
+        }
+        //  await LoadProjectsAsync();
+    }
 
-	// Aplica los filtros y recarga los proyectos
-	private async Task ApplyFiltersAsync()
-	{
-		await LoadProjectsAsync();
-	}
+    // Aplica los filtros y recarga los proyectos
+    private async Task ApplyFiltersAsync()
+    {
+        await LoadProjectsAsync();
+    }
 
-	// Limpia los filtros de búsqueda y recarga la lista de proyectos
-	private async Task ClearFilters()
-	{
-		searchName = string.Empty;
-		searchProjectId = 0;
-		searchDateStart = DateTime.Today;
-		searchDateEnd = DateTime.Today;
-		searchStateId = null;
-		searchTypeId = null;
-		searchSellerId = null;
+    // Limpia los filtros de búsqueda y recarga la lista de proyectos
+    private async Task ClearFilters()
+    {
+        searchName = string.Empty;
+        searchProjectId = 0;
+        searchDateStart = DateTime.Today;
+        searchDateEnd = DateTime.Today;
+        searchStateId = null;
+        searchTypeId = null;
+        searchSellerId = null;
 
-		ValidInputs.EnableDate = false;
-		ValidInputs.EnableState = false;
-		ValidInputs.EnableType = false;
-		ValidInputs.EnableSeller = false;
-		ValidInputs.EnableCompany = false;
-		ValidInputs.EnableTask = false;
+        ValidInputs.EnableDate = false;
+        ValidInputs.EnableState = false;
+        ValidInputs.EnableType = false;
+        ValidInputs.EnableSeller = false;
+        ValidInputs.EnableCompany = false;
+        ValidInputs.EnableTask = false;
 
-		projects.Clear();
-		StateHasChanged();
-	}
+        projects.Clear();
+        StateHasChanged();
+    }
 
-	// Carga los proyectos según los filtros aplicados
-	private async Task LoadProjectsAsync()
-	{
-		Searching = true;
-		bool canSearch = false;
-		using (var db = await DbContextFactory.CreateDbContextAsync())
-		{
-			var query = db.Projects.AsQueryable();
+    // Carga los proyectos según los filtros aplicados
+    private async Task LoadProjectsAsync()
+    {
+        Searching = true;
+        bool canSearch = false;
+        using (var db = await DbContextFactory.CreateDbContextAsync())
+        {
+            var query = db.Projects.AsQueryable();
 
-			if (!string.IsNullOrWhiteSpace(searchName))
-			{
-				query = query.Where(p => p.Title.Contains(searchName));
-				canSearch = true;
-			}
+            if (!string.IsNullOrWhiteSpace(searchName))
+            {
+                query = query.Where(p => p.Title.Contains(searchName));
+                canSearch = true;
+            }
 
-			if (searchProjectId > 0)
-			{
-				query = query.Where(p => p.ProjectId == searchProjectId);
-				canSearch = true;
-			}
+            if (searchProjectId > 0)
+            {
+                query = query.Where(p => p.ProjectId == searchProjectId);
+                canSearch = true;
+            }
 
-			if (searchDateStart != default && ValidInputs.EnableDate)
-			{
-				query = query.Where(p => p.CreationDate >= searchDateStart && p.CreationDate < searchDateEnd);
-				canSearch = true;
-			}
+            if (searchDateStart != default && ValidInputs.EnableDate)
+            {
+                query = query.Where(p => p.CreationDate >= searchDateStart && p.CreationDate < searchDateEnd);
+                canSearch = true;
+            }
 
-			if (searchStateId.HasValue && ValidInputs.EnableState)
-			{
-				query = query.Where(p => p.StateId == searchStateId);
-				canSearch = true;
-			}
+            if (searchStateId.HasValue && ValidInputs.EnableState)
+            {
+                query = query.Where(p => p.StateId == searchStateId);
+                canSearch = true;
+            }
 
-			if (searchTypeId.HasValue && ValidInputs.EnableType)
-			{
-				query = query.Where(p => p.TypeId == searchTypeId);
-				canSearch = true;
-			}
+            if (searchTypeId.HasValue && ValidInputs.EnableType)
+            {
+                query = query.Where(p => p.TypeId == searchTypeId);
+                canSearch = true;
+            }
 
-			if (searchSellerId.HasValue && ValidInputs.EnableSeller)
-			{
-				query = query.Where(p => p.SellerId == searchSellerId);
-				canSearch = true;
-			}
+            if (searchSellerId.HasValue && ValidInputs.EnableSeller)
+            {
+                query = query.Where(p => p.SellerId == searchSellerId);
+                canSearch = true;
+            }
 
-			if (searchCompanyId.HasValue && ValidInputs.EnableCompany)
-			{
-				query = query.Where(p => p.CompanyId == searchCompanyId);
-				canSearch = true;
-			}
-			if (searchTask.HasValue && ValidInputs.EnableTask)
-			{
-				query = query.Where(p => p.TaskNumber == searchTask.ToString());
-				canSearch = true;
-			}
+            if (searchCompanyId.HasValue && ValidInputs.EnableCompany)
+            {
+                query = query.Where(p => p.CompanyId == searchCompanyId);
+                canSearch = true;
+            }
+            if (searchTask.HasValue && ValidInputs.EnableTask)
+            {
+                query = query.Where(p => p.TaskNumber == searchTask.ToString());
+                canSearch = true;
+            }
 
-			if (canSearch)
-			{
-				projects = await query
-					.AsNoTracking()
-					.Include(p => p.State)
-					.Include(p => p.Customer)
-					.Include(p => p.Type)
-					   .Include(p => p.Company)
-					.OrderByDescending(p => p.ProjectId)
-					.ToListAsync();
+            if (canSearch)
+            {
+                projects = await query
+                    .AsNoTracking()
+                    .Include(p => p.State)
+                    .Include(p => p.Customer)
+                    .Include(p => p.Type)
+                       .Include(p => p.Company)
+                    .OrderByDescending(p => p.ProjectId)
+                    .ToListAsync();
 
-				if (projects.Count == 0)
-				{
-					messages.Add(new()
-						{
-							Message = "No hay resultados",
-							Type = ToastType.Danger
-						});
-				}
-			}
-			else
-			{
-				messages.Add(new()
-					{
-						Message = "No puede realizar la búsqueda. Aplique un filtro",
-						Type = ToastType.Warning
-					});
-			}
-		}
-		Searching = false;
-		await InvokeAsync(StateHasChanged);
-	}
+                if (projects.Count == 0)
+                {
+                    messages.Add(new()
+                    {
+                        Message = "No hay resultados",
+                        Type = ToastType.Danger
+                    });
+                }
+            }
+            else
+            {
+                messages.Add(new()
+                {
+                    Message = "No puede realizar la búsqueda. Aplique un filtro",
+                    Type = ToastType.Warning
+                });
+            }
+        }
+        Searching = false;
+        await InvokeAsync(StateHasChanged);
+    }
 
-	// Genera y descarga el reporte
-	private async Task DownloadReportAsync()
-	{
-		messages.Add(new()
-			{
-				Message = "Generando Documento",
-				Type = ToastType.Info
-			});
-		var data = await XmlsGenerate.GenerateFileProjects(projects);
-		var pdfBase64 = Convert.ToBase64String(data);
+    // Genera y descarga el reporte
+    private async Task DownloadReportAsync()
+    {
+        messages.Add(new()
+        {
+            Message = "Generando Documento",
+            Type = ToastType.Info
+        });
+        var data = await XmlsGenerate.GenerateFileProjects(projects);
+        var pdfBase64 = Convert.ToBase64String(data);
 
-		// Invocar una función JavaScript para iniciar la descarga del PDF
-		await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
-	}
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+    }
 
 
-	private class SearchInputs
-	{
-		public bool EnableTitle { get; set; }
-		public bool EnableProjectId { get; set; }
-		public bool EnableDate { get; set; }
-		public bool EnableState { get; set; }
-		public bool EnableType { get; set; }
-		public bool EnableSeller { get; set; }
-		public bool EnableCompany { get; set; }
-		public bool EnableTask { get; set; }
-	}
+    private class SearchInputs
+    {
+        public bool EnableTitle { get; set; }
+        public bool EnableProjectId { get; set; }
+        public bool EnableDate { get; set; }
+        public bool EnableState { get; set; }
+        public bool EnableType { get; set; }
+        public bool EnableSeller { get; set; }
+        public bool EnableCompany { get; set; }
+        public bool EnableTask { get; set; }
+    }
 }
