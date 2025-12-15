@@ -1,10 +1,9 @@
 ﻿@using System.Globalization
+@using ProjectsMecsaSPA.Components.Shared
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@inject Bitrix24ClientService Bitrix24Client
 
 
-<DeleteReasonDialog @ref="deleteDialog" />
 <ConfirmDialog @ref="dialog" />
 @if (IsEditing)
 {
@@ -136,8 +135,6 @@ else
 
     private ConfirmDialog dialog = default!;
 
-    private DeleteReasonDialog deleteDialog = default!;
-
     private bool IsEditing { get; set; }
 
     Collapse collapse1 = default!;
@@ -170,30 +167,9 @@ else
     }
     private async Task ShowConfirmationAsync()
     {
-        var reason = await deleteDialog.ShowAsync();
-
-        // Cancelado o vacío
-        if (string.IsNullOrWhiteSpace(reason))
-            return;
-
         try
         {
             item.IsDeleted = true;
-            item.DeletedReason = reason;
-
-     /*       var dbcontext = DbContextFactory.CreateDbContext();
-            dbcontext.Bill.Update(item);
-            await dbcontext.SaveChangesAsync();*/
-
-            await Bitrix24Client.SendTaskCommentAsync(
-                item.TaskNumber,
-                $"Se ha eliminado una factura desde el app de proyectos\n" +
-                $"Número de factura: {item.BillNumber}\n" +
-                $"Proyecto: {item.ProjectId}\n" +
-                $"Monto: {item.Amount}\n" +
-                $"Motivo: {reason}",
-                252);
-
             await OnDelete.InvokeAsync(item);
         }
         catch (Exception ex)

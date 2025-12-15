@@ -1,8 +1,19 @@
-﻿@inject ProjectsDBContext db
+﻿@using ProjectsMecsaSPA.Components.Shared
+@inject Bitrix24ClientService Bitrix24Client
 
-    <h6 class="text-end">
+@inject ProjectsDBContext db
+
+<h6 class="text-end">
     <strong>Monto Facturado: </strong> @Bills.Sum(e => e.Amount).ToString("N2")
-    </h6>
+</h6>
+
+<div>
+    <h3>
+        TES
+    </h3>
+    <DeleteReasonDialog @ref="deleteDialog" />
+
+</div>
 
 <table class="table table-hover">
     <thead>
@@ -19,24 +30,49 @@
     <tbody>
         @foreach (var item in Bills)
         {
-            <BillRowComponent item="item" OnDelete="()=> RemoveBill(item)" />
+            <BillRowComponent item="item" OnDelete="() => RemoveBill(item)" />
         }
     </tbody>
 </table>
+
+
 @code {
 
     [Parameter]
     public List<Bill> Bills { get; set; }
 
-    private void RemoveBill(Bill bill)
+    private DeleteReasonDialog deleteDialog = default!;
+
+    private async Task RemoveBill(Bill bill)
     {
-        var BillToDelete = Bills.Where(e => e.BillId == bill.BillId).FirstOrDefault();
-        if( BillToDelete != null) Bills.Remove(BillToDelete);
+        var reason = await deleteDialog.ShowAsync();
+
+        if (string.IsNullOrWhiteSpace(reason))
+            return;
+
+        bill.IsDeleted = true;
+        bill.DeletedReason = reason;
 
         db.Bill.Update(bill);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
+
+        Bills.Remove(bill);
         StateHasChanged();
+
+
+
+        await Bitrix24Client.SendTaskCommentAsync(
+             bill.TaskNumber,
+             $"Se ha eliminado una factura desde el app de proyectos\n" +
+             $"Número de factura: {bill.BillNumber}\n" +
+             $"Proyecto: {bill.ProjectId}\n" +
+             $"Monto: {bill.Amount}\n" +
+             $"Motivo: {reason}",
+             252);
+
+
     }
+
 
     protected override async Task OnInitializedAsync()
     {
