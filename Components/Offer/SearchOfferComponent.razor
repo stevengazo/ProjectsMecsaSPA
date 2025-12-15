@@ -4,15 +4,18 @@
 @inject IDbContextFactory<ProjectsDBContext> dbContextFactory
 @inject IJSRuntime JS
 
+<!-- HEADER -->
 <div class="d-flex justify-content-between W-100">
     <h3>Buscar Ofertas</h3>
-    <button class="btn btn-sm btn-outline-success" @onclick="ShowAddOfferComponent">Agregar Oferta <Icon Name="IconName.DatabaseAdd" /></button>
+    <Tooltip Class="d-inline-block" Title="Agregar Oferta" role="button">
+        <button class="btn btn-sm btn-outline-success" @onclick="ShowAddOfferComponent"><Icon Name="IconName.DatabaseAdd" /> Oferta</button>
+    </Tooltip>
 </div>
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
 <Offcanvas @ref="offcanvas" />
-
+<!-- Filter Inputs || Add-->
 <div class="row mb-3 d-flex  flex-row">
     <div class="col-md-2 mb-2 d-flex align-items-center">
         <div class=" form-floating">
@@ -35,9 +38,9 @@
         <div class="col-md-2 mb-2 d-flex align-items-center">
             <div class=" form-floating">
                 <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
-                <label for="creationDate" class="form-label">Fecha de Creación</label>  
+                <label for="creationDate" class="form-label">Fecha de Creación</label>
             </div>
-           <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableCreation = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCreation = false" class="btn-link btn-sm btn-outline-danger ms-2" />
         </div>
     }
 
@@ -54,7 +57,7 @@
                 </select>
                 <label for="type" class="form-label">Tipo de Oferta</label>
             </div>
-            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
         </div>
     }
 
@@ -71,9 +74,9 @@
                     <option value="Cobro">Cobro</option>
                 </select>
                 <label for="state" class="form-label">Estado</label>
-               
+
             </div>
-            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
         </div>
     }
     @if (ValidInputs.EnableResponsible)
@@ -81,8 +84,8 @@
         <div class="col-md-2 mb-2 d-flex align-items-center">
             <div class=" form-floating">
                 <select class="form-select" id="state" @bind="SearchCriteria.Seller">
-                  
-                    @foreach(var i in Sellers)
+
+                    @foreach (var i in Sellers)
                     {
                         <option value="@i">@i</option>
                     }
@@ -90,10 +93,10 @@
                 <label for="state" class="form-label">Responsable</label>
 
             </div>
-            <Icon Name="IconName.X" @onclick="()=>ValidInputs.EnableResponsible = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableResponsible = false" class="btn-link btn-sm btn-outline-danger ms-2" />
         </div>
     }
-
+    <!-- Add Filter Buttons -->
     <div class="col mb-2 d-flex flex-row gap-1">
         @if (!ValidInputs.EnableCreation)
         {
@@ -124,12 +127,14 @@
 
 </div>
 
+<!-- Primary Buttons -->
 <div class="d-flex gap-2 mb-3">
     <button class="btn btn-primary" @onclick="SearchOffers">Buscar</button>
     <button class="btn btn-secondary" @onclick="ClearFilters">Limpiar</button>
     <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
 </div>
 
+<!-- Loading Spinner -->
 @if (IsSearching)
 {
     <div class="d-flex justify-content-center">
@@ -175,24 +180,36 @@ else
 }
 
 @code {
-    private List<Offer> Offers { get; set; } = new List<Offer>();
-    private const int MaxResults = 1500; // Límite de resultados
-    private OfferSearchCriteria SearchCriteria { get; set; } = new OfferSearchCriteria();
-    private bool IsCustomerNameValid { get; set; } = true;
-    private bool IsSearchPerformed { get; set; } = false;
-    private bool IsSearching { get; set; } = false;
-    private string ErrorMessage { get; set; }
-    private SearchInputs ValidInputs = new();
+    #region Properties
 
+    private List<Offer> Offers { get; set; } = new List<Offer>();
+
+    private const int MaxResults = 1500; // Límite de resultados
+
+    private OfferSearchCriteria SearchCriteria { get; set; } = new OfferSearchCriteria();
+
+    private bool IsCustomerNameValid { get; set; } = true;
+
+    private bool IsSearchPerformed { get; set; } = false;
+
+    private bool IsSearching { get; set; } = false;
+
+    private string ErrorMessage { get; set; }
+
+    private SearchInputs ValidInputs = new();
 
     private Offcanvas offcanvas = default!;
 
     private List<string> Sellers = new();
 
     private string? message;
+
     List<ToastMessage> messages = new List<ToastMessage>();
 
+    #endregion
 
+
+    #region Methods
 
     private async Task ShowAddOfferComponent()
     {
@@ -231,7 +248,7 @@ else
                 query = query.Where(o => o.Customer.Contains(SearchCriteria.Customer));
 
             if (SearchCriteria.Creation.HasValue && ValidInputs.EnableCreation)
-                query = query.Where(o => o.Creation.Year == SearchCriteria.Creation.Value.Year  
+                query = query.Where(o => o.Creation.Year == SearchCriteria.Creation.Value.Year
                     && o.Creation.Month == SearchCriteria.Creation.Value.Month);
 
             if (!string.IsNullOrEmpty(SearchCriteria.Type) && ValidInputs.EnableType)
@@ -243,19 +260,19 @@ else
             if (!string.IsNullOrEmpty(SearchCriteria.Seller) && ValidInputs.EnableResponsible)
                 query = query.Where(o => o.Responsible == SearchCriteria.Seller);
 
-            Offers = await query.Take(MaxResults).OrderByDescending(e=>e.OfferId).ToListAsync();
-            if(Offers.Count == MaxResults)
+            Offers = await query.Take(MaxResults).OrderByDescending(e => e.OfferId).ToListAsync();
+            if (Offers.Count == MaxResults)
             {
                 messages.Add(new()
-                    {
-                        Message = "El sistema limito la cantidad de ofertas obtenidas",
-                        Type = ToastType.Warning
-                    });
+                {
+                    Message = "El sistema limito la cantidad de ofertas obtenidas",
+                    Type = ToastType.Warning
+                });
                 messages.Add(new()
-                    {
-                        Message = "Establezca filtros más especificos e intentelo de nuevo",
-                        Type = ToastType.Warning
-                    });
+                {
+                    Message = "Establezca filtros más especificos e intentelo de nuevo",
+                    Type = ToastType.Warning
+                });
             }
             IsSearchPerformed = true;
             ErrorMessage = Offers.Any() ? string.Empty : "No se encontraron ofertas.";
@@ -272,7 +289,7 @@ else
 
     private async Task LoadSellers()
     {
-        using(var dbTemp = dbContextFactory.CreateDbContext())
+        using (var dbTemp = dbContextFactory.CreateDbContext())
         {
             Sellers = dbTemp.Seller.Select(e => e.SellerName).ToList();
         }
@@ -281,7 +298,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         LoadSellers();
-        base.OnInitializedAsync();   
+        base.OnInitializedAsync();
     }
 
     private void ValidateCustomerName()
@@ -302,6 +319,13 @@ else
         ErrorMessage = string.Empty;
     }
 
+    private async Task DownloadReport()
+    {
+        var data = await XmlsGenerate.GenerateFileOffers(Offers);
+        var pdfBase64 = Convert.ToBase64String(data);
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Ofertas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+    }
+
     private class OfferSearchCriteria
     {
         public int? OfferId { get; set; }
@@ -312,13 +336,6 @@ else
         public string State { get; set; }
     }
 
-    private async Task DownloadReport() 
-    {
-        var data = await XmlsGenerate.GenerateFileOffers(Offers);
-        var pdfBase64 = Convert.ToBase64String(data);
-        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Ofertas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
-    }
-
     private class SearchInputs
     {
         public bool EnableCreation { get; set; }
@@ -326,4 +343,7 @@ else
         public bool EnableState { set; get; }
         public bool EnableResponsible { get; set; }
     }
+
+
+    #endregion
 }
