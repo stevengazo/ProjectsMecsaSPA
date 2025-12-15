@@ -30,9 +30,12 @@
 
     private void RemoveBill(Bill bill)
     {
-        Bills.Remove(bill);
-		db.Remove(bill);
-		db.SaveChanges();
+        var BillToDelete = Bills.Where(e => e.BillId == bill.BillId).FirstOrDefault();
+        if( BillToDelete != null) Bills.Remove(BillToDelete);
+
+        db.Bill.Update(bill);
+        db.SaveChanges();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

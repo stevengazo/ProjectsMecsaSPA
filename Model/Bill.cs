@@ -42,6 +42,8 @@ namespace ProjectsMecsaSPA.Model
         [Required(ErrorMessage = "La fecha de factura es obligatoria.")]
         public DateTime BillDate { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+        public string DeletedReason { get; set; } = "";
         public Project? Project { get; set; }
 
         [Required(ErrorMessage = "El ID del proyecto es obligatorio.")]

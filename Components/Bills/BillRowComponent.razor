@@ -1,8 +1,11 @@
 ﻿@using System.Globalization
+@using ProjectsMecsaSPA.Components.Shared
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject Bitrix24ClientService Bitrix24Client
 
+
+<ProjectsMecsaSPA.Components.Shared.DeleteReasonDialog @ref="deleteDialog" />
 <ConfirmDialog @ref="dialog" />
 @if (IsEditing)
 {
@@ -134,6 +137,8 @@ else
 
     private ConfirmDialog dialog = default!;
 
+    private DeleteReasonDialog deleteDialog = default!;
+
     private bool IsEditing { get; set; }
 
     Collapse collapse1 = default!;
@@ -166,21 +171,39 @@ else
     }
     private async Task ShowConfirmationAsync()
     {
-        var confirmation = await dialog.ShowAsync(
-            title: "Deseas borrar este archivo?",
-            message1: "Una vez haya sido borrado, no se podra recuperar. La información ingresada en Bitrix24 no será eliminada.",
-            message2: "Quieres proceder?");
+        var reason = await deleteDialog.ShowAsync();
 
-        if (confirmation)
+        // Cancelado o vacío
+        if (string.IsNullOrWhiteSpace(reason))
+            return;
+
+        try
         {
-            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{item.Amount}", 252);
-			await OnDelete.InvokeAsync(item);
+            item.IsDeleted = true;
+            item.DeletedReason = reason;
+
+     /*       var dbcontext = DbContextFactory.CreateDbContext();
+            dbcontext.Bill.Update(item);
+            await dbcontext.SaveChangesAsync();*/
+
+            await Bitrix24Client.SendTaskCommentAsync(
+                item.TaskNumber,
+                $"Se ha eliminado una factura desde el app de proyectos\n" +
+                $"Número de factura: {item.BillNumber}\n" +
+                $"Proyecto: {item.ProjectId}\n" +
+                $"Monto: {item.Amount}\n" +
+                $"Motivo: {reason}",
+                252);
+
+            await OnDelete.InvokeAsync(item);
         }
-        else
+        catch (Exception ex)
         {
-            // do something
+            Console.WriteLine(ex);
+            throw;
         }
     }
+
 
     private async Task ToggleContentAsync() => await collapse1.ToggleAsync();
 }

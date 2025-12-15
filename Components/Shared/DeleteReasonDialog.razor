@@ -1,0 +1,64 @@
+﻿
+
+@using Microsoft.AspNetCore.Components
+
+<Modal @bind-Visible="Visible">
+    <div>
+        <h5 class="modal-title text-danger">Eliminar factura</h5>
+    </div>
+
+    <div>
+        <p>
+            ¿Estás seguro de que deseas eliminar esta factura?
+            <br />
+            <strong>Esta acción no se puede deshacer.</strong>
+        </p>
+
+        <label class="form-label mt-2">Motivo de eliminación</label>
+        <InputTextArea class="form-control"
+                       @bind-Value="Reason"
+                       rows="3"
+                       placeholder="Escribe el motivo obligatorio..." />
+    </div>
+
+    <div>
+        <Button Class="btn" @onclick="Cancel">
+            Cancelar
+        </Button>
+        <Button Class="btn btn-danger" @onclick="Confirm" disabled="@IsConfirmDisabled">
+            Eliminar
+        </Button>
+    </div>
+</Modal>
+
+@code {
+    private bool Visible { get; set; }
+    private string? Reason { get; set; }
+
+    private TaskCompletionSource<string?>? _tcs;
+
+    private bool IsConfirmDisabled =>
+        string.IsNullOrWhiteSpace(Reason);
+
+    public Task<string?> ShowAsync()
+    {
+        Reason = string.Empty;
+        Visible = true;
+        StateHasChanged();
+
+        _tcs = new TaskCompletionSource<string?>();
+        return _tcs.Task;
+    }
+
+    private void Confirm()
+    {
+        Visible = false;
+        _tcs?.SetResult(Reason);
+    }
+
+    private void Cancel()
+    {
+        Visible = false;
+        _tcs?.SetResult(null);
+    }
+}
