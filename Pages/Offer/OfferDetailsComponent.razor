@@ -1,12 +1,11 @@
 ﻿@page "/offers/{id}"
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@inject IDbContextFactory<ApplicationDbContext> dbIdentityFactory
 @inject NavigationManager NAV;
 
 <!-- Authentication -->
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
+@inject IDbContextFactory<ApplicationDbContext> dbIdentityFactory
 
 <AuthorizeView>
     <Authorized>
@@ -52,7 +51,9 @@
     /// DNI of the responsible
     /// </summary>
     private int CurrentUserDNI;
-
+    /// <summary>
+    /// Database for the Identity Schema
+    /// </summary>
     private ApplicationDbContext dbIdentity;
 
     #endregion
