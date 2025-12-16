@@ -1,28 +1,52 @@
 ﻿@page "/search-customer"
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<h3>Buscar Clientes</h3>
+<h3> Clientes</h3>
 
 <EditForm Model="searchModel" OnValidSubmit="ApplyFilters">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mb-3">
-        <label for="name">Nombre</label>
-        <InputText id="name" @bind-Value="searchModel.Name" class="form-control" />
-    </div>
+    <div class="border rounded shadow-sm p-3 mb-3">
 
-    <div class="mb-3">
-        <label for="type">Tipo</label>
-        <InputSelect id="type" @bind-Value="searchModel.Type" class="form-select">
-            <option value="">Seleccione un tipo</option>
-            <option value="Publico">Público</option>
-            <option value="Privado">Privado</option>
-        </InputSelect>
-    </div>
+        <h6 class="fw-bold mb-3">Filtros de Búsqueda</h6>
 
-    <button type="submit" class="btn btn-primary">Buscar</button>
+        <div class="row g-3 align-items-end">
+
+            <div class="col-md-6">
+                <label for="name" class="form-label small fw-semibold">
+                    Nombre
+                </label>
+                <InputText id="name"
+                           @bind-Value="searchModel.Name"
+                           class="form-control form-control-sm"
+                           placeholder="Ingrese el nombre" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="type" class="form-label small fw-semibold">
+                    Tipo
+                </label>
+                <InputSelect id="type"
+                             @bind-Value="searchModel.Type"
+                             class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="Publico">Público</option>
+                    <option value="Privado">Privado</option>
+                </InputSelect>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button type="submit"
+                        class="btn btn-sm btn-outline-primary">
+                    Buscar
+                </button>
+            </div>
+
+        </div>
+    </div>
 </EditForm>
+
 
 @if (customers != null)
 {

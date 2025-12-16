@@ -9,21 +9,6 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div>
-    <label>
-        @CurrentUserDNI
-    </label>
-    <label>
-        @CurrentUserName
-    </label>
-    <label>
-        @IsAdmin
-    </label>
-</div>
-
-
-
-
 <!-- HEADER -->
 <div class="d-flex justify-content-between W-100">
     <h3>Buscar Ofertas</h3>
@@ -132,7 +117,7 @@
         @if (!ValidInputs.EnableCreation)
         {
             <Tooltip Class="d-inline-block" Title="Filtro de Fechas" role="button">
-                <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-success">
+                <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-outline-success">
                     <Icon Name="IconName.Calendar2Date" />
                 </button>
             </Tooltip>
@@ -140,7 +125,7 @@
         @if (!ValidInputs.EnableState)
         {
             <Tooltip Class="d-inline-block" Title="Filtro de Estado" role="button">
-                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success">
+                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-outline-success">
                     <Icon Name="IconName.Check" />
                 </button>
             </Tooltip>
@@ -148,7 +133,7 @@
         @if (!ValidInputs.EnableType)
         {
             <Tooltip Class="d-inline-block" Title="Tipo de Oferta" role="button">
-                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
+                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-outline-success">
                     <Icon Name="IconName.Type" />
                 </button>
             </Tooltip>
@@ -156,7 +141,7 @@
         @if (!ValidInputs.EnableResponsible && IsAdmin)
         {
             <Tooltip Class="d-inline-block" Title="Filtro de Responsable" role="button">
-                <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-success">
+                <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-outline-success">
                     <Icon Name="IconName.People" />
                 </button>
             </Tooltip>
@@ -168,8 +153,8 @@
 
 <!-- Primary Buttons -->
 <div class="d-flex gap-2 mb-3">
-    <button class="btn btn-primary" @onclick="SearchOffers">Buscar</button>
-    <button class="btn btn-secondary" @onclick="ClearFilters">Limpiar</button>
+    <button class="btn btn-outline-primary" @onclick="SearchOffers">Buscar</button>
+    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Limpiar</button>
     <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
 </div>
 

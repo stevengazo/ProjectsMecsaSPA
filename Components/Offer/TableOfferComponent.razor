@@ -1,129 +1,129 @@
 ﻿
-<table class="table table-hover border table-sm">
-    <tbody>
-        <tr>
-            <th>Número</th>
-            <td>@offer.OfferId</td>
-        </tr>
-        <tr>
-            <th>Fecha</th>
-            <td>@offer.Creation.ToLongDateString()</td>
-        </tr>
-        <tr>
-            <th>Cliente</th>
-            <td>@offer.Customer</td>
-        </tr>
-        <tr>
-            <th>Descripción</th>
-            <td>@offer.Description</td>
-        </tr>
-        <tr>
-            <th>Tipo Contacto</th>
-            <td>@offer.ContactType</td>
-        </tr>
-        <tr>
-            <th>Tipo</th>
-            <td>@offer.Type</td>
-        </tr>
-        <tr>
-            <th>Require DDCE</th>
-            @if (offer.RequiredDDCE)
-            {
-                <td>Vinculado a DDCE</td>
+<div class="border rounded shadow-sm p-3">
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
-        <tr>
-            <th>Requiere Ionizante</th>
-            @if (offer.RequiredLightningStrike)
-            {
-                <td>Vinculado a Ionizante</td>
+    <!-- ========================================================= -->
+    <!-- INFORMACIÓN GENERAL -->
+    <!-- ========================================================= -->
+    <h6 class="text-center fw-bold mb-3">Información General</h6>
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
-        <tr>
-            <th>Requiere Torre</th>
-            @if (offer.RequireTower)
-            {
-                <td>Vinculado a Torres</td>
+    <div class="row g-3 mb-3">
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Número</div>
+            <div>@offer.OfferId</div>
+        </div>
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
-        <tr>
-            <th>Requiere SPAT</th>
-            @if (offer.RequireSPAT)
-            {
-                <td>Vinculado a SPAT</td>
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Fecha</div>
+            <div>@offer.Creation.ToLongDateString()</div>
+        </div>
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
-        <tr>
-            <th>Require Supresor</th>
-            @if (offer.RequireSurgeProtector)
-            {
-                <td>Vinculado a Supresores</td>
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Autor</div>
+            <div>@offer.Author</div>
+        </div>
+    </div>
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
+    <div class="mb-3">
+        <div class="fw-semibold text-muted small">Cliente</div>
+        <div>@offer.Customer</div>
+    </div>
 
-        <tr>
-            <th>Otros</th>
-            @if (offer.RequireOther)
-            {
-                <td>Vinculado a Otros</td>
+    <div class="mb-4">
+        <div class="fw-semibold text-muted small">Descripción</div>
+        <div class="text-break">@offer.Description</div>
+    </div>
 
-            }
-            else
-            {
-                <td>No</td>
-            }
-        </tr>
-        <tr>
-            <th>Monto</th>
-            <td>@offer.Amount</td>
-        </tr>
-        <tr>
-            <th>Calculado Por</th>
-            <td>@offer.CalculateBy</td>
-        </tr>
-        <tr>
-            <th>Autor</th>
-            <td>@offer.Author</td>
-        </tr>
-        <tr>
-            <th>Responsable</th>
-            <td>@offer.Responsible</td>
-        </tr>
-        <tr>
-            <th>Estado</th>
-            <td>@offer.State</td>
-        </tr>
-    </tbody>
-</table>
+    <hr class="my-3" />
+
+    <!-- ========================================================= -->
+    <!-- CLASIFICACIÓN -->
+    <!-- ========================================================= -->
+    <h6 class="text-center fw-bold mb-3">Clasificación</h6>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="fw-semibold text-muted small">Tipo de Contacto</div>
+            <span class="badge bg-secondary">@offer.ContactType</span>
+        </div>
+
+        <div class="col-md-6">
+            <div class="fw-semibold text-muted small">Tipo de Oferta</div>
+            <span class="badge bg-info">@offer.Type</span>
+        </div>
+    </div>
+
+    <hr class="my-3" />
+
+    <!-- ========================================================= -->
+    <!-- REQUERIMIENTOS -->
+    <!-- ========================================================= -->
+    <h6 class="text-center fw-bold mb-3">Requerimientos</h6>
+
+    <div class="row g-2 mb-4">
+        <div class="col-md-4">
+            @RequerimientoBadge("DDCE", offer.RequiredDDCE)
+        </div>
+        <div class="col-md-4">
+            @RequerimientoBadge("Ionizante", offer.RequiredLightningStrike)
+        </div>
+        <div class="col-md-4">
+            @RequerimientoBadge("Torre", offer.RequireTower)
+        </div>
+        <div class="col-md-4">
+            @RequerimientoBadge("SPAT", offer.RequireSPAT)
+        </div>
+        <div class="col-md-4">
+            @RequerimientoBadge("Supresor", offer.RequireSurgeProtector)
+        </div>
+        <div class="col-md-4">
+            @RequerimientoBadge("Otros", offer.RequireOther)
+        </div>
+    </div>
+
+    <hr class="my-3" />
+
+    <!-- ========================================================= -->
+    <!-- DATOS COMERCIALES -->
+    <!-- ========================================================= -->
+    <h6 class="text-center fw-bold mb-3">Datos Comerciales</h6>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Monto</div>
+            <div>@offer.Amount.ToString("N2")</div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Calculado Por</div>
+            <div>@offer.CalculateBy</div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="fw-semibold text-muted small">Responsable</div>
+            <div>@offer.Responsible</div>
+        </div>
+
+        <div class="col-md-4 mt-2">
+            <div class="fw-semibold text-muted small">Estado</div>
+            <span class="badge bg-success">@offer.State</span>
+        </div>
+    </div>
+
+</div>
+
 
 @code {
 
     [Parameter]
     public Offer offer { get; set; }
+
+    RenderFragment RequerimientoBadge(string label, bool value) => builder =>
+  {
+      builder.OpenElement(0, "span");
+      builder.AddAttribute(1, "class",
+          value ? "badge bg-success me-1" : "badge bg-secondary me-1");
+      builder.AddContent(2, value ? $"✔ {label}" : $"✖ {label}");
+      builder.CloseElement();
+  };
 
 }

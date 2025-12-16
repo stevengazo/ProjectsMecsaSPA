@@ -3,108 +3,118 @@
 
 
 <ConfirmDialog @ref="dialog" />
+<div class="border rounded shadow-sm p-3 mb-2">
 
-<div class="border rounded m-1 shadow p-2" >
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold mb-0">Información del Cliente</h6>
+
+        @if (!IsEditing)
+        {
+            <span class="badge bg-secondary">
+                @customer.Type
+            </span>
+        }
+    </div>
+
     @if (IsEditing)
     {
-        <table class="table table-sm">
-            <tr>
-                <th>
-                    Id Interno
-                </th>
-                <td>
-                    @customer.CustomerId
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Nombre
-                </th>
-                <td>
-                    <EditForm Model="customer">
-                        <InputText class="form-control" @bind-Value="customer.Name"></InputText>
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Tipo
-                </th>
-                <td>
-                    <EditForm Model="customer">
-                        <InputSelect id="type" @bind-Value="customer.Type" class="form-select">
-                            <option value="Publico">Público</option>
-                            <option value="Privado">Privado</option>
-                        </InputSelect>
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Cédula
-                </th>
-                <td>
-                    <EditForm Model="customer">
-                        <InputNumber class="form-control" @bind-Value="customer.DNI" ></InputNumber>
-                    </EditForm>
-                </td>
-            </tr>
-        </table>
-        <div class="d-flex flex-row gap-2">
-            <button class="btn btn-sm btn-outline-danger" @onclick="()=>IsEditing = false">Cancelar</button>
-            <button class="btn btn-sm btn-outline-success" @onclick="Update">Guardar Cambios</button>
+        <table class="table table-sm align-middle mb-2">
+            <tbody>
+                <tr>
+                    <th class="w-25 text-muted">Id Interno</th>
+                    <td>@customer.CustomerId</td>
+                </tr>
 
-            </div>
-       
+                <tr>
+                    <th class="text-muted">Nombre</th>
+                    <td>
+                        <EditForm Model="customer">
+                            <InputText class="form-control form-control-sm"
+                                       @bind-Value="customer.Name" />
+                        </EditForm>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="text-muted">Tipo</th>
+                    <td>
+                        <EditForm Model="customer">
+                            <InputSelect @bind-Value="customer.Type"
+                                         class="form-select form-select-sm">
+                                <option value="Publico">Público</option>
+                                <option value="Privado">Privado</option>
+                            </InputSelect>
+                        </EditForm>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="text-muted">Cédula</th>
+                    <td>
+                        <EditForm Model="customer">
+                            <InputNumber class="form-control form-control-sm"
+                                         @bind-Value="customer.DNI" />
+                        </EditForm>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-sm btn-outline-secondary"
+                    @onclick="() => IsEditing = false">
+                Cancelar
+            </button>
+
+            <button class="btn btn-sm btn-outline-success"
+                    @onclick="Update">
+                Guardar Cambios
+            </button>
+        </div>
     }
     else
     {
-        <table class="table table-sm">
-            <tr>
-                <th>
-                  Id Interno
-                </th>
-                <td>
-                    @customer.CustomerId
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Nombre
-                </th>
-                <td>
-                    @customer.Name
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Tipo
-                </th>
-                <td>
-                    @customer.Type
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Cédula
-                </th>
-                <td>
-                    @customer.DNI
-                </td>
-            </tr>
-        </table>
-<div class="d-flex flex-row gap-2 p-2">
+        <table class="table table-sm align-middle mb-2">
+            <tbody>
+                <tr>
+                    <th class="w-25 text-muted">Id Interno</th>
+                    <td>@customer.CustomerId</td>
+                </tr>
 
-            <button class="btn btn-sm btn-outline-info" @onclick="()=>IsEditing = true">Editar Cliente</button>
+                <tr>
+                    <th class="text-muted">Nombre</th>
+                    <td class="fw-semibold">@customer.Name</td>
+                </tr>
+
+                <tr>
+                    <th class="text-muted">Tipo</th>
+                    <td>@customer.Type</td>
+                </tr>
+
+                <tr>
+                    <th class="text-muted">Cédula</th>
+                    <td>@customer.DNI</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-sm btn-outline-info"
+                    @onclick="() => IsEditing = true">
+                Editar Cliente
+            </button>
+
             @if (CanDelete)
             {
-                <button class="btn btn-sm btn-outline-danger" @onclick="Delete">Eliminar</button>
+                <button class="btn btn-sm btn-outline-danger"
+                        @onclick="Delete">
+                    Eliminar
+                </button>
             }
-       
-    </div>
+        </div>
     }
-
 </div>
+
 
 @code {
     [Parameter]

@@ -3,158 +3,235 @@
 @inject IJSRuntime JS
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+<div class="border rounded shadow-sm p-3 mb-3">
 
-<!-- Contenedor para los filtros de búsqueda -->
-<div class="row mb-3">
-    <div class="col-md-2 mb-2">
-        <input type="text" @bind="searchName" placeholder="Buscar por nombre" class="form-control" />
-    </div>
-    <div class="col-md-2 mb-2">
-        <input type="number" min="0" @bind="searchProjectId" placeholder="Buscar por número de proyecto" class="form-control" />
-    </div>
-    @if (ValidInputs.EnableDate)
-    {
-        <div class="col-md-2 mb-2 d-flex flex-column">
-            <div class="d-flex align-items-center mb-1">
-                <label class="form-label me-2">Inicio</label>
-                <input type="date" @bind="searchDateStart" class="form-control" />
+    <h6 class="fw-bold mb-3">Filtros de Búsqueda</h6>
+
+    <div class="row g-2 align-items-end">
+
+        <!-- Nombre -->
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">Nombre</label>
+            <input type="text"
+                   @bind="searchName"
+                   placeholder="Buscar por nombre"
+                   class="form-control form-control-sm" />
+        </div>
+
+        <!-- Proyecto -->
+        <div class="col-md-2">
+            <label class="form-label small fw-semibold">Proyecto</label>
+            <input type="number"
+                   min="0"
+                   @bind="searchProjectId"
+                   placeholder="N° Proyecto"
+                   class="form-control form-control-sm" />
+        </div>
+
+        <!-- Fecha -->
+        @if (ValidInputs.EnableDate)
+        {
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Rango de fechas</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="date"
+                           @bind="searchDateStart"
+                           class="form-control form-control-sm" />
+
+                    <input type="date"
+                           @bind="searchDateEnd"
+                           class="form-control form-control-sm" />
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableDate = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
             </div>
-            <div class="d-flex align-items-center mb-1">
-                <label class="form-label me-2">Final</label>
-                <input type="date" @bind="searchDateEnd" class="form-control" />
+        }
+
+        <!-- Estado -->
+        @if (ValidInputs.EnableState)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Estado</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <select @bind="searchStateId"
+                            class="form-select form-select-sm">
+                        <option value="">Seleccionar estado</option>
+                        @foreach (var state in StatesOfProjects)
+                        {
+                            <option value="@state.Key">@state.Value</option>
+                        }
+                    </select>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableState = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
             </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableDate = false" class="btn btn-sm btn-outline-danger align-self-end mt-1" />
-        </div>
-    }
+        }
 
-    @if (ValidInputs.EnableState)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <select @bind="searchStateId" class="form-control">
-                <option value="">Seleccionar estado</option>
-                @foreach (var state in StatesOfProjects)
+        <!-- Tipo -->
+        @if (ValidInputs.EnableType)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Tipo</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <select @bind="searchTypeId"
+                            class="form-select form-select-sm">
+                        <option value="">Seleccionar tipo</option>
+                        @foreach (var type in TypesOfProjects)
+                        {
+                            <option value="@type.Key">@type.Value</option>
+                        }
+                    </select>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableType = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            </div>
+        }
+
+        <!-- Vendedor -->
+        @if (ValidInputs.EnableSeller)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Vendedor</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <select @bind="searchSellerId"
+                            class="form-select form-select-sm">
+                        <option value="">Seleccionar vendedor</option>
+                        @foreach (var seller in Sellers)
+                        {
+                            <option value="@seller.Key">@seller.Value</option>
+                        }
+                    </select>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableSeller = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            </div>
+        }
+
+        <!-- Empresa -->
+        @if (ValidInputs.EnableCompany)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">Empresa</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <select @bind="searchCompanyId"
+                            class="form-select form-select-sm">
+                        <option value="">Seleccionar empresa</option>
+                        @foreach (var company in Companies)
+                        {
+                            <option value="@company.CompanyId">@company.CompanyName</option>
+                        }
+                    </select>
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableCompany = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            </div>
+        }
+
+        <!-- Tarea -->
+        @if (ValidInputs.EnableTask)
+        {
+            <div class="col-md-2">
+                <label class="form-label small fw-semibold">N° Tarea</label>
+                <div class="d-flex gap-2 align-items-center">
+                    <input type="number"
+                           min="0"
+                           @bind="searchTask"
+                           class="form-control form-control-sm" />
+
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableTask = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            </div>
+        }
+
+        <!-- BOTONES PARA ACTIVAR FILTROS -->
+        <div class="col-md-12 mt-2">
+            <div class="d-flex flex-wrap gap-2">
+
+                @if (!ValidInputs.EnableState)
                 {
-                    <option value="@state.Key">@state.Value</option>
+                    <Tooltip Title="Estado">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableState = true">
+                            <Icon Name="IconName.Check" />
+                        </button>
+                    </Tooltip>
                 }
-            </select>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
 
-    @if (ValidInputs.EnableType)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <select @bind="searchTypeId" class="form-control">
-                <option value="">Seleccionar tipo</option>
-                @foreach (var type in TypesOfProjects)
+                @if (!ValidInputs.EnableDate)
                 {
-                    <option value="@type.Key">@type.Value</option>
+                    <Tooltip Title="Fecha">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableDate = true">
+                            <Icon Name="IconName.Calendar2Date" />
+                        </button>
+                    </Tooltip>
                 }
-            </select>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
 
-    @if (ValidInputs.EnableSeller)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <select @bind="searchSellerId" class="form-control">
-                <option value="">Seleccionar vendedor</option>
-                @foreach (var type in Sellers)
+                @if (!ValidInputs.EnableType)
                 {
-                    <option value="@type.Key">@type.Value</option>
+                    <Tooltip Title="Tipo">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableType = true">
+                            <Icon Name="IconName.Type" />
+                        </button>
+                    </Tooltip>
                 }
-            </select>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableSeller = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
 
-    @if (ValidInputs.EnableCompany)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <select @bind="searchCompanyId" class="form-control">
-                <option value="">Seleccionar empresa</option>
-                @foreach (var type in Companies)
+                @if (!ValidInputs.EnableSeller)
                 {
-                    <option value="@type.CompanyId">@type.CompanyName</option>
+                    <Tooltip Title="Vendedor">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableSeller = true">
+                            <Icon Name="IconName.People" />
+                        </button>
+                    </Tooltip>
                 }
-            </select>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCompany = false" class="btn btn-sm btn-outline-danger ms-2" />
+
+                @if (!ValidInputs.EnableCompany)
+                {
+                    <Tooltip Title="Empresa">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableCompany = true">
+                            <Icon Name="IconName.Building" />
+                        </button>
+                    </Tooltip>
+                }
+
+                @if (!ValidInputs.EnableTask)
+                {
+                    <Tooltip Title="Tarea">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableTask = true">
+                            <Icon Name="IconName.SortNumericUp" />
+                        </button>
+                    </Tooltip>
+                }
+
+            </div>
         </div>
-    }
-
-    @if (ValidInputs.EnableTask)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <Tooltip Class="me-2" Title="Tarea" Placement="TooltipPlacement.Left" />
-            <input type="number" min="0" @bind="searchTask" class="form-control" />
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableTask = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
-
-
-   <!---Opciones  -->
-
-    <div class="col mb-2 d-flex flex-row">
-        @if (!ValidInputs.EnableState)
-        {
-            <Tooltip Title="Estado" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-outline-success me-2">
-                     <Icon Name="IconName.Check" />
-                </button>
-            </Tooltip>
-      
-        }
-
-        @if (!ValidInputs.EnableDate)
-        {
-            <Tooltip  Title="Fecha" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableDate = true" class="btn btn-sm btn-outline-success me-2">
-                   <Icon Name="IconName.Calendar2Date" />
-                </button>
-            </Tooltip>
-
-        }
-
-        @if (!ValidInputs.EnableType)
-        {
-            <Tooltip Title="Tipo de Proyecto" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm  btn-outline-success me-2">
-                    <Icon Name="IconName.Type" />
-                </button>
-            </Tooltip>
-
-        }
-        @if (!ValidInputs.EnableSeller)
-        {
-            <Tooltip Title="Vendedor" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableSeller = true" class="btn btn-sm  btn-outline-success me-2">
-                    <Icon Name="IconName.People" />
-                </button>
-            </Tooltip>
-   
-        }
-        @if (!ValidInputs.EnableCompany)
-        {
-            <Tooltip Title="Compañia" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableCompany = true" class="btn btn-sm  btn-outline-success me-2">
-                    <Icon Name="IconName.Building" />
-                </button>
-            </Tooltip>
-
-        }
-        @if (!ValidInputs.EnableTask)
-        {
-            <Tooltip Title="Número de Tarea" Placement="TooltipPlacement.Top">
-                <button @onclick="() => ValidInputs.EnableTask = true" class="btn btn-sm  btn-outline-success me-2">
-                    <Icon Name="IconName.SortNumericUp" />
-                </button>
-            </Tooltip>
-        }
     </div>
 </div>
 
-<div class="row mb-3 g-2 align-items-end">
+<!-- ACCIONES -->
+<div class="row g-2 align-items-end mb-3">
     <div class="col-md-2 col-sm-4">
         <button @onclick="ApplyFiltersAsync"
                 class="btn btn-outline-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-1">

@@ -1,23 +1,40 @@
 ﻿@inject ProjectsDBContext db
 
+<div class="border rounded shadow-sm p-3 mb-3">
 
-<div>
-	<h5>Agregar Compania</h5>
-	<div class="d-flex flex-row gap-2">
-		<EditForm Model="@companyNew">
-			<div class="form-floating">
-				<InputText class="form-control" id="Name" @bind-Value="companyNew.CompanyName" />
-				<label for="Name">Nombre</label>
-			</div>
-		</EditForm>
-		<button class="btn btn-primary" @onclick="AddCompanyAsync">Agregar</button>
-	</div>
+    <h6 class="fw-bold mb-3">Agregar Compañía</h6>
+
+    <EditForm Model="@companyNew">
+        <div class="row g-2 align-items-end">
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputText id="CompanyName"
+                               class="form-control form-control-sm shadow-sm"
+                               @bind-Value="companyNew.CompanyName" />
+                    <label for="CompanyName">Nombre de la Compañía</label>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <button type="button"
+                        class="btn btn-sm btn-outline-success w-100"
+                        @onclick="AddCompanyAsync">
+                    Agregar
+                </button>
+            </div>
+
+        </div>
+    </EditForm>
 </div>
 
-@foreach (var i in companies)
-{
-	<CompanyData Company="@i" />
-}
+<div class="mt-3">
+    @foreach (var i in companies)
+    {
+        <CompanyData Company="@i" />
+    }
+</div>
+
 
 @code {
 	List<Company> companies = new List<Company>();

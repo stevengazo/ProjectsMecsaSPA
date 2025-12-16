@@ -9,37 +9,45 @@
     Agregar
 </button>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                Nombre
-            </th>
-            <th>
-                Cédula
-            </th>
-            <th>
-                Correo
-            </th>
-            <th>
-                Nombre de usuario
-            </th>
-            <th>
-                Estado
-            </th>
-            <th colspan="3">
-                Acciones
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Users)
-        {
-            <RowUserComponent item="item" />
-        }
-    </tbody>
-</table>
+<div class="border rounded shadow-sm p-3">
 
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Usuarios</h5>
+
+        <button class="btn btn-outline-success btn-sm"
+                @onclick="AddUser">
+            Agregar Usuario
+        </button>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- TABLA -->
+    <!-- ========================================================= -->
+    <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Correo</th>
+                    <th>Usuario</th>
+                    <th>Estado</th>
+                    <th class="text-center" colspan="3">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Users)
+                {
+                    <RowUserComponent item="item" />
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
 
 
 
