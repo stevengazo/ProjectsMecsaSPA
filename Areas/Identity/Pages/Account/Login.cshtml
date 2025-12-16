@@ -5,47 +5,100 @@
     ViewData["Title"] = "Iniciar sesión";
 }
 
+<div class="row justify-content-center align-items-center ">
 
-<div class="row justify-content-center">
-    <div class="col-md-4  shadow rounded border p-2">
-        <section>
-            <form id="account" method="post">
-                <h2>Iniciar sesión.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-floating my-2">
-                    <input asp-for="Input.UserName" class="form-control" autocomplete="username" aria-required="true" />
-                    <label asp-for="Input.UserName" class="form-label"></label>
-                    <span asp-validation-for="Input.UserName" class="text-danger"></span>
-                </div>
-                <div class="form-floating my-2">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
-                    <label asp-for="Input.Password" class="form-label"></label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="my-2">
-                    <div class="checkbox">
-                        <label asp-for="Input.RememberMe" class="form-label">
-                            <input class="form-check-input" asp-for="Input.RememberMe" />
-                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+    <div class="col-md-4 col-sm-10">
+
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+
+            <!-- Banda superior -->
+            <div class="bg-primary text-white text-center py-4">
+                <h3 class="fw-semibold mb-0">Bienvenido</h3>
+                <small class="opacity-75">
+                    Inicia sesión para continuar
+                </small>
+            </div>
+
+            <div class="card-body p-4">
+
+                <form id="account" method="post">
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-danger py-2 small"></div>
+
+                    <!-- Usuario -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.UserName"
+                               class="form-control rounded-3"
+                               autocomplete="username"
+                               placeholder="Usuario"
+                               aria-required="true" />
+                        <label asp-for="Input.UserName">
+                            Nombre de usuario
                         </label>
+                        <span asp-validation-for="Input.UserName"
+                              class="text-danger small"></span>
                     </div>
-                </div>
-                <div class="my-2">
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Iniciar sesión</button>
-                </div>
-                <div class="my-2">
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">¿Olvidaste tu contraseña?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Regístrate como un nuevo usuario</a>
-                    </p>
-                </div>
-            </form>
-        </section>
+
+                    <!-- Contraseña -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Password"
+                               class="form-control rounded-3"
+                               autocomplete="current-password"
+                               placeholder="Contraseña"
+                               aria-required="true" />
+                        <label asp-for="Input.Password">
+                            Contraseña
+                        </label>
+                        <span asp-validation-for="Input.Password"
+                              class="text-danger small"></span>
+                    </div>
+
+                    <!-- Recordarme -->
+                    <div class="d-flex flex-column justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   asp-for="Input.RememberMe" />
+                            <label class="form-check-label"
+                                   asp-for="Input.RememberMe">
+                                Recordarme
+                            </label>
+                        </div>
+
+                        <a asp-page="./ForgotPassword"
+                           class="small text-decoration-none">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <!-- Botón -->
+                    <div class="d-grid mb-3">
+                        <button id="login-submit"
+                                type="submit"
+                                class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                            Entrar
+                        </button>
+                    </div>
+
+                    <!-- Registro -->
+                    <div class="text-center small text-muted">
+                        ¿No tienes cuenta?
+                        <a asp-page="./Register"
+                           asp-route-returnUrl="@Model.ReturnUrl"
+                           class="fw-semibold text-decoration-none">
+                            Crear una nueva
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
     </div>
 </div>
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
