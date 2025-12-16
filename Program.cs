@@ -48,7 +48,7 @@ builder.Services.AddHttpClient<APICarServices>(client =>
 #endregion
 
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlServer(UsersConnection));
 
 builder.Services.AddDbContextFactory<ProjectsDBContext>(options =>

@@ -2,7 +2,7 @@
 @using System.Security.Claims
 
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@inject ApplicationDbContext dbIdentity;
+@inject IDbContextFactory<ApplicationDbContext> dbIdentityFactory;
 
 @inject NavigationManager NAV
 
@@ -153,6 +153,8 @@
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
+    private ApplicationDbContext dbIdentity;
+
     private List<Seller> sellers = new();
     private Offer offer = new Offer
         {
@@ -162,6 +164,7 @@
     protected override async Task OnInitializedAsync()
     {
 
+        dbIdentity = dbIdentityFactory.CreateDbContext();
         using var context = DbContextFactory.CreateDbContext();
         sellers = context.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
         // Obtén el estado de autenticación

@@ -1,11 +1,26 @@
 ﻿@page "/offers/{id}"
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject IDbContextFactory<ApplicationDbContext> dbIdentityFactory
 @inject NavigationManager NAV;
+
+<!-- Authentication -->
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 
 <AuthorizeView>
     <Authorized>
         <h3>Detalles de la Oferta</h3>
-        <OfferInfo offer="offer" />
+        @if(IsAdmin || offer.ResponsibleId == CurrentUserDNI.ToString())
+        {
+            <OfferInfo offer="offer" />
+        }
+        else
+        {
+            <h3>
+                Usted no posee permisos para la revisión de esta oferta, contacte con un administrador.
+            </h3>
+        }
     </Authorized>
     <NotAuthorized>
         <ErrorViewComponent />
@@ -13,10 +28,34 @@
 </AuthorizeView>
 
 @code {
+    #region Parameters
+
+    /// <summary>
+    /// Id Of the offer
+    /// </summary>
     [Parameter]
     public string id { get; set; }
 
     private Offer offer;
+
+    /// <summary>
+    /// Get or Set the current user
+    /// </summary>
+    private string? CurrentUserName;
+
+    /// <summary>
+    /// Validate if the user is admin or not
+    /// </summary>
+    private bool IsAdmin;
+
+    /// <summary>
+    /// DNI of the responsible
+    /// </summary>
+    private int CurrentUserDNI;
+
+    private ApplicationDbContext dbIdentity;
+
+    #endregion
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,5 +63,23 @@
         int.TryParse(id, out int _id);
         offer = db.Offers.FirstOrDefault(e => e.OfferId == _id);
         base.OnInitializedAsync();
+        dbIdentity = dbIdentityFactory.CreateDbContext();
+        LoadUserContext();
+    }
+
+    private async Task LoadUserContext()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+            return;
+
+        CurrentUserName = user.Identity!.Name;
+
+        IsAdmin = user.IsInRole("administrador");
+
+            CurrentUserDNI = dbIdentity.Users.FirstOrDefault(e => e.UserName == CurrentUserName).DNI;
+        
     }
 }
