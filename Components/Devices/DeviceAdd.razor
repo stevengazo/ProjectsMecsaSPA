@@ -1,11 +1,13 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
 <EditForm Model="newDevice" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
     <div class="card shadow-sm border-0">
 
-        <!-- Header -->
-        <div class="card-header bg-white border-0 pb-0">
-            <h5 class="fw-semibold text-primary mb-0">
+        <!-- HEADER -->
+        <div class="card-header bg-white border-bottom">
+            <h5 class="fw-semibold text-primary mb-1">
                 Nuevo Dispositivo
             </h5>
             <small class="text-muted">
@@ -13,18 +15,18 @@
             </small>
         </div>
 
-        <!-- Body -->
-        <div class="card-body pt-4">
-            <div class="row g-4">
+        <!-- BODY -->
+        <div class="card-body">
+            <div class="row g-3">
 
                 <!-- Nombre -->
                 <div class="col-md-6">
                     <div class="form-floating">
                         <InputText id="DeviceName"
                                    class="form-control"
-                                   placeholder="Nombre del dispositivo"
+                                   placeholder="Nombre"
                                    @bind-Value="newDevice.DeviceName" />
-                        <label for="DeviceName">Nombre</label>
+                        <label for="DeviceName">Nombre del dispositivo</label>
                     </div>
                 </div>
 
@@ -34,10 +36,10 @@
                         <InputSelect id="DeviceType"
                                      class="form-select"
                                      @bind-Value="newDevice.DeviceType">
-                            <option value="" selected disabled></option>
+                            <option value="" disabled selected></option>
                             <option value="Medicion">Equipo de Medición</option>
                         </InputSelect>
-                        <label for="DeviceType">Tipo</label>
+                        <label for="DeviceType">Tipo de dispositivo</label>
                     </div>
                 </div>
 
@@ -46,24 +48,26 @@
                     <div class="form-floating">
                         <InputText id="SerialNumber"
                                    class="form-control"
-                                   placeholder="Número de serie"
+                                   placeholder="Serie"
                                    @bind-Value="newDevice.SerialNumber" />
-                        <label for="SerialNumber">Serie</label>
+                        <label for="SerialNumber">Número de serie</label>
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="card-footer bg-white border-0 text-end">
-            <button type="submit" class="btn btn-primary px-4">
-                Agregar Dispositivo
+        <!-- FOOTER -->
+        <div class="card-footer bg-white border-top d-flex justify-content-end gap-2">
+            <button type="submit"
+                    class="btn btn-outline-primary px-4">
+                Agregar dispositivo
             </button>
         </div>
 
     </div>
 </EditForm>
+
 
 @code {
 

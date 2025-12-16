@@ -8,12 +8,19 @@
 <!-- Authentication -->
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
 <!-- HEADER -->
-<div class="d-flex justify-content-between W-100">
-    <h3>Buscar Ofertas</h3>
-    <Tooltip Class="d-inline-block" Title="Agregar Oferta" role="button">
-        <button class="btn btn-sm btn-outline-success" @onclick="ShowAddOfferComponent"><Icon Name="IconName.DatabaseAdd" /> Oferta</button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h3 class="mb-0">Buscar Ofertas</h3>
+        <small class="text-muted">Filtre y gestione las ofertas registradas</small>
+    </div>
+
+    <Tooltip Title="Agregar Oferta">
+        <button class="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                @onclick="ShowAddOfferComponent">
+            <Icon Name="IconName.DatabaseAdd" />
+            <span>Oferta</span>
+        </button>
     </Tooltip>
 </div>
 
@@ -23,139 +30,185 @@
 <!-- Canvas -->
 <Offcanvas @ref="offcanvas" />
 
-<!-- Filter Inputs || Add-->
-<div class="row mb-3 d-flex  flex-row">
-    <div class="col-md-2 mb-2 d-flex align-items-center">
-        <div class=" form-floating">
-            <input type="number" class="form-control" id="offerId" @bind="SearchCriteria.OfferId" />
-            <label for="offerId" class="form-label">Numero</label>
+<!-- FILTER CARD -->
+<div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+
+            <!-- Número -->
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input type="number"
+                           class="form-control"
+                           id="offerId"
+                           @bind="SearchCriteria.OfferId" />
+                    <label for="offerId">Número</label>
+                </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="customer"
+                           @bind="SearchCriteria.Customer" />
+                    <label for="customer">Cliente</label>
+                </div>
+                @if (!IsCustomerNameValid)
+                {
+                    <small class="text-danger">
+                        Mínimo 5 caracteres
+                    </small>
+                }
+            </div>
+
+            <!-- Fecha -->
+            @if (ValidInputs.EnableCreation)
+            {
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <div class="form-floating flex-grow-1">
+                        <input type="month"
+                               class="form-control"
+                               id="creationDate"
+                               @bind="SearchCriteria.Creation" />
+                        <label for="creationDate">Creación</label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableCreation = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            }
+
+            <!-- Tipo -->
+            @if (ValidInputs.EnableType)
+            {
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <div class="form-floating flex-grow-1">
+                        <select class="form-select" @bind="SearchCriteria.Type">
+                            <option value="">Seleccionar</option>
+                            <option value="Mantenimiento">Mantenimiento</option>
+                            <option value="Instalacion">Instalación</option>
+                            <option value="Mejoras">Mejoras</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <label>Tipo</label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableType = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            }
+
+            <!-- Estado -->
+            @if (ValidInputs.EnableState)
+            {
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <div class="form-floating flex-grow-1">
+                        <select class="form-select" @bind="SearchCriteria.State">
+                            <option value="">Seleccionar</option>
+                            <option value="Enviado">Enviado</option>
+                            <option value="Negociación">Negociación</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Vendido">Vendido</option>
+                            <option value="Cobro">Cobro</option>
+                        </select>
+                        <label>Estado</label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableState = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            }
+
+            <!-- Responsable -->
+            @if (ValidInputs.EnableResponsible && IsAdmin)
+            {
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <div class="form-floating flex-grow-1">
+                        <select class="form-select" @bind="SearchCriteria.Seller">
+                            @foreach (var i in Sellers)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                        <label>Responsable</label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => ValidInputs.EnableResponsible = false">
+                        <Icon Name="IconName.X" />
+                    </button>
+                </div>
+            }
+
+            <!-- ADD FILTER BUTTONS -->
+            <div class="col-md-12 d-flex gap-1 flex-wrap mt-2">
+                @if (!ValidInputs.EnableCreation)
+                {
+                    <Tooltip Title="Fecha">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableCreation = true">
+                            <Icon Name="IconName.Calendar2Date" />
+                        </button>
+                    </Tooltip>
+                }
+
+                @if (!ValidInputs.EnableState)
+                {
+                    <Tooltip Title="Estado">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableState = true">
+                            <Icon Name="IconName.Check" />
+                        </button>
+                    </Tooltip>
+                }
+
+                @if (!ValidInputs.EnableType)
+                {
+                    <Tooltip Title="Tipo">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableType = true">
+                            <Icon Name="IconName.Type" />
+                        </button>
+                    </Tooltip>
+                }
+
+                @if (!ValidInputs.EnableResponsible && IsAdmin)
+                {
+                    <Tooltip Title="Responsable">
+                        <button class="btn btn-sm btn-outline-success"
+                                @onclick="() => ValidInputs.EnableResponsible = true">
+                            <Icon Name="IconName.People" />
+                        </button>
+                    </Tooltip>
+                }
+            </div>
+
         </div>
     </div>
-    <div class="col-md-2 mb-2 d-flex align-items-center">
-        <div class=" form-floating">
-            <input type="text" class="form-control" id="customer" @bind="SearchCriteria.Customer" />
-            <label for="customer" class="form-label">Nombre del Cliente:</label>
-        </div>
-        @if (!IsCustomerNameValid)
-        {
-            <div class="text-danger">El nombre del cliente debe tener al menos 5 caracteres.</div>
-        }
-    </div>
-
-
-    @if (ValidInputs.EnableCreation)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <div class=" form-floating">
-                <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
-                <label for="creationDate" class="form-label">Fecha de Creación</label>
-            </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCreation = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
-
-
-    @if (ValidInputs.EnableType)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <div class=" form-floating">
-                <select class="form-select" id="type" @bind="SearchCriteria.Type">
-                    <option value="">Seleccionar...</option>
-                    <option value="Mantenimiento">Mantenimiento</option>
-                    <option value="Instalacion">Instalación</option>
-                    <option value="Mejoras">Mejoras</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <label for="type" class="form-label">Tipo de Oferta</label>
-            </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
-
-
-    @if (ValidInputs.EnableState)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <div class=" form-floating">
-                <select class="form-select" id="state" @bind="SearchCriteria.State">
-                    <option value="">Seleccionar...</option>
-                    <option value="Enviado">Enviado</option>
-                    <option value="Negociación">Negociación</option>
-                    <option value="Pendiente">Pendiente</option>
-                    <option value="Vendido">Vendido</option>
-                    <option value="Cobro">Cobro</option>
-                </select>
-                <label for="state" class="form-label">Estado</label>
-
-            </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
-
-
-    @if (ValidInputs.EnableResponsible && IsAdmin)
-    {
-        <div class="col-md-2 mb-2 d-flex align-items-center">
-            <div class=" form-floating">
-                <select class="form-select" id="state" @bind="SearchCriteria.Seller">
-
-                    @foreach (var i in Sellers)
-                    {
-                        <option value="@i">@i</option>
-                    }
-                </select>
-                <label for="state" class="form-label">Responsable</label>
-
-            </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableResponsible = false" class="btn btn-sm btn-outline-danger ms-2" />
-        </div>
-    }
-
-
-    <!-- Add Filter Buttons -->
-    <div class="col mb-2 d-flex flex-row gap-1">
-        @if (!ValidInputs.EnableCreation)
-        {
-            <Tooltip Class="d-inline-block" Title="Filtro de Fechas" role="button">
-                <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-outline-success">
-                    <Icon Name="IconName.Calendar2Date" />
-                </button>
-            </Tooltip>
-        }
-        @if (!ValidInputs.EnableState)
-        {
-            <Tooltip Class="d-inline-block" Title="Filtro de Estado" role="button">
-                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-outline-success">
-                    <Icon Name="IconName.Check" />
-                </button>
-            </Tooltip>
-        }
-        @if (!ValidInputs.EnableType)
-        {
-            <Tooltip Class="d-inline-block" Title="Tipo de Oferta" role="button">
-                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-outline-success">
-                    <Icon Name="IconName.Type" />
-                </button>
-            </Tooltip>
-        }
-        @if (!ValidInputs.EnableResponsible && IsAdmin)
-        {
-            <Tooltip Class="d-inline-block" Title="Filtro de Responsable" role="button">
-                <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-outline-success">
-                    <Icon Name="IconName.People" />
-                </button>
-            </Tooltip>
-        }
-    </div>
-
-
 </div>
 
-<!-- Primary Buttons -->
-<div class="d-flex gap-2 mb-3">
-    <button class="btn btn-outline-primary" @onclick="SearchOffers">Buscar</button>
-    <button class="btn btn-outline-secondary" @onclick="ClearFilters">Limpiar</button>
-    <button @onclick="DownloadReport" class="btn btn-outline-warning">Descargar</button>
+<!-- ACTION BUTTONS -->
+<div class="d-flex gap-2 justify-content-end">
+    <button class="btn btn-outline-primary d-flex align-items-center gap-1"
+            @onclick="SearchOffers">
+        <Icon Name="IconName.Search" />
+        Buscar
+    </button>
+
+    <button class="btn btn-outline-secondary"
+            @onclick="ClearFilters">
+        Limpiar
+    </button>
+
+    <button class="btn btn-outline-warning d-flex align-items-center gap-1"
+            @onclick="DownloadReport">
+        <Icon Name="IconName.Download" />
+        Descargar
+    </button>
 </div>
 
 <!-- Loading Spinner -->
