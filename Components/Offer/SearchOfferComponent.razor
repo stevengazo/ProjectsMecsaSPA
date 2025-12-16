@@ -1,8 +1,16 @@
 ﻿@using ProjectsMecsaSPA.Model
 @using ProjectsMecsaSPA.Utilities
 @inject ProjectsDBContext DbContext
+@inject ApplicationDbContext dbIdentity
 @inject IDbContextFactory<ProjectsDBContext> dbContextFactory
 @inject IJSRuntime JS
+
+<!-- Authentication -->
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@CurrentUserDNI
+@CurrentUserName
 
 <!-- HEADER -->
 <div class="d-flex justify-content-between W-100">
@@ -12,9 +20,12 @@
     </Tooltip>
 </div>
 
+<!-- Toast Message -->
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 
+<!-- Canvas -->
 <Offcanvas @ref="offcanvas" />
+
 <!-- Filter Inputs || Add-->
 <div class="row mb-3 d-flex  flex-row">
     <div class="col-md-2 mb-2 d-flex align-items-center">
@@ -33,6 +44,8 @@
             <div class="text-danger">El nombre del cliente debe tener al menos 5 caracteres.</div>
         }
     </div>
+
+
     @if (ValidInputs.EnableCreation)
     {
         <div class="col-md-2 mb-2 d-flex align-items-center">
@@ -40,9 +53,10 @@
                 <input type="month" class="form-control" id="creationDate" @bind="SearchCriteria.Creation" />
                 <label for="creationDate" class="form-label">Fecha de Creación</label>
             </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCreation = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableCreation = false" class="btn btn-sm btn-outline-danger ms-2" />
         </div>
     }
+
 
     @if (ValidInputs.EnableType)
     {
@@ -57,9 +71,10 @@
                 </select>
                 <label for="type" class="form-label">Tipo de Oferta</label>
             </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableType = false" class="btn btn-sm btn-outline-danger ms-2" />
         </div>
     }
+
 
     @if (ValidInputs.EnableState)
     {
@@ -76,10 +91,12 @@
                 <label for="state" class="form-label">Estado</label>
 
             </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableState = false" class="btn btn-sm btn-outline-danger ms-2" />
         </div>
     }
-    @if (ValidInputs.EnableResponsible)
+
+
+    @if (ValidInputs.EnableResponsible && IsAdmin)
     {
         <div class="col-md-2 mb-2 d-flex align-items-center">
             <div class=" form-floating">
@@ -93,34 +110,44 @@
                 <label for="state" class="form-label">Responsable</label>
 
             </div>
-            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableResponsible = false" class="btn-link btn-sm btn-outline-danger ms-2" />
+            <Icon Name="IconName.X" @onclick="() => ValidInputs.EnableResponsible = false" class="btn btn-sm btn-outline-danger ms-2" />
         </div>
     }
+
+
     <!-- Add Filter Buttons -->
     <div class="col mb-2 d-flex flex-row gap-1">
         @if (!ValidInputs.EnableCreation)
         {
-            <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-success ">
-                Mes <Icon Name="IconName.Calendar2Date" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Filtro de Fechas" role="button">
+                <button @onclick="() => ValidInputs.EnableCreation = true" class="btn btn-sm btn-success">
+                    <Icon Name="IconName.Calendar2Date" />
+                </button>
+            </Tooltip>
         }
         @if (!ValidInputs.EnableState)
         {
-            <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success ">
-                Estado <Icon Name="IconName.Check" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Filtro de Estado" role="button">
+                <button @onclick="() => ValidInputs.EnableState = true" class="btn btn-sm btn-success">
+                    <Icon Name="IconName.Check" />
+                </button>
+            </Tooltip>
         }
         @if (!ValidInputs.EnableType)
         {
-            <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
-                Tipo <Icon Name="IconName.Type" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Tipo de Oferta" role="button">
+                <button @onclick="() => ValidInputs.EnableType = true" class="btn btn-sm btn-success">
+                    <Icon Name="IconName.Type" />
+                </button>
+            </Tooltip>
         }
         @if (!ValidInputs.EnableResponsible)
         {
-            <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-success">
-                Responsable <Icon Name="IconName.People" />
-            </button>
+            <Tooltip Class="d-inline-block" Title="Filtro de Responsable" role="button">
+                <button @onclick="() => ValidInputs.EnableResponsible = true" class="btn btn-sm btn-success">
+                    <Icon Name="IconName.People" />
+                </button>
+            </Tooltip>
         }
     </div>
 
@@ -180,6 +207,7 @@ else
 }
 
 @code {
+
     #region Properties
 
     private List<Offer> Offers { get; set; } = new List<Offer>();
@@ -206,8 +234,20 @@ else
 
     List<ToastMessage> messages = new List<ToastMessage>();
 
-    #endregion
+    /// <summary>
+    /// Get or Set the current user
+    /// </summary>
+    private string? CurrentUserName;
+    /// <summary>
+    /// Validate if the user is admin or not
+    /// </summary>
+    private bool IsAdmin;
+    /// <summary>
+    /// DNI of the responsible
+    /// </summary>
+    private int CurrentUserDNI;
 
+    #endregion
 
     #region Methods
 
@@ -260,6 +300,11 @@ else
             if (!string.IsNullOrEmpty(SearchCriteria.Seller) && ValidInputs.EnableResponsible)
                 query = query.Where(o => o.Responsible == SearchCriteria.Seller);
 
+            if(!IsAdmin)
+            {
+                query = query.Where(r => r.ResponsibleId == CurrentUserDNI.ToString());
+            }
+
             Offers = await query.Take(MaxResults).OrderByDescending(e => e.OfferId).ToListAsync();
             if (Offers.Count == MaxResults)
             {
@@ -299,6 +344,26 @@ else
     {
         LoadSellers();
         base.OnInitializedAsync();
+
+
+        // Load the user data 
+        LoadUserContext();
+    }
+
+    private async Task LoadUserContext()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (!user.Identity?.IsAuthenticated ?? true) 
+            return;
+        CurrentUserName = user.Identity!.Name;
+
+        IsAdmin = user.IsInRole("Admin");
+
+        using( var db = dbIdentity)
+        {
+            CurrentUserDNI = db.Users.FirstOrDefault(e => e.UserName == CurrentUserName).DNI;
+        }
     }
 
     private void ValidateCustomerName()
