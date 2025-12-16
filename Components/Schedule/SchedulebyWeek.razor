@@ -1,4 +1,5 @@
-﻿@inject ProjectsDBContext db
+﻿@using ProjectsMecsaSPA.Utilities
+@inject ProjectsDBContext db
 
 @inject IJSRuntime JS
 
@@ -7,9 +8,32 @@
 <div class="d-flex justify-content-start align-items-center mb-3">
     <button class="btn btn-outline-primary m-1" @onclick="PrevWeek">⟨ Semana anterior</button>
     <button class="btn btn-outline-primary m-1" @onclick="NextWeek">Semana siguiente ⟩</button>
-    <button class="btn btn-success m-1" @onclick="DownloadAsImage">
-        📸 Descargar
-    </button>
+
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Acciones
+        </button>
+
+        <ul class="dropdown-menu">
+            <li>
+                <button class="btn btn-sm m-1" @onclick="DownloadAsImage">
+                    Imagen
+                </button>
+            </li>
+            <li>
+                <button class="btn btn-sm m-1" @onclick="DownloadAsXlsx">
+                    Excel
+                </button>
+            </li>
+           
+        </ul>
+    </div>
+
+
+
 </div>
 
 <div id="weekTable">
@@ -97,13 +121,18 @@
 
 
 @code {
+    #region Properties
+
     [Parameter]
     public List<Schedule> Schedules { get; set; } = new();
 
     private List<Employee> employees = new();
+
     private List<DateTime> weekDays = new();
 
     private DateTime CurrentMonday;
+
+    #endregion
 
     protected override void OnParametersSet()
     {
@@ -122,10 +151,9 @@
         base.OnParametersSet();
     }
 
-    // ============
-    //  LÓGICA DE SEMANAS
-    // ============
 
+
+    #region Week Logic
     private DateTime GetMonday(DateTime date)
     {
         int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
@@ -149,18 +177,21 @@
         BuildWeek(CurrentMonday);
     }
 
-   /* // Genera y descarga el reporte
+    /* // Genera y descarga el reporte
     private async Task DownloadReportAsync()
     {
-        
-       // var data =  agrega la imagen
-      //  var pdfBase64 = Convert.ToBase64String(data);
+
+        // var data =  agrega la imagen
+        //  var pdfBase64 = Convert.ToBase64String(data);
 
         // Invocar una función JavaScript para iniciar la descarga del PDF
         await JS.InvokeVoidAsync("downloadpdf", pdfBase64, $"Calendario_{DateTime.Now:yyyyMMdd_HHmm}.jpg");
-    }*/
+        }*/
+
+    #endregion
 
 
+    #region Downloads 
     private async Task DownloadAsImage()
     {
         // Capturar la tabla como imagen Base64
@@ -177,6 +208,20 @@
             "image/png"
         );
     }
+
+    private async Task DownloadAsXlsx()
+    {
+        var bytes = await XmlsGenerate.GenerateWeekResumeAsync(employees, Schedules);
+        var base64 = Convert.ToBase64String(bytes);
+
+        await JS.InvokeVoidAsync(
+    "downloadFile",
+    base64,
+    "Reporte Semanal.xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    #endregion
 
 
 }
