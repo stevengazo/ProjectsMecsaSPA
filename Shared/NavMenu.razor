@@ -9,19 +9,23 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-      <!-- Kanban -->
+
+        <!-- Kanban -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="" Match="NavLinkMatch.All">
                 <Icon Name="IconName.Kanban" class="text-white mx-1"></Icon> Kanban
             </NavLink>
         </div>
         <!-- Cronograma -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="cronograma">
-                <Icon Name="IconName.People" class="text-white mx-1"></Icon> Cronograma
-            </NavLink>
-        </div>
-
+        <AuthorizeView Roles="administrador,ingeniero">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="cronograma">
+                        <Icon Name="IconName.People" class="text-white mx-1"></Icon> Cronograma
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         <!-- Proyectos -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="projects">
@@ -35,11 +39,15 @@
             </NavLink>
         </div>
         <!-- Facturas -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="billslist">
-                <Icon Name="IconName.CurrencyDollar" class="text-white mx-1"></Icon> Facturas
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="billslist">
+                        <Icon Name="IconName.CurrencyDollar" class="text-white mx-1"></Icon> Facturas
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         <!-- Clientes -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="customers">
@@ -47,24 +55,31 @@
             </NavLink>
         </div>
         <!-- Estadísticas -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="chartsprojects">
-                <Icon Name="IconName.BarChartLineFill" class="text-white mx-1"></Icon> Estadísticas
-            </NavLink>
-        </div>
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="chartsprojects">
+                        <Icon Name="IconName.BarChartLineFill" class="text-white mx-1"></Icon> Estadísticas
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
         <!-- Configuración -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="settings">
-                <Icon Name="IconName.Tools" class="text-white mx-1"></Icon> Configuración
-            </NavLink>
-        </div>
-        <!-- Configuración -->
+        <AuthorizeView Roles="administrador">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="settings">
+                        <Icon Name="IconName.Tools" class="text-white mx-1"></Icon> Configuración
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Ofertas -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="offers">
                 <Icon Name="IconName.Tools" class="text-white mx-1"></Icon> ofertas
             </NavLink>
         </div>
-        
     </nav>
 </div>
 
