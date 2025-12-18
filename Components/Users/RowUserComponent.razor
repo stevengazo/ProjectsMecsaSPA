@@ -4,90 +4,128 @@
 
 <ConfirmDialog @ref="dialog" />
 
-@if (IsEditing)
+@if (!isdelete)
 {
-    <tr>
-        
-        <td>
-            <EditForm Model="item" class="d-flex flex-row">
-                <InputText @bind-Value="item.Name" class="form-control form-control-sm"></InputText>
-                <InputText @bind-Value="item.LastName" class="form-control form-control-sm"></InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="item">
-                <InputNumber @bind-Value="item.DNI" class="form-control form-control-sm"></InputNumber>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="item">
-                <InputText @bind-Value="item.Email" class="form-control form-control-sm"></InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="item">
-                <InputText @bind-Value="item.UserName" class="form-control form-control-sm"></InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="item">
-                <InputCheckbox @bind-Value="item.EmailConfirmed" class=""></InputCheckbox>
-            </EditForm>
-        </td>
-        <td>
-            <button class="btn btn-outline-success btn-sm" @onclick="Update">
-                Guardar
-            </button>
-            <button class="btn btn-outline-danger btn-sm" @onclick="()=>IsEditing =false">
-                Cancelar
-            </button>
-        </td>
-    </tr>
-
-}
-else
-{
-    @if (!isdelete)
+    @if (IsEditing)
     {
-        <tr>
+        <EditForm Model="item" OnValidSubmit="Update">
+            <DataAnnotationsValidator />
+
+            <tr class="table-warning align-middle">
+
+                <!-- NOMBRE -->
+                <td>
+                    <div class="d-flex gap-1">
+                        <InputText class="form-control form-control-sm shadow-sm"
+                                   @bind-Value="item.Name"
+                                   placeholder="Nombre" />
+
+                        <InputText class="form-control form-control-sm shadow-sm"
+                                   @bind-Value="item.LastName"
+                                   placeholder="Apellido" />
+                    </div>
+                </td>
+
+                <!-- DNI -->
+                <td>
+                    <InputNumber class="form-control form-control-sm shadow-sm"
+                                 @bind-Value="item.DNI" />
+                </td>
+
+                <!-- EMAIL -->
+                <td>
+                    <InputText class="form-control form-control-sm shadow-sm"
+                               @bind-Value="item.Email" />
+                </td>
+
+                <!-- USUARIO -->
+                <td>
+                    <InputText class="form-control form-control-sm shadow-sm"
+                               @bind-Value="item.UserName" />
+                </td>
+
+                <!-- ESTADO -->
+                <td class="text-center">
+                    <div class="form-check form-switch d-flex justify-content-center">
+                        <InputCheckbox class="form-check-input shadow-sm"
+                                       @bind-Value="item.EmailConfirmed" />
+                    </div>
+                </td>
+
+                <!-- ACCIONES -->
+                <td class="text-center">
+                    <button type="submit"
+                            class="btn btn-outline-success btn-sm me-1">
+                        Guardar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            @onclick="() => IsEditing = false">
+                        Cancelar
+                    </button>
+                </td>
+
+            </tr>
+        </EditForm>
+    }
+    else
+    {
+        <tr class="align-middle">
+
             <td>
                 @item.Name @item.LastName
             </td>
+
             <td>
                 @item.DNI
             </td>
+
             <td>
                 @item.Email
             </td>
+
             <td>
                 @item.UserName
             </td>
-            @if (item.EmailConfirmed)
-            {
-                <td>
-                    Activo
-                </td>
-            }
-            else
-            {
-                <td>
-                    Inactivo
-                </td>
-            }
-            <td>
-                <a href="user/@item.Id" class="btn btn-outline-info btn-sm">
+
+            <!-- ESTADO -->
+            <td class="text-center">
+                @if (item.EmailConfirmed)
+                {
+                    <span class="badge bg-success">Activo</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactivo</span>
+                }
+            </td>
+
+            <!-- ACCIONES -->
+            <td class="text-center">
+                <a href="user/@item.Id"
+                   class="btn btn-outline-info btn-sm me-1"
+                   title="Ver">
                     <Icon Name="IconName.Eye" />
                 </a>
-                <button class="btn btn-outline-success btn-sm" @onclick="()=>IsEditing =true">
+
+                <button class="btn btn-outline-success btn-sm me-1"
+                        title="Editar"
+                        @onclick="() => IsEditing = true">
                     <Icon Name="IconName.PencilFill" />
                 </button>
-                <a class="btn btn-outline-danger btn-sm" @onclick="ShowConfirmationAsync">
+
+                <button class="btn btn-outline-danger btn-sm"
+                        title="Eliminar"
+                        @onclick="ShowConfirmationAsync">
                     <Icon Name="IconName.XCircleFill" />
-                </a>
+                </button>
             </td>
+
         </tr>
     }
 }
+
 
 
 @code {

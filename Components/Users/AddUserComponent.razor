@@ -3,50 +3,123 @@
 @inject SignInManager<UserIdentityEx> _signInManager
 @inject UserManager<UserIdentityEx> userManager
 
+<!-- ===================================== -->
+<!-- DATOS DEL USUARIO -->
+<!-- ===================================== -->
 <EditForm Model="user">
-    <div>
-        <label>Nombre</label>
-        <InputText @bind-Value="user.Name" class="form-control" > </InputText>
-    </div>
-    <div>
-        <label>Apellidos</label>
-        <InputText @bind-Value="user.LastName" class="form-control"> </InputText>
-    </div>
-    <div>
-        <label>Cedula</label>
-        <InputNumber @bind-Value="user.DNI" class="form-control"> </InputNumber>
-    </div>
-    <div>
-        <label>Nombre Usuario</label>
-        <InputText @bind-Value="user.UserName" class="form-control"> </InputText>
-    </div>
-    <div>
-        <label>Correo</label>
-        <InputText @bind-Value="user.Email" class="form-control"> </InputText>
-    </div>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-    <div>
-        <label>Telefono</label>
-        <InputText @bind-Value="user.PhoneNumber" class="form-control"> </InputText>
+    <h5 class="fw-bold text-center mb-4">Datos del Usuario</h5>
+
+    <div class="row g-3 p-2">
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="Name"
+                           class="form-control shadow-sm"
+                           @bind-Value="user.Name" />
+                <label for="Name">Nombre</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="LastName"
+                           class="form-control shadow-sm"
+                           @bind-Value="user.LastName" />
+                <label for="LastName">Apellidos</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputNumber id="DNI"
+                             class="form-control shadow-sm"
+                             @bind-Value="user.DNI" />
+                <label for="DNI">Cédula</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="UserName"
+                           class="form-control shadow-sm"
+                           @bind-Value="user.UserName" />
+                <label for="UserName">Nombre de Usuario</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="Email"
+                           type="email"
+                           class="form-control shadow-sm"
+                           @bind-Value="user.Email" />
+                <label for="Email">Correo</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="PhoneNumber"
+                           class="form-control shadow-sm"
+                           @bind-Value="user.PhoneNumber" />
+                <label for="PhoneNumber">Teléfono</label>
+            </div>
+        </div>
     </div>
 </EditForm>
+
+<hr class="my-4" />
+
+<!-- ===================================== -->
+<!-- CREDENCIALES -->
+<!-- ===================================== -->
 <EditForm Model="PassObj">
-    <div>
-        <label>Contraseña</label>
-        <InputText @bind-Value="PassObj.Password" class="form-control"> </InputText>
-    </div>
-    <div> 
-        <label>Contraseña Confirmar</label>
-        <InputText @bind-Value="PassObj.ConfirmPass" class="form-control"> </InputText>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <h5 class="fw-bold text-center mb-4">Credenciales</h5>
+
+    <div class="row g-3 p-2">
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="Password"
+                           type="password"
+                           class="form-control shadow-sm"
+                           @bind-Value="PassObj.Password" />
+                <label for="Password">Contraseña</label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-floating">
+                <InputText id="ConfirmPass"
+                           type="password"
+                           class="form-control shadow-sm"
+                           @bind-Value="PassObj.ConfirmPass" />
+                <label for="ConfirmPass">Confirmar Contraseña</label>
+            </div>
+        </div>
     </div>
 </EditForm>
 
-<button  class="btn btn-outline-success" @onclick="Add">
-    Guardar Usuario
-</button>
-<label class="text-danger">
-    @errorMessage
-</label>
+<!-- ===================================== -->
+<!-- ACCIONES -->
+<!-- ===================================== -->
+<div class="text-center mt-4">
+    <button class="btn btn-outline-success px-5" @onclick="Add">
+        Guardar Usuario
+    </button>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="text-danger mt-2">
+            @errorMessage
+        </div>
+    }
+</div>
+
 
 @code {
     UserIdentityEx user = new();

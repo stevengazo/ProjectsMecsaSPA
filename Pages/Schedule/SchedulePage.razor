@@ -1,0 +1,40 @@
+﻿@page "/cronograma"
+@using ProjectsMecsaSPA.Components.Shared.Calendar
+
+@inject ProjectsDBContext db
+
+
+<h3>Cronograma</h3>
+<Tabs>
+    <Tab Title="Vista de calendario">
+        <Content>
+            <Calendar Schedules="Schedules" />
+        </Content>
+    </Tab>
+    <Tab Title="Vista de lista">
+        <Content>
+            <SchedulebyWeek Schedules="Schedules" />
+        </Content>
+    </Tab>
+</Tabs>
+
+
+
+@code {
+
+    private List<Schedule> Schedules = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Schedules = await db.Schedules
+                                .AsNoTracking()
+                                .Where(e => e.Start.Year == DateTime.Now.Year)
+                                .Include(e => e.SchEmpls)
+                                .ThenInclude(se => se.Employee)
+                                .Include(e => e.Project)
+                                .ThenInclude(e => e.Type)
+                                .Include(e => e.SchDevs)
+                                .ThenInclude(e => e.Device)
+                                .ToListAsync();
+    }
+}

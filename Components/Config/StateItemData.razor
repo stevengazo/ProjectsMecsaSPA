@@ -1,34 +1,67 @@
 ﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<div class="card p-2 shadow-sm d-flex m-1 flex-row justify-content-between align-items-center gap-2">  
-    <div class="d-flex flex-row gap-4">
-        <label class="bg-success text-white p-2 rounded shadow">
-            @StateItem.OrderPriority
-        </label>
-        <label class="mb-0 flex-grow-1">@StateItem.StateName</label>
-    </div>
-    <div>
-        @if (CanEdit)
-        {
-            <EditForm Model="@StateItem" OnValidSubmit="EditState" class="d-flex align-items-center gap-2">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <InputText class="form-control form-control-sm" @bind-Value="StateItem.StateName" style="width: 200px;" />
-                <InputNumber class="form-control form-control-sm" @bind-Value="StateItem.OrderPriority" style="width: 200px;" />
+<div class="card shadow-sm border-0 p-2 my-1">
+    <div class="d-flex justify-content-between align-items-center">
+
+        <!-- Información -->
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-success shadow-sm px-3 py-2">
+                @StateItem.OrderPriority
+            </span>
+
+            <span class="fw-semibold text-muted">
+                @StateItem.StateName
+            </span>
+        </div>
+
+        <!-- Acciones -->
+        <div>
+            @if (CanEdit)
+            {
+                <EditForm Model="@StateItem"
+                          OnValidSubmit="EditState"
+                          class="d-flex align-items-center gap-2">
+
+                    <DataAnnotationsValidator />
+
+                    <InputText class="form-control form-control-sm"
+                               @bind-Value="StateItem.StateName"
+                               placeholder="Nombre"
+                               style="width: 180px;" />
+
+                    <InputNumber class="form-control form-control-sm"
+                                 @bind-Value="StateItem.OrderPriority"
+                                 placeholder="Prioridad"
+                                 style="width: 90px;" />
+
+                    <button type="submit"
+                            class="btn btn-sm btn-outline-success">
+                        ✔
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            @onclick="() => CanEdit = false">
+                        ✖
+                    </button>
+                </EditForm>
 
                 @if (!string.IsNullOrEmpty(ErrorMessage))
                 {
-                    <div class="text-danger">@ErrorMessage</div>
+                    <div class="text-danger small mt-1">
+                        @ErrorMessage
+                    </div>
                 }
+            }
+            else
+            {
+                <button class="btn btn-sm btn-outline-primary"
+                        @onclick="() => CanEdit = true">
+                    ✎
+                </button>
+            }
+        </div>
 
-                <button type="submit" class="btn btn-success btn-sm">✔</button>
-                <button type="button" class="btn btn-secondary btn-sm" @onclick="()=> CanEdit = false">✖</button>
-            </EditForm>
-        }
-        else
-        {
-            <button class="btn btn-primary btn-sm" @onclick="()=> CanEdit = true">✎</button>
-        }
     </div>
 </div>
 

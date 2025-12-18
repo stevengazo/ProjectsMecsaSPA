@@ -9,38 +9,61 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <table class="table table-hover border table-sm">
-            <tbody>
-                <tr>
-                    <th>Número</th>
-                    <td>@tmpOffer.OfferId</td>
-                </tr>
-                <tr>
-                    <th>Fecha</th>
-                    <td>
-                        <InputDate @bind-Value="tmpOffer.Creation" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => tmpOffer.Creation)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Cliente</th>
-                    <td>
-                        <InputText @bind-Value="tmpOffer.Customer" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => tmpOffer.Customer)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Descripción</th>
-                    <td>
-                        <InputText @bind-Value="tmpOffer.Description" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => tmpOffer.Description)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Tipo Contacto</th>
-                    <td>
-                        <InputSelect @bind-Value="tmpOffer.ContactType" class="form-control form-control-sm">
-                            <option value=" ">Seleccione una opción</option>
+        <!-- ========================================================= -->
+        <!-- INFORMACIÓN GENERAL -->
+        <!-- ========================================================= -->
+        <h5 class="text-center fw-bold mb-4">Información General</h5>
+
+        <div class="p-2">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="fw-semibold text-muted small">Número</div>
+                    <div>@tmpOffer.OfferId</div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputDate class="form-control shadow-sm"
+                                   @bind-Value="tmpOffer.Creation" />
+                        <label>Fecha Registro</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.Creation)" class="text-danger small" />
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="tmpOffer.Customer" />
+                        <label>Cliente</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.Customer)" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <div class="form-floating">
+                    <InputTextArea class="form-control shadow-sm"
+                                   @bind-Value="tmpOffer.Description" />
+                    <label>Descripción</label>
+                </div>
+                <ValidationMessage For="@(() => tmpOffer.Description)" class="text-danger small" />
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- ========================================================= -->
+        <!-- CLASIFICACIÓN -->
+        <!-- ========================================================= -->
+        <h5 class="text-center fw-bold mb-4">Clasificación</h5>
+
+        <div class="p-2">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect class="form-control shadow-sm"
+                                     @bind-Value="tmpOffer.ContactType">
+                            <option value="">Seleccione</option>
                             <option value="Vendedor">Vendedor</option>
                             <option value="Reactivación">Reactivación</option>
                             <option value="Whatsapp">Whatsapp</option>
@@ -48,104 +71,149 @@
                             <option value="Llamada">Llamada</option>
                             <option value="Otro">Otro</option>
                         </InputSelect>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Tipo</th>
-                    <td>
-                        <InputSelect @bind-Value="tmpOffer.Type" class="form-control form-control-sm">
+                        <label>Tipo de Contacto</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect class="form-control shadow-sm"
+                                     @bind-Value="tmpOffer.Type">
                             <option value="Mantenimiento">Mantenimiento</option>
                             <option value="Instalación">Instalación</option>
                             <option value="Mejoras">Mejoras</option>
                             <option value="Otro">Otro</option>
                         </InputSelect>
-                        <ValidationMessage For="@(() => tmpOffer.Type)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincular a DDCE</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequiredDDCE" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincular a Pararrayos</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequiredLightningStrike" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincula a Torre</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequireTower" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincular a SPAT</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequireSPAT" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincular a supresores</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequireSurgeProtector" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vincular a Otros</th>
-                    <td>
-                        <InputCheckbox @bind-Value="tmpOffer.RequireOther" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Monto</th>
-                    <td>
-                        <InputNumber @bind-Value="tmpOffer.Amount" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => tmpOffer.Amount)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Calculado Por</th>
-                    <td>
-                        <InputText @bind-Value="tmpOffer.CalculateBy" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => tmpOffer.CalculateBy)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Responsable</th>
-                    <td>
-                        <InputSelect @bind-Value="tmpOffer.ResponsibleId" class="form-control form-control-sm">
+                        <label>Tipo de Oferta</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.Type)" class="text-danger small" />
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- ========================================================= -->
+        <!-- REQUERIMIENTOS -->
+        <!-- ========================================================= -->
+        <h5 class="text-center fw-bold mb-4">Requerimientos</h5>
+
+        <div class="p-2">
+            <div class="form-check form-switch mb-2">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequiredDDCE" />
+                <label class="form-check-label fw-semibold">Vincular a DDCE</label>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequiredLightningStrike" />
+                <label class="form-check-label fw-semibold">Vincular a Pararrayos</label>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequireTower" />
+                <label class="form-check-label fw-semibold">Vincular a Torre</label>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequireSPAT" />
+                <label class="form-check-label fw-semibold">Vincular a SPAT</label>
+            </div>
+
+            <div class="form-check form-switch mb-2">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequireSurgeProtector" />
+                <label class="form-check-label fw-semibold">Vincular a Supresores</label>
+            </div>
+
+            <div class="form-check form-switch">
+                <InputCheckbox class="form-check-input shadow-sm"
+                               @bind-Value="tmpOffer.RequireOther" />
+                <label class="form-check-label fw-semibold">Vincular a Otros</label>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- ========================================================= -->
+        <!-- DATOS COMERCIALES -->
+        <!-- ========================================================= -->
+        <h5 class="text-center fw-bold mb-4">Datos Comerciales</h5>
+
+        <div class="p-2">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputNumber class="form-control shadow-sm"
+                                     @bind-Value="tmpOffer.Amount" />
+                        <label>Monto</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.Amount)" class="text-danger small" />
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="tmpOffer.CalculateBy" />
+                        <label>Calculado Por</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.CalculateBy)" class="text-danger small" />
+                </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect class="form-control shadow-sm"
+                                     @bind-Value="tmpOffer.ResponsibleId">
                             @foreach (var item in sellers)
                             {
                                 <option value="@item.SellerId">@item.SellerName</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="@(() => tmpOffer.ResponsibleId)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Etapa</th>
-                    <td>
-                        <InputSelect @bind-Value="tmpOffer.State" class="form-control form-control-sm">
+                        <label>Responsable</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.ResponsibleId)" class="text-danger small" />
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect class="form-control shadow-sm"
+                                     @bind-Value="tmpOffer.State">
                             <option value="Enviado">Enviado</option>
                             <option value="Negociación">Negociación</option>
                             <option value="Pendiente">Pendiente</option>
                             <option value="Vendido">Vendido</option>
                             <option value="Cobro">Cobro</option>
                         </InputSelect>
-                        <ValidationMessage For="@(() => tmpOffer.State)" />
-                    </td>
-                </tr>
+                        <label>Etapa</label>
+                    </div>
+                    <ValidationMessage For="@(() => tmpOffer.State)" class="text-danger small" />
+                </div>
+            </div>
+        </div>
 
+        <!-- ========================================================= -->
+        <!-- ACCIONES -->
+        <!-- ========================================================= -->
+        <div class="form-group mt-4 text-center">
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm me-2"
+                    @onclick="CancelEdit">
+                Cancelar
+            </button>
 
-                <!-- Aquí puedes agregar más campos si es necesario -->
-            </tbody>
-        </table>
+            <button type="submit"
+                    class="btn btn-outline-info btn-sm">
+                Actualizar
+            </button>
+        </div>
 
-        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
-        <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
     </EditForm>
+
 }
 else
 {

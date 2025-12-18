@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20250930005012_InitialDb")]
-    partial class InitialDb
+    [Migration("20251215162034_InitialProMig")]
+    partial class InitialProMig
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -57,6 +57,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("DeletedReason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LastEditionDate")
                         .HasColumnType("datetime2");
@@ -206,6 +213,63 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                             Name = "Default",
                             Type = "Publico"
                         });
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Device", b =>
+                {
+                    b.Property<int>("DeviceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceId"), 1L, 1);
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeviceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeviceId");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Employee", b =>
+                {
+                    b.Property<int>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"), 1L, 1);
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmployeeId");
+
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.FileModel", b =>
@@ -434,6 +498,111 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasIndex("TypeId");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchDev", b =>
+                {
+                    b.Property<int>("SchDevId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchDevId"), 1L, 1);
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SchDevId");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Schedule_Device");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
+                {
+                    b.Property<int>("ScheduleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleId"), 1L, 1);
+
+                    b.Property<string>("Car")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CarPlate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("DependencyId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Draft")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("WeekendWork")
+                        .HasColumnType("bit");
+
+                    b.HasKey("ScheduleId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Schedules");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchEmpl", b =>
+                {
+                    b.Property<int>("SchEmplId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchEmplId"), 1L, 1);
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SchEmplId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Schedule_Employee");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Seller", b =>
@@ -728,6 +897,55 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Type");
                 });
 
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchDev", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Device", "Device")
+                        .WithMany("SchDevs")
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectsMecsaSPA.Model.Schedule", "Schedule")
+                        .WithMany("SchDevs")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
+
+                    b.Navigation("Schedule");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
+                        .WithMany("Schedules")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchEmpl", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Employee", "Employee")
+                        .WithMany("SchEmpls")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectsMecsaSPA.Model.Schedule", "Schedule")
+                        .WithMany("SchEmpls")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>
                 {
                     b.Navigation("BillFiles");
@@ -743,6 +961,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Projects");
                 });
 
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Device", b =>
+                {
+                    b.Navigation("SchDevs");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Employee", b =>
+                {
+                    b.Navigation("SchEmpls");
+                });
+
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Project", b =>
                 {
                     b.Navigation("Bills");
@@ -750,6 +978,15 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Commentaries");
 
                     b.Navigation("Files");
+
+                    b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
+                {
+                    b.Navigation("SchDevs");
+
+                    b.Navigation("SchEmpls");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Seller", b =>

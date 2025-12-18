@@ -1,0 +1,85 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<EditForm Model="newDevice" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="card shadow-sm border-0">
+
+        <!-- HEADER -->
+        <div class="card-header bg-white border-bottom">
+            <h5 class="fw-semibold text-primary mb-1">
+                Nuevo Dispositivo
+            </h5>
+            <small class="text-muted">
+                Registre la información básica del equipo
+            </small>
+        </div>
+
+        <!-- BODY -->
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Nombre -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="DeviceName"
+                                   class="form-control"
+                                   placeholder="Nombre"
+                                   @bind-Value="newDevice.DeviceName" />
+                        <label for="DeviceName">Nombre del dispositivo</label>
+                    </div>
+                </div>
+
+                <!-- Tipo -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputSelect id="DeviceType"
+                                     class="form-select"
+                                     @bind-Value="newDevice.DeviceType">
+                            <option value="" disabled selected></option>
+                            <option value="Medicion">Equipo de Medición</option>
+                        </InputSelect>
+                        <label for="DeviceType">Tipo de dispositivo</label>
+                    </div>
+                </div>
+
+                <!-- Serie -->
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText id="SerialNumber"
+                                   class="form-control"
+                                   placeholder="Serie"
+                                   @bind-Value="newDevice.SerialNumber" />
+                        <label for="SerialNumber">Número de serie</label>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="card-footer bg-white border-top d-flex justify-content-end gap-2">
+            <button type="submit"
+                    class="btn btn-outline-primary px-4">
+                Agregar dispositivo
+            </button>
+        </div>
+
+    </div>
+</EditForm>
+
+
+@code {
+
+    private Device newDevice = new Device();
+
+
+
+    private async Task HandleValidSubmit()
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+        dbContext.Devices.Add(newDevice);
+        await dbContext.SaveChangesAsync();
+        newDevice = new Device(); // Reset the form
+    }
+}

@@ -6,162 +6,138 @@
 
 
 
-@if (IsEditing)
-{
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>
-                    Datos
-                </th>
-                <th>
-                    Información
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    @nameof(user.Name)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputText class="form-control" @bind-Value="user.Name" />
-                    </EditForm>
+<div class="border rounded shadow-sm p-3">
 
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.LastName)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputText class="form-control" @bind-Value="user.LastName" />
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.Email)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputText class="form-control" @bind-Value="user.Email" />
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.UserName)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputText class="form-control" @bind-Value="user.UserName" />
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.PhoneNumber)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputText class="form-control" @bind-Value="user.PhoneNumber" />
-                    </EditForm>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.DNI)
-                </td>
-                <td>
-                    <EditForm Model="user">
-                        <InputNumber class="form-control" @bind-Value="user.DNI" />
-                    </EditForm>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <button class="btn btn-sm btn-outline-success" @onclick="UpdateUser">
-        Guardar
-    </button>
-    <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=false">
-        Cancelar
-    </button>
+    @if (IsEditing)
+    {
+        <EditForm Model="user" OnValidSubmit="UpdateUser">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-}
-else
-{
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>
-                    Datos
-                </th>
-                <th>
-                    Información
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    @nameof(user.Name)
-                </td>
-                <td>
-                    @user.Name
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.LastName)
-                </td>
-                <td>
-                    @user.LastName
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.Email)
-                </td>
-                <td>
-                    @user.Email
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.UserName)
-                </td>
-                <td>
-                    @user.UserName
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.PhoneNumber)
-                </td>
-                <td>
-                    @user.PhoneNumber
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    @nameof(user.DNI)
-                </td>
-                <td>
-                    @user.DNI
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <button class="btn btn-sm btn-outline-warning" @onclick="()=>IsEditing=true">
-        Editar
-    </button>
-    <button class="btn btn-sm btn-outline-warning" @onclick="ShowPasswordChange">
-        Cambio Contraseña
-    </button>
-}
+            <h5 class="text-center fw-bold mb-4">Editar Usuario</h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="user.Name" />
+                        <label>Nombre</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="user.LastName" />
+                        <label>Apellido</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="user.Email" />
+                        <label>Correo</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="user.UserName" />
+                        <label>Usuario</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputText class="form-control shadow-sm"
+                                   @bind-Value="user.PhoneNumber" />
+                        <label>Teléfono</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <InputNumber class="form-control shadow-sm"
+                                     @bind-Value="user.DNI" />
+                        <label>Cédula</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                <button type="submit"
+                        class="btn btn-outline-success btn-sm me-2">
+                    Guardar
+                </button>
+
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        @onclick="() => IsEditing = false">
+                    Cancelar
+                </button>
+            </div>
+        </EditForm>
+    }
+    else
+    {
+        <h5 class="text-center fw-bold mb-4">Detalle del Usuario</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Nombre</div>
+                <div>@user.Name</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Apellido</div>
+                <div>@user.LastName</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Correo</div>
+                <div>@user.Email</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Usuario</div>
+                <div>@user.UserName</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Teléfono</div>
+                <div>@user.PhoneNumber</div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="fw-semibold text-muted small">Cédula</div>
+                <div>@user.DNI</div>
+            </div>
+
+        </div>
+
+        <div class="text-center d-flex justify-content-start mt-4">
+            <Tooltip Class="d-inline-block" Title="Editar Usuario" role="button">
+                <button class="btn btn-outline-warning btn-sm me-2"
+                        @onclick="() => IsEditing = true">
+                    Editar
+                </button>
+            </Tooltip>
+            <Tooltip Class="d-inline-block" Title="Editar Contraseña" role="button">
+                <button class="btn btn-outline-info btn-sm"
+                        @onclick="ShowPasswordChange">
+                    Cambio Contraseña
+                </button>
+            </Tooltip>
+        </div>
+    }
+
+</div>
 
 
 

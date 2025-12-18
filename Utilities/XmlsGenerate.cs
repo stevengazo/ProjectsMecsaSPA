@@ -6,9 +6,23 @@ using static ProjectsMecsaSPA.Pages.Bill.BillsListPage;
 
 namespace ProjectsMecsaSPA.Utilities
 {
+    /// <summary>
+    /// Proporciona métodos utilitarios para la generación de archivos Excel
+    /// relacionados con ofertas y proyectos utilizando ClosedXML.
+    /// </summary>
     public static class XmlsGenerate
     {
-
+        #region Offers
+        /// <summary>
+        /// Genera un archivo Excel con el listado de ofertas.
+        /// </summary>
+        /// <param name="offers">
+        /// Colección de ofertas a exportar. Cada oferta se representa como una fila
+        /// con información general, requisitos técnicos y montos.
+        /// </param>
+        /// <returns>
+        /// Un arreglo de bytes que representa el archivo Excel generado.
+        /// </returns>
         public static async Task<byte[]> GenerateFileOffers(IEnumerable<Offer> offers)
         {
             using var workbook = new XLWorkbook();
@@ -82,6 +96,20 @@ namespace ProjectsMecsaSPA.Utilities
             workbook.SaveAs(memoryStream);
             return memoryStream.ToArray();
         }
+
+        #endregion
+
+        #region Projects
+
+        /// <summary>
+        /// Genera un archivo Excel con un resumen de proyectos y su información de facturación.
+        /// </summary>
+        /// <param name="projects">
+        /// Colección de proyectos con información resumida de montos, facturas y estado.
+        /// </param>
+        /// <returns>
+        /// Un arreglo de bytes que representa el archivo Excel generado.
+        /// </returns>
         public static async Task<byte[]> GenerateFileProjects(IEnumerable<ProjectBillSummary> projects)
         {
             using var workbook = new XLWorkbook();
@@ -122,16 +150,30 @@ namespace ProjectsMecsaSPA.Utilities
             return memoryStream.ToArray();
         }
 
-
-
-
+        /// <summary>
+        /// Genera un archivo Excel con el listado completo de proyectos.
+        /// </summary>
+        /// <param name="projects">
+        /// Lista de proyectos a exportar.
+        /// </param>
+        /// <returns>
+        /// Un arreglo de bytes que representa el archivo Excel generado.
+        /// </returns>
         public static async Task<byte[]> GenerateFileProjects(List<Project> projects)
         {
             return await GenerateFileProjects(projects.AsEnumerable());
         }
 
-
-
+        /// <summary>
+        /// Genera un archivo Excel con información detallada de proyectos.
+        /// </summary>
+        /// <param name="projects">
+        /// Colección de proyectos que incluye datos generales, cliente, estado,
+        /// montos, moneda y condiciones del proyecto.
+        /// </param>
+        /// <returns>
+        /// Un arreglo de bytes que representa el archivo Excel generado.
+        /// </returns>
         public static async Task<byte[]> GenerateFileProjects(IEnumerable<Project> projects)
         {
             using var workbook = new XLWorkbook();
@@ -193,11 +235,109 @@ namespace ProjectsMecsaSPA.Utilities
             workbook.SaveAs(memoryStream);
             return memoryStream.ToArray();
         }
+
+        #endregion
+
+
+        #region Weeks
+
+        public static async Task<byte[]> GenerateWeekResumeAsync(IEnumerable<Employee> employees, IEnumerable<Schedule> schedules)
+        {
+            // Define the current week (starting from Monday)
+            var currentMonday = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
+            var weekDays = Enumerable.Range(0, 7).Select(i => currentMonday.AddDays(i)).ToList();
+
+            // Create the Excel file
+            using var workbook = new XLWorkbook();
+            workbook.Author = "SPA - Projects";
+
+            // Create the worksheet
+            var worksheet = workbook.Worksheets.Add("Semana");
+
+            // Title: Week of [currentMonday] to [currentMonday + 6]
+            worksheet.Cell(1, 1).Value = $"Semana del {currentMonday:dd MMM yyyy} al {currentMonday.AddDays(6):dd MMM yyyy}";
+            worksheet.Cell(1, 1).Style.Font.Bold = true;
+            worksheet.Cell(1, 1).Style.Font.FontSize = 14;
+
+            // Add table headers (days of the week)
+            worksheet.Cell(3, 1).Value = "Empleado";  // Employee header
+            for (int i = 0; i < 7; i++)
+            {
+                var day = weekDays[i];
+                worksheet.Cell(3, i + 2).Value = $"{day:dddd}\n{day:dd/MM}";
+                worksheet.Cell(3, i + 2).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Cell(3, i + 2).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+                worksheet.Cell(3, i + 2).Style.Font.Bold = true;
+            }
+
+            // Fill the table rows with employees' schedules
+            int row = 4;
+            foreach (var employee in employees)
+            {
+                // Get the schedules for the employee during the week
+                var employeeSchedules = schedules
+                    .Where(s => s.SchEmpls.Any(se => se.EmployeeId == employee.EmployeeId))
+                    .ToList();
+
+                worksheet.Cell(row, 1).Value = $"{employee.FirstName} {employee.LastName}";
+                if (employee.Position == "Tecnico")
+                {
+                    worksheet.Cell(row, 1).Style.Font.Italic = true; // Mark technician
+                }
+
+                // Fill in each day for the employee
+                for (int i = 0; i < 7; i++)
+                {
+                    var day = weekDays[i];
+                    var daySchedules = employeeSchedules
+                        .Where(s => s.Start.Date <= day.Date && s.End.Date >= day.Date)
+                        .ToList();
+
+                    var cell = worksheet.Cell(row, i + 2);
+                    if (!daySchedules.Any())
+                    {
+                        cell.Value = "-";  // No schedule
+                        cell.Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+                        cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                    }
+                    else
+                    {
+                        // Loop through the schedules for this day and display the details
+                        foreach (var schedule in daySchedules)
+                        {
+
+                            var projectTitle = schedule.Project?.Title ?? "No Project";
+                            var projectId = schedule.Project?.ProjectId ;
+                            var province = schedule.Project?.Province ?? "N/A";
+                            var projectType = schedule.Project?.Type?.Name ?? "N/A";
+                            var car = schedule.Car ?? "N/A";
+
+                            cell.Value = $"Proyecto: {projectId} - {projectTitle}";
+                           
+                            cell.Style.Alignment.SetVertical(XLAlignmentVerticalValues.Top);
+                            cell.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Left);
+                            cell.Style.Border.TopBorder = XLBorderStyleValues.Thin;
+
+                            // Add project details in the next lines (simulated)
+                            cell.Style.Alignment.SetWrapText(true);
+                            cell.Value += $"\nProvincia: {province}\nTipo: {projectType}\nAuto: {car}";
+                        }
+                    }
+
+                    // Adjust column width to fit content
+                    worksheet.Columns().AdjustToContents();
+                }
+                row++;
+            }
+
+            // Save the file in a memory stream
+            using var memoryStream = new MemoryStream();
+            workbook.SaveAs(memoryStream);
+
+            return memoryStream.ToArray();
+        }
+
+        #endregion
+
     }
-
-
-
-
-
-
 }

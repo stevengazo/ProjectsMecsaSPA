@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Proyectos <Icon Name="IconName.Lightning"></Icon></a>
+        <a class="navbar-brand" href="">Proyectos</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,48 +9,88 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
+        <!-- Kanban -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="" Match="NavLinkMatch.All">
-                <Icon Name="IconName.Kanban" class="text-white mx-1"></Icon> Coordinación
+                <Icon Name="IconName.Kanban" class="text-white mx-1"></Icon> Kanban
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="direct-sales">
-                <Icon Name="IconName.CashCoin" class="text-white mx-1"></Icon> Ventas Directas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="customers">
-                <Icon Name="IconName.People" class="text-white mx-1"></Icon> Clientes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="projects">
-                <Icon Name="IconName.Activity" class="text-white mx-1"></Icon> Proyectos
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="billslist">
-                <Icon Name="IconName.CurrencyDollar" class="text-white mx-1"></Icon> Facturas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="chartsprojects">
-                <Icon Name="IconName.BarChartLineFill" class="text-white mx-1"></Icon> Estadisticas
-            </NavLink>
-        </div>
+        <!-- Cronograma -->
+        <AuthorizeView Roles="administrador,ingeniero,asistente">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="cronograma">
+                        <Icon Name="IconName.People" class="text-white mx-1"></Icon> Cronograma
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Proyectos -->
+        <AuthorizeView Roles="administrador,ingeniero,asistente">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="projects">
+                        <Icon Name="IconName.Activity" class="text-white mx-1"></Icon> Proyectos
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Ventas Directas -->
+        <AuthorizeView Roles="administrador,ingeniero,asistente">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="direct-sales">
+                        <Icon Name="IconName.Activity" class="text-white mx-1"></Icon> Ventas Directas
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Facturas -->
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="billslist">
+                        <Icon Name="IconName.CurrencyDollar" class="text-white mx-1"></Icon> Facturas
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Clientes -->
+        <AuthorizeView Roles="administrador,ingeniero,asistente,contabilidad">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="customers">
+                        <Icon Name="IconName.People" class="text-white mx-1"></Icon> Clientes
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Ofertas -->
         <div class="nav-item px-3">
             <NavLink class="nav-link px-2" href="offers">
-                <Icon Name="IconName.FileCheck" class="text-white mx-1"></Icon> Ofertas
+                <Icon Name="IconName.Cash" class="text-white mx-1"></Icon> ofertas
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link px-2" href="settings">
-                <Icon Name="IconName.Tools" class="text-white mx-1"></Icon> Configuracion
-            </NavLink>
-        </div>
-        
+        <!-- Estadísticas -->
+        <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="chartsprojects">
+                        <Icon Name="IconName.BarChartLineFill" class="text-white mx-1"></Icon> Estadísticas
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        <!-- Configuración -->
+        <AuthorizeView Roles="administrador">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link px-2" href="settings">
+                        <Icon Name="IconName.Tools" class="text-white mx-1"></Icon> Configuración
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 

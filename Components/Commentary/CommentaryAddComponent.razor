@@ -4,12 +4,20 @@
 @inject AuthenticationStateProvider asp;
 @inject Bitrix24ClientService bitrix24Client;
 
-<EditForm Model="commentary" class="d-flex flex-column gap-1 my-1">
-    <div >
-        <InputTextArea @bind-Value="commentary.CommentaryText" class="form-control" />
-    </div>
-    <button class="btn w-100 btn-sm btn-outline-success" @onclick="Add">Agregar</button>
+<EditForm Model="commentary" class="d-flex flex-column gap-2 my-2">
+
+    <InputTextArea @bind-Value="commentary.CommentaryText"
+                   class="form-control"
+                   placeholder="Escribe tu comentario..."
+                   rows="3" />
+
+    <button class="btn btn-sm btn-outline-success align-self-end px-4"
+            @onclick="Add">
+        Agregar
+    </button>
+
 </EditForm>
+
 @code {
     [Parameter]
     public int ProjectId { get; set; }

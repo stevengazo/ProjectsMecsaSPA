@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class InitialDb : Migration
+    public partial class InitialProMig : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -35,6 +35,38 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.CustomerId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Devices",
+                columns: table => new
+                {
+                    DeviceId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DeviceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DeviceType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devices", x => x.DeviceId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.EmployeeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -193,6 +225,8 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     LastEditor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastEditionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BillDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedReason = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -254,6 +288,36 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 });
 
             migrationBuilder.CreateTable(
+                name: "Schedules",
+                columns: table => new
+                {
+                    ScheduleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TaskName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DependencyId = table.Column<int>(type: "int", nullable: false),
+                    Start = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    End = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CarPlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Car = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WeekendWork = table.Column<bool>(type: "bit", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Draft = table.Column<bool>(type: "bit", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schedules", x => x.ScheduleId);
+                    table.ForeignKey(
+                        name: "FK_Schedules_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "ProjectId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BillFiles",
                 columns: table => new
                 {
@@ -274,6 +338,59 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         column: x => x.BillId,
                         principalTable: "Bill",
                         principalColumn: "BillId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Schedule_Device",
+                columns: table => new
+                {
+                    SchDevId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    DeviceId = table.Column<int>(type: "int", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schedule_Device", x => x.SchDevId);
+                    table.ForeignKey(
+                        name: "FK_Schedule_Device_Devices_DeviceId",
+                        column: x => x.DeviceId,
+                        principalTable: "Devices",
+                        principalColumn: "DeviceId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Schedule_Device_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "Schedules",
+                        principalColumn: "ScheduleId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Schedule_Employee",
+                columns: table => new
+                {
+                    SchEmplId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ScheduleId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schedule_Employee", x => x.SchEmplId);
+                    table.ForeignKey(
+                        name: "FK_Schedule_Employee_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "EmployeeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Schedule_Employee_Schedules_ScheduleId",
+                        column: x => x.ScheduleId,
+                        principalTable: "Schedules",
+                        principalColumn: "ScheduleId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -369,6 +486,31 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "IX_Projects_TypeId",
                 table: "Projects",
                 column: "TypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schedule_Device_DeviceId",
+                table: "Schedule_Device",
+                column: "DeviceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schedule_Device_ScheduleId",
+                table: "Schedule_Device",
+                column: "ScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schedule_Employee_EmployeeId",
+                table: "Schedule_Employee",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schedule_Employee_ScheduleId",
+                table: "Schedule_Employee",
+                column: "ScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Schedules_ProjectId",
+                table: "Schedules",
+                column: "ProjectId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -386,7 +528,22 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "Offers");
 
             migrationBuilder.DropTable(
+                name: "Schedule_Device");
+
+            migrationBuilder.DropTable(
+                name: "Schedule_Employee");
+
+            migrationBuilder.DropTable(
                 name: "Bill");
+
+            migrationBuilder.DropTable(
+                name: "Devices");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
+
+            migrationBuilder.DropTable(
+                name: "Schedules");
 
             migrationBuilder.DropTable(
                 name: "Projects");

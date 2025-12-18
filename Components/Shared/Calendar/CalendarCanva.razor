@@ -1,0 +1,555 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+@if (SelectedSchedule is not null)
+{
+    <div class="p-3">
+        <!-- 🔷 SECCIÓN GENERAL -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h4 class="mb-0 text-primary">
+                Proyecto @SelectedSchedule.Project?.Title
+            </h4>
+            <span class="text-secondary fst-italic">
+                Número Proyecto: @SelectedSchedule.ProjectId
+            </span>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <a href="/projects/@SelectedSchedule.ProjectId"
+               class="btn btn-sm btn-outline-info me-2">
+                Proyecto
+            </a>
+
+            <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@SelectedSchedule.Project.TaskNumber/"
+               class="btn btn-sm btn-outline-primary me-2"
+               target="_blank">
+                Tarea
+            </a>
+
+            <button class="btn btn-sm btn-outline-success me-2"
+                    @onclick="StartEditDates">
+                Editar
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger"
+                    @onclick="DeleteSchedule">
+                Borrar
+            </button>
+        </div>
+
+        <hr />
+
+        <!--  DETALLES / EDICIÓN -->
+
+        <div class="mb-3">
+            <h5 class="text-primary">@SelectedSchedule.TaskName</h5>
+
+            @if (!editDates)
+            {
+                <!-- MODO NORMAL -->
+                <table class="table table-sm mb-3">
+                    <tbody>
+                        <tr>
+                            <td><b>Inicio:</b> @SelectedSchedule.Start.ToString("dd/MM/yyyy")</td>
+                            <td><b>Fin:</b> @SelectedSchedule.End.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                        <tr>
+                            <td><b>Vehículo:</b></td>
+                            <td>@SelectedSchedule.Car</td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <!-- MODO EDICIÓN -->
+                <div class="border rounded p-3">
+
+                    <div class="mb-3">
+                        <label class="form-label">Tarea:</label>
+                        <input type="text" class="form-control"
+                               @bind="TaskNameEdit" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Descripción:</label>
+                        <input type="text" class="form-control"
+                               @bind="NotesEdit" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+
+                        <select @bind="ColorEdit" class="form-select form-select-sm color-select">
+                            <option value="">Seleccione un Color</option>
+
+                            <option value="gray" style="background:#808080; color:#fff;">Gris</option>
+                            <option value="silver" style="background:#C0C0C0; color:#000;">Plateado</option>
+
+                            <option value="red" style="background:#ff0000; color:#fff;">Rojo</option>
+                            <option value="maroon" style="background:#800000; color:#fff;">Burdeos</option>
+
+                            <option value="blue" style="background:#0000ff; color:#fff;">Azul</option>
+                            <option value="skyblue" style="background:#87ceeb; color:#000;">Celeste</option>
+                            <option value="navy" style="background:#000080; color:#fff;">Azul Marino</option>
+
+                            <option value="green" style="background:#008000; color:#fff;">Verde</option>
+                            <option value="lime" style="background:#00ff00; color:#000;">Verde Lima</option>
+                            <option value="olive" style="background:#808000; color:#fff;">Oliva</option>
+
+                            <option value="yellow" style="background:#ffff00; color:#000;">Amarillo</option>
+                            <option value="gold" style="background:#ffd700; color:#000;">Dorado</option>
+                            <option value="orange" style="background:#ffa500; color:#000;">Naranja</option>
+
+                            <option value="brown" style="background:#8b4513; color:#fff;">Café</option>
+                            <option value="chocolate" style="background:#d2691e; color:#fff;">Chocolate</option>
+                        </select>
+                    </div>
+
+
+
+
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Inicio</label>
+                            <input type="date" class="form-control"
+                                   @bind="editStart" />
+                        </div>
+
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Fin</label>
+                            <input type="date" class="form-control"
+                                   @bind="editEnd" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-primary btn-sm" @onclick="SaveDates">Guardar</button>
+                        <button class="btn btn-secondary btn-sm ms-2" @onclick="CancelEditDates">Cancelar</button>
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(SelectedSchedule.Notes))
+            {
+                <div class="mt-3">
+                    <b>Notas:</b><br />
+                    @SelectedSchedule.Notes
+                </div>
+            }
+        </div>
+
+        <hr />
+
+        <!-- 🔷 EMPLEADOS -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="text-primary mb-0">Empleados</h5>
+
+            <button class="btn btn-sm btn-outline-success"
+                    @onclick="() => showAddEmployee = true">
+                Agregar
+            </button>
+        </div>
+
+        @if (EmployeesBySchedule.Count == 0)
+        {
+            <p class="text-muted">No hay empleados asignados.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle mb-4">
+                <thead>
+                    <tr>
+                        <th>Empleado</th>
+                        <th>Posición</th>
+                        <th>Teléfono</th>
+                        <th style="width: 80px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var se in EmployeesBySchedule)
+                    {
+                        <tr>
+                            <td>@se.Employee.FirstName @se.Employee.LastName</td>
+                            <td>@se.Employee.Position</td>
+                            <td>@se.Employee.PhoneNumber</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger"
+                                        @onclick="() => DeleteEmployee(se.SchEmplId)">
+                                    Quitar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <!--  DEVICES / EQUIPOS -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="text-primary mb-0">Equipos</h5>
+            <button class="btn btn-sm btn-outline-success"
+                    @onclick="() => showAddDevice = true">
+                Agregar 
+            </button>
+        </div>
+
+        @if (SelectedSchedule.SchDevs.Count == 0)
+        {
+            <p class="text-muted">No hay equipos asignados.</p>
+        }
+        else
+        {
+            <table class="table table-sm align-middle mb-4">
+                <tbody>
+                    @foreach (var d in SelectedSchedule.SchDevs)
+                    {
+                        <tr>
+                            <td>@d.Device.DeviceName</td>
+                            <td>@d.Device.SerialNumber</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger ms-3"
+                                        @onclick="() => DeleteDevice(d.SchDevId)">
+                                    Quitar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <!-- 🔷 MODAL: AGREGAR EQUIPO -->
+        @if (showAddDevice)
+        {
+            <div class="modal fade show d-block" tabindex="-1"
+                 style="background-color: rgba(0,0,0,0.4);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Agregar Equipo</h5>
+                            <button class="btn-close" @onclick="CloseAddDevice"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <label class="form-label">Seleccione un equipo</label>
+
+                            <select class="form-select" @bind="selectedDeviceId">
+                                <option value="">Seleccione</option>
+
+                                @foreach (var dev in allDevices)
+                                {
+                                    <option value="@dev.DeviceId">
+                                        @dev.DeviceName (@dev.DeviceType)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" @onclick="CloseAddDevice">Cancelar</button>
+                            <button class="btn btn-primary" @onclick="AddDevice">Agregar</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- ===
+        ====================================================== -->
+        <!-- 🔷 MODAL: AGREGAR EMPLEADO -->
+        <!-- ========================================================= -->
+        @if (showAddEmployee)
+        {
+            <div class="modal fade show d-block" tabindex="-1"
+                 style="background-color: rgba(0,0,0,0.4);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title">Agregar Empleado</h5>
+                            <button class="btn-close" @onclick="CloseAddEmployee"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label class="form-label">Seleccione un empleado</label>
+                            <select class="form-select" @bind="selectedEmployeeId">
+                                <option value="">Seleccione</option>
+                                @foreach (var emp in allEmployees)
+                                {
+                                    <option value="@emp.EmployeeId">
+                                        @emp.FirstName @emp.LastName (@emp.Position)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" @onclick="CloseAddEmployee">Cancelar</button>
+                            <button class="btn btn-primary" @onclick="AddEmployee">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="text-muted p-3">
+        No hay schedule seleccionado.
+    </div>
+}
+
+@code {
+
+    [Parameter] public Schedule SelectedSchedule { get; set; }
+    [Parameter] public EventCallback OnHideOffcanvas { get; set; }
+
+    [Parameter] public EventCallback<(int Id, bool Status)> OnChanged { get; set; }
+
+    private List<SchDev> DevicesBySchedule = new();
+    private List<Device> allDevices = new();
+
+    private bool showAddDevice = false;
+    private int? selectedDeviceId;
+
+
+    private List<SchEmpl> EmployeesBySchedule = new();
+    private List<Employee> allEmployees = new();
+
+    private bool showAddEmployee = false;
+    private int? selectedEmployeeId;
+
+    //  Variables para edición de fechas
+    private bool editDates = false;
+    private DateTime editStart;
+    private DateTime editEnd;
+    private string NotesEdit;
+    private string TaskNameEdit;
+    private string ColorEdit;
+
+    //  SE EJECUTA CADA VEZ QUE CAMBIA SELECTEDSCHEDULE
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedSchedule == null)
+            return;
+
+        using var db = await DbContextFactory.CreateDbContextAsync();
+
+        // empleados
+        EmployeesBySchedule = await db.Schedule_Employee
+            .Where(se => se.ScheduleId == SelectedSchedule.ScheduleId)
+            .Include(se => se.Employee)
+            .ToListAsync();
+
+        allEmployees = await db.Employees.ToListAsync();
+
+        // 🔹 equipos
+        DevicesBySchedule = await db.Schedule_Device
+            .Where(sd => sd.ScheduleId == SelectedSchedule.ScheduleId)
+            .Include(sd => sd.Device)
+            .ToListAsync();
+
+        allDevices = await db.Devices.ToListAsync();
+    }
+
+    private void CloseAddDevice()
+    {
+        showAddDevice = false;
+        selectedDeviceId = null;
+    }
+
+    private async Task AddDevice()
+    {
+        try
+        {
+            if (selectedDeviceId == null)
+                return;
+
+            using var db = await DbContextFactory.CreateDbContextAsync();
+
+            var newRelation = new SchDev
+            {
+                ScheduleId = SelectedSchedule.ScheduleId,
+                DeviceId = selectedDeviceId.Value
+            };
+
+            db.Schedule_Device.Add(newRelation);
+            await db.SaveChangesAsync();
+
+            await OnParametersSetAsync();
+            CloseAddDevice();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error adding device: {e.Message}");
+        }
+        finally
+        {
+            await Update(false);
+        }
+    }
+
+    private void StartEditDates()
+    {
+        editStart = SelectedSchedule.Start;
+        editEnd = SelectedSchedule.End;
+        TaskNameEdit = SelectedSchedule.TaskName;
+        NotesEdit = SelectedSchedule.Notes;
+        editDates = true;
+        ColorEdit = SelectedSchedule.Color;
+    }
+
+    private void CancelEditDates()
+    {
+        editDates = false;
+    }
+
+    private async Task SaveDates()
+    {
+        try
+        {
+            using var db = await DbContextFactory.CreateDbContextAsync();
+
+            var item = await db.Schedules
+                .FirstOrDefaultAsync(s => s.ScheduleId == SelectedSchedule.ScheduleId);
+
+            if (item != null)
+            {
+                item.Start = editStart;
+                item.End = editEnd;
+                item.TaskName = TaskNameEdit;
+                item.Notes = NotesEdit;
+                item.Color = ColorEdit;
+                await db.SaveChangesAsync();
+
+                // Actualizar UI
+                SelectedSchedule.Start = editStart;
+                SelectedSchedule.End = editEnd;
+                SelectedSchedule.TaskName = TaskNameEdit;
+                SelectedSchedule.Notes = NotesEdit;
+                SelectedSchedule.Color = ColorEdit;
+            }
+
+            editDates = false;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error updating schedule dates: {e.Message}");
+        }
+        finally
+        {
+            Update(false);
+        }
+    }
+
+    private void CloseAddEmployee()
+    {
+        showAddEmployee = false;
+        selectedEmployeeId = null;
+    }
+
+    private async Task AddEmployee()
+    {
+        try
+        {
+            if (selectedEmployeeId == null)
+                return;
+
+            using var db = await DbContextFactory.CreateDbContextAsync();
+
+            var newRelation = new SchEmpl
+            {
+                ScheduleId = SelectedSchedule.ScheduleId,
+                EmployeeId = selectedEmployeeId.Value
+            };
+
+            db.Schedule_Employee.Add(newRelation);
+            await db.SaveChangesAsync();
+
+            await OnParametersSetAsync();
+            CloseAddEmployee();
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
+        finally
+        {
+         await   Update(false);
+        }
+    }
+
+    private async Task DeleteEmployee(int schEmplId)
+    {
+        using var db = await DbContextFactory.CreateDbContextAsync();
+
+        var item = await db.Schedule_Employee.FindAsync(schEmplId);
+
+        if (item != null)
+        {
+            db.Schedule_Employee.Remove(item);
+            await db.SaveChangesAsync();
+        }
+
+        await OnParametersSetAsync();
+
+      await  Update(false);
+    }
+
+    private async Task DeleteSchedule()
+    {
+        try
+        {
+            using var db = await DbContextFactory.CreateDbContextAsync();
+
+            var scheduleToDelete = await db.Schedules
+                .FirstOrDefaultAsync(s => s.ScheduleId == SelectedSchedule.ScheduleId);
+
+            var allDevicesSelected = db.Schedule_Device.Where(sd => sd.ScheduleId == SelectedSchedule.ScheduleId);
+            db.Schedule_Device.RemoveRange(allDevicesSelected);
+
+            var allEmployeseesSelected = db.Schedule_Employee.Where(se => se.ScheduleId == SelectedSchedule.ScheduleId);
+            db.Schedule_Employee.RemoveRange(allEmployeseesSelected);
+
+            db.Schedules.Remove(scheduleToDelete);
+            await db.SaveChangesAsync();
+
+            await OnParametersSetAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting device: {ex.Message}");
+        }
+
+        finally
+        {
+            await OnHideOffcanvas.InvokeAsync();
+            Update(true);
+        }
+    }
+
+    private async Task DeleteDevice(int schDevId)
+    {
+        using var db = await DbContextFactory.CreateDbContextAsync();
+        var item = await db.Schedule_Device.FindAsync(schDevId);
+        if (item != null)
+        {
+            db.Schedule_Device.Remove(item);
+            await db.SaveChangesAsync();
+        }
+        await OnParametersSetAsync();
+
+        Update(false);
+
+    }
+
+    private async Task Update(bool isDeleted)
+    {
+        await OnChanged.InvokeAsync((SelectedSchedule.ScheduleId, isDeleted));
+    }
+
+}

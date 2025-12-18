@@ -1,0 +1,424 @@
+﻿@using ProjectsMecsaSPA.Model
+
+<div class="calendar-container">
+
+    <!-- HEADER -->
+    <div class="calendar-header">
+        <div>
+            <button class="btn btn-sm" @onclick="Prev">◀</button>
+            <span class="text-secondary text-sm">@HeaderText</span>
+            <button class="btn btn-sm" @onclick="Next">▶</button>
+        </div>
+        <div class="view-buttons">
+            <button class="btn btn-sm @(CurrentView == CalendarView.Monthly ? "btn-primary" : "btn-outline-primary")"
+                    @onclick="() => SetView(CalendarView.Monthly)">
+                Mensual
+            </button>
+            <button class="btn btn-sm @(CurrentView == CalendarView.Weekly ? "btn-primary" : "btn-outline-primary")"
+                    @onclick="() => SetView(CalendarView.Weekly)">
+                Semanal
+            </button>
+        </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="calendar-grid">
+
+        @foreach (var day in WeekDays)
+        {
+            <div class="calendar-day-name">@day</div>
+        }
+
+        @if (CurrentView == CalendarView.Monthly)
+        {
+            @foreach (var day in DaysInMonth)
+            {
+                @RenderDay(day)
+            }
+        }
+        else
+        {
+            @foreach (var day in CurrentWeekDays)
+            {
+                @RenderDay(day)
+            }
+        }
+
+    </div>
+</div>
+
+
+
+
+<!-- OFFCANVAS DETALLE -->
+<Offcanvas @ref="offcanvas" title="Detalle del Cronograma">
+    <BodyTemplate>
+        <CalendarCanva SelectedSchedule="SelectedSchedule"
+                       OnHideOffcanvas="OnHideOffcanvasClick"
+                       OnChanged="ScheduleChanged" />
+    </BodyTemplate>
+</Offcanvas>
+
+
+<Offcanvas @ref="offcanvasAddSchedule" Title="Agregar Registro de Cronograma">
+    <BodyTemplate>
+        <AddScheduleByCalendar SelectedDate="SelectedDate"
+                               OnHideOffcanvas="OnHideCanvasAddClick"
+                               OnChanged="AddSchedule" />
+    </BodyTemplate>
+</Offcanvas>
+
+@code {
+
+    private Offcanvas offcanvas = default!;
+    private Schedule? SelectedSchedule;
+
+    private DateTime SelectedDate = DateTime.Today;
+    private Offcanvas offcanvasAddSchedule = default!;
+
+    private async Task OnHideCanvasAddClick()
+    {
+        await offcanvasAddSchedule.HideAsync();
+    }
+
+    private async Task OnHideOffcanvasClick()
+    {
+        FilterSchedules();
+        StateHasChanged();
+        await offcanvas.HideAsync();
+    }
+
+    [Parameter]
+    public List<Schedule> Schedules { get; set; } = new();
+
+
+    /* --- VISTAS --- */
+    private enum CalendarView { Monthly, Weekly }
+    private CalendarView CurrentView = CalendarView.Monthly;
+
+    private string HeaderText =>
+        CurrentView == CalendarView.Monthly
+            ? CurrentMonth.ToString("MMMM yyyy")
+            : $"Semana del {CurrentWeekDays.First():dd/MM} al {CurrentWeekDays.Last():dd/MM}";
+
+
+    /* ---  DATOS DEL CALENDARIO --- */
+    private DateTime CurrentMonth = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private List<DateTime> DaysInMonth = new();
+    private List<DateTime> CurrentWeekDays = new();
+    private List<Schedule> SchedulesForView = new();
+
+    private readonly string[] WeekDays =
+        { "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom" };
+
+    protected override void OnInitialized()
+    {
+        LoadMonth();
+        LoadWeek();
+        FilterSchedules();
+    }
+
+    protected override void OnParametersSet()
+    {
+        FilterSchedules();
+    }
+
+    private void FilterSchedules()
+    {
+        if (CurrentView == CalendarView.Monthly)
+        {
+            var first = DaysInMonth.First();
+            var last = DaysInMonth.Last();
+
+            SchedulesForView = Schedules
+
+                .Where(s => s.End >= first && s.Start <= last)
+
+                .ToList();
+        }
+        else
+        {
+            var first = CurrentWeekDays.First();
+            var last = CurrentWeekDays.Last();
+
+            SchedulesForView = Schedules
+                .Where(s => s.End >= first && s.Start <= last)
+                .ToList();
+        }
+    }
+
+    private void LoadMonth()
+    {
+        DaysInMonth.Clear();
+
+        // Día 1 del mes
+        var first = CurrentMonth;
+
+        // Ajuste para que la semana inicie en lunes
+        int offset = ((int)first.DayOfWeek + 6) % 7;
+
+        for (int i = 0; i < offset; i++)
+        {
+            DaysInMonth.Add(first.AddDays(-(offset - i)));
+        }
+
+        int days = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
+        for (int d = 1; d <= days; d++)
+        {
+            DaysInMonth.Add(new DateTime(CurrentMonth.Year, CurrentMonth.Month, d));
+        }
+
+        while (DaysInMonth.Count % 7 != 0)
+        {
+            DaysInMonth.Add(DaysInMonth.Last().AddDays(1));
+        }
+    }
+
+    private void LoadWeek()
+    {
+        DateTime today = DateTime.Today;
+        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        DateTime monday = today.AddDays(-diff);
+
+        CurrentWeekDays = Enumerable.Range(0, 7)
+            .Select(i => monday.AddDays(i))
+            .ToList();
+    }
+
+    private void SetView(CalendarView view)
+    {
+        CurrentView = view;
+
+        if (view == CalendarView.Monthly)
+            LoadMonth();
+        else
+            LoadWeek();
+
+        FilterSchedules();
+    }
+
+    private void Prev()
+    {
+        if (CurrentView == CalendarView.Monthly)
+        {
+            CurrentMonth = CurrentMonth.AddMonths(-1);
+            LoadMonth();
+        }
+        else
+        {
+            CurrentWeekDays = CurrentWeekDays
+                .Select(d => d.AddDays(-7))
+                .ToList();
+        }
+
+        FilterSchedules();
+    }
+
+    private void Next()
+    {
+        if (CurrentView == CalendarView.Monthly)
+        {
+            CurrentMonth = CurrentMonth.AddMonths(1);
+            LoadMonth();
+        }
+        else
+        {
+            CurrentWeekDays = CurrentWeekDays
+                .Select(d => d.AddDays(7))
+                .ToList();
+        }
+
+        FilterSchedules();
+    }
+
+    private async Task OnScheduleClick(Schedule sch)
+    {
+        SelectedSchedule = sch;
+        await offcanvas.ShowAsync();
+    }
+    private RenderFragment RenderDay(DateTime day) => builder =>
+{
+    var daySchedules = SchedulesForView
+        .Where(s => day.Date >= s.Start.Date && day.Date <= s.End.Date)
+        .ToList();
+
+    builder.OpenElement(0, "div");
+    builder.AddAttribute(1, "class", $"calendar-day {(day.Date == DateTime.Today ? "today" : "")}");
+
+    /* -------------------------
+    Encabezado del día
+       (Número + botón)
+    -------------------------- */
+    builder.OpenElement(2, "div");
+    builder.AddAttribute(3, "class", "day-header");
+    builder.AddAttribute(4, "style", "display:flex; justify-content:space-between; align-items:center;");
+
+    // Número del día
+    builder.OpenElement(5, "span");
+    builder.AddAttribute(6, "class", "day-number");
+    builder.AddContent(7, day.Day);
+    builder.CloseElement();
+
+    // Botón agregar (+)
+    builder.OpenElement(8, "button");
+    builder.AddAttribute(9, "class", "btn btn-sm btn-outline-success");
+    builder.AddAttribute(10, "style",
+        "width:26px; height:26px; padding:0; text-align:center; line-height:24px;");
+    builder.AddAttribute(11, "onclick",
+        EventCallback.Factory.Create(this, () =>
+        {
+            SelectedDate = day;
+            offcanvasAddSchedule.ShowAsync();
+        }));
+    builder.AddContent(12, "+");
+    builder.CloseElement();
+
+    builder.CloseElement(); // day-header
+    /* ---------------------------------- */
+
+    // Schedules
+    if (daySchedules.Any())
+    {
+        builder.OpenElement(13, "div");
+        builder.AddAttribute(14, "class", "schedules");
+
+        foreach (var sch in daySchedules)
+        {
+            bool esDomingo = day.DayOfWeek == DayOfWeek.Sunday;
+            bool esSabado = day.DayOfWeek == DayOfWeek.Saturday;
+
+            if (esDomingo)
+                continue;
+
+            if (esSabado && !sch.WeekendWork)
+                continue;
+
+            builder.OpenElement(15, "div");
+            builder.AddAttribute(16, "class", "schedule-item");
+            builder.AddAttribute(17, "onclick",
+                EventCallback.Factory.Create(this, () => OnScheduleClick(sch)));
+
+            string bg = (esSabado && sch.WeekendWork) ? "orange" : sch.Color;
+            builder.AddAttribute(18, "style", $"background-color:{bg};");
+
+            builder.AddMarkupContent(19, $@"
+                <h5>{sch.ProjectId} - {sch.Project?.Title}</h5>
+                <label>Provincia: {sch.Project.Province}</label>
+                <label>Vehículo: {sch.Car}</label>
+                <hr/>
+                <h6>Empleados:</h6>
+            ");
+
+            foreach (var emp in sch.SchEmpls)
+                builder.AddMarkupContent(20, $"<label>{emp.Employee.FirstName} {emp.Employee.LastName}</label><br/>");
+
+            builder.AddMarkupContent(21, "<hr/><h6>Equipos:</h6>");
+
+            foreach (var dev in sch.SchDevs)
+                builder.AddMarkupContent(22, $"<label>{dev.Device.DeviceName} {dev.Device.SerialNumber}</label><br/>");
+
+            builder.CloseElement(); // schedule-item
+        }
+
+        builder.CloseElement(); // schedules
+    }
+
+    builder.CloseElement(); // calendar-day
+};
+
+
+    private async Task AddSchedule(Schedule newObj)
+    {
+        Schedules.Add(newObj);
+        FilterSchedules();
+        StateHasChanged();
+    }
+
+    private async Task ScheduleChanged((int Id, bool Deleted) change)
+    {
+        if (change.Deleted)
+        {
+            Schedules.RemoveAll(s => s.ScheduleId == change.Id);
+            FilterSchedules();
+            StateHasChanged();
+
+        }
+        else
+        {
+            FilterSchedules();
+            StateHasChanged();
+        }
+    }
+}
+
+
+<style>
+    .calendar-container {
+        font-family: sans-serif;
+        width: 100%;
+        height: auto;
+        margin: auto;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+
+    .view-buttons button {
+        margin-left: 4px;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+
+    .calendar-day-name {
+        text-align: center;
+        font-weight: bold;
+        padding: 5px 0;
+    }
+
+    .calendar-day {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 3px;
+        background: #fafafa;
+        position: relative;
+        height: auto;
+        min-height: 70px;
+    }
+
+    .day-number {
+        font-weight: bold;
+        text-align: right;
+    }
+
+    .today {
+        background: #e0f2ff;
+        border-color: #0094ff;
+        font-weight: bold;
+    }
+
+    .schedules {
+        margin-top: 4px;
+        height: auto;
+    }
+
+    .schedule-item {
+        background: #1e88e5;
+        color: white;
+        padding: 4px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-top: 3px;
+        cursor: pointer;
+        text-align: left;
+    }
+
+</style>

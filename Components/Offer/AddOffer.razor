@@ -2,166 +2,236 @@
 @using System.Security.Claims
 
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@inject ApplicationDbContext dbIdentity;
+@inject IDbContextFactory<ApplicationDbContext> dbIdentityFactory;
 
 @inject NavigationManager NAV
 
-
-<EditForm Model="offer" OnValidSubmit="Add" class="p-2">
+<EditForm Model="offer" OnValidSubmit="Add">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <div class="row mb-2">
-        <label>Autor</label>
-        <InputText @bind-Value="offer.Author" readonly />
-    </div>
-    <div class="row mb-2">
-        <label>Fecha Registro</label>
-        <InputDate @bind-Value="offer.Creation" class="form-control form-control-sm"></InputDate>
-        <ValidationMessage For="@(() => offer.Creation)" />
-    </div>
-    <div class="row mb-2">
-        <label>Cliente</label>
-        <InputText @bind-Value="offer.Customer" class="form-control form-control-sm"></InputText>
-        <ValidationMessage For="@(() => offer.Customer)" />
-    </div>
-    <div class="row mb-2">
-        <label>Descripción</label>
-        <InputTextArea @bind-Value="offer.Description" class="form-control form-control-sm"></InputTextArea>
-        <ValidationMessage For="@(() => offer.Description)" />
+
+    <!-- ========================================================= -->
+    <!-- INFORMACIÓN GENERAL -->
+    <!-- ========================================================= -->
+    <h5 class="text-center fw-bold mb-4">Información General</h5>
+
+    <div class="p-2">
+        <div class="form-group mb-3">
+            <div class="form-floating">
+                <InputText class="form-control shadow-sm"
+                           @bind-Value="offer.Author"
+                           readonly />
+                <label>Autor</label>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <div class="form-floating">
+                <InputDate class="form-control shadow-sm"
+                           @bind-Value="offer.Creation" />
+                <label>Fecha Registro</label>
+            </div>
+            <ValidationMessage For="@(() => offer.Creation)" class="text-danger small" />
+        </div>
+
+        <div class="form-group mb-3">
+            <div class="form-floating">
+                <InputText class="form-control shadow-sm"
+                           @bind-Value="offer.Customer" />
+                <label>Cliente</label>
+            </div>
+            <ValidationMessage For="@(() => offer.Customer)" class="text-danger small" />
+        </div>
+
+        <div class="form-group mb-4">
+            <div class="form-floating">
+                <InputTextArea class="form-control shadow-sm"
+                               @bind-Value="offer.Description" />
+                <label>Descripción</label>
+            </div>
+            <ValidationMessage For="@(() => offer.Description)" class="text-danger small" />
+        </div>
     </div>
 
-    <div class="row mb-2">
-        <label>Tipo Contacto</label>
-        <InputSelect @bind-Value="offer.ContactType" class="form-control form-control-sm">
-            <option value=" ">Seleccione una opción</option>
-            <option value="Vendedor">Vendedor</option>
-            <option value="Reactivación">Reactivación</option>
-            <option value="Whatsapp">Whatsapp</option>
-            <option value="Correo">Correo</option>
-            <option value="Llamada">Llamada</option>
-            <option value="Otro">Otro</option>
-        </InputSelect>
-        <ValidationMessage For="@(() => offer.ContactType)" />
-    </div>
-    <div class="row mb-2">
-        <label>Tipo Oferta</label>
-        <InputSelect @bind-Value="offer.Type" class="form-control form-control-sm">
-            <option value="">Seleccione</option>
-            <option value="Mantenimiento">Mantenimiento</option>
-            <option value="Instalación">Instalación</option>
-            <option value="Mejoras">Mejoras</option>
-            <option value="Otro">Otro</option>
-        </InputSelect>
-        <ValidationMessage For="@(() => offer.Author)" />
+    <hr class="my-4" />
+
+    <!-- ========================================================= -->
+    <!-- CLASIFICACIÓN -->
+    <!-- ========================================================= -->
+    <h5 class="text-center fw-bold mb-4">Clasificación</h5>
+
+    <div class="p-2">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect class="form-control shadow-sm"
+                                 @bind-Value="offer.ContactType">
+                        <option value="">Seleccione</option>
+                        <option value="Vendedor">Vendedor</option>
+                        <option value="Reactivación">Reactivación</option>
+                        <option value="Whatsapp">Whatsapp</option>
+                        <option value="Correo">Correo</option>
+                        <option value="Llamada">Llamada</option>
+                        <option value="Otro">Otro</option>
+                    </InputSelect>
+                    <label>Tipo de Contacto</label>
+                </div>
+                <ValidationMessage For="@(() => offer.ContactType)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect class="form-control shadow-sm"
+                                 @bind-Value="offer.Type">
+                        <option value="">Seleccione</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Instalación">Instalación</option>
+                        <option value="Mejoras">Mejoras</option>
+                        <option value="Otro">Otro</option>
+                    </InputSelect>
+                    <label>Tipo de Oferta</label>
+                </div>
+                <ValidationMessage For="@(() => offer.Type)" class="text-danger small" />
+            </div>
+        </div>
     </div>
 
-    <div class="table-responsive border rounded">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere DDCE</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequiredDDCE" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere Ionizante</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequiredLightningStrike" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere Torre</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequireTower" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere SPAT</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequireSPAT" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere Supresor</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequireSurgeProtector" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-center">
-                        <label>Requiere Otro</label>
-                    </td>
-                    <td class="text-center">
-                        <InputCheckbox @bind-Value="offer.RequireOther" class="form-check-input"></InputCheckbox>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <hr class="my-4" />
+
+    <!-- ========================================================= -->
+    <!-- REQUERIMIENTOS -->
+    <!-- ========================================================= -->
+    <h5 class="text-center fw-bold mb-4">Requerimientos</h5>
+
+    <div class="p-2">
+        <div class="form-check form-switch mb-2">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequiredDDCE" />
+            <label class="form-check-label fw-semibold">Requiere DDCE</label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequiredLightningStrike" />
+            <label class="form-check-label fw-semibold">Requiere Ionizante</label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequireTower" />
+            <label class="form-check-label fw-semibold">Requiere Torre</label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequireSPAT" />
+            <label class="form-check-label fw-semibold">Requiere SPAT</label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequireSurgeProtector" />
+            <label class="form-check-label fw-semibold">Requiere Supresor</label>
+        </div>
+
+        <div class="form-check form-switch">
+            <InputCheckbox class="form-check-input shadow-sm"
+                           @bind-Value="offer.RequireOther" />
+            <label class="form-check-label fw-semibold">Requiere Otro</label>
+        </div>
     </div>
 
-    <div class="row mb-2">
-        <label>Monto</label>
-        <InputNumber @bind-Value="offer.Amount" class="form-control form-control-sm"></InputNumber>
-        <ValidationMessage For="@(() => offer.Amount)" />
-    </div>
-    <div class="row mb-2">
-        <label>Cotizado Por</label>
-        <InputText @bind-Value="offer.CalculateBy" class="form-control form-control-sm"></InputText>
-        <ValidationMessage For="@(() => offer.CalculateBy)" />
-    </div>
-    <div class="row mb-2">
-        <label>Responsable</label>
-        <InputSelect @bind-Value="offer.ResponsibleId" class="form-control form-control-sm">
-            @foreach (var item in sellers)
-            {
-                <option value="@item.SellerId">@item.SellerName</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => offer.Responsible)" />
-    </div>
-    <div class="row mb-2">
-        <label>Etapa</label>
-        <InputSelect @bind-Value="offer.State" class="form-control form-control-sm">
-            <option value="">Seleccione</option>
-            <option value="Enviado">Enviado</option>
-            <option value="Negociación">Negociación</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Vendido">Vendido</option>
-            <option value="Cobro">Cobro</option>
-        </InputSelect>
-        <ValidationMessage For="@(() => offer.State)" />
+    <hr class="my-4" />
+
+    <!-- ========================================================= -->
+    <!-- DATOS COMERCIALES -->
+    <!-- ========================================================= -->
+    <h5 class="text-center fw-bold mb-4">Datos Comerciales</h5>
+
+    <div class="p-2">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputNumber class="form-control shadow-sm"
+                                 @bind-Value="offer.Amount" />
+                    <label>Monto</label>
+                </div>
+                <ValidationMessage For="@(() => offer.Amount)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputText class="form-control shadow-sm"
+                               @bind-Value="offer.CalculateBy" />
+                    <label>Cotizado Por</label>
+                </div>
+                <ValidationMessage For="@(() => offer.CalculateBy)" class="text-danger small" />
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect class="form-control shadow-sm"
+                                 @bind-Value="offer.ResponsibleId">
+                        @foreach (var item in sellers)
+                        {
+                            <option value="@item.SellerId">@item.SellerName</option>
+                        }
+                    </InputSelect>
+                    <label>Responsable</label>
+                </div>
+                <ValidationMessage For="@(() => offer.ResponsibleId)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect class="form-control shadow-sm"
+                                 @bind-Value="offer.State">
+                        <option value="">Seleccione</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="Negociación">Negociación</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Vendido">Vendido</option>
+                        <option value="Cobro">Cobro</option>
+                    </InputSelect>
+                    <label>Etapa</label>
+                </div>
+                <ValidationMessage For="@(() => offer.State)" class="text-danger small" />
+            </div>
+        </div>
     </div>
 
+    <!-- ========================================================= -->
+    <!-- SUBMIT -->
+    <!-- ========================================================= -->
+    <div class="form-group mt-4 text-center">
+        <button type="submit" class="btn btn-outline-success btn-sm w-50">
+            Agregar Oferta
+        </button>
+    </div>
 
-    <button type="submit" class="btn btn-outline-success">Agregar</button>
 </EditForm>
 
- @inject AuthenticationStateProvider asp;
+
+@inject AuthenticationStateProvider asp;
 
 @code {
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
+    private ApplicationDbContext dbIdentity;
+
     private List<Seller> sellers = new();
     private Offer offer = new Offer
-        {
-            Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
-        };
+    {
+        Creation = DateTime.Now // Inicializa la fecha de creación con la fecha actual
+    };
 
     protected override async Task OnInitializedAsync()
     {
 
+        dbIdentity = dbIdentityFactory.CreateDbContext();
         using var context = DbContextFactory.CreateDbContext();
         sellers = context.Seller.Where(e => e.IsActive).OrderBy(e => e.SellerName).ToList();
         // Obtén el estado de autenticación
@@ -206,7 +276,7 @@
             }
         }
 
-        
+
 
 
     }

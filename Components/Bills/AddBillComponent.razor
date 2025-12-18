@@ -9,138 +9,199 @@
 
 <style>
     .custom-file-input {
-    all: unset; /* Elimina todos los estilos predeterminados */
+        all: unset;
     }
 
     .file-drop-zone {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 90%;
-    min-height: 150px;
-    border: 1px dashed #ff9320;
-    border-radius: 10px;
-    background-color: #f8f9fa;
-    text-align: center;
-    padding: 10px;
-    transition: background-color 0.3s, border-color 0.3s;
-    cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 140px;
+        border: 1px dashed #adb5bd;
+        border-radius: 10px;
+        background-color: #f8f9fa;
+        text-align: center;
+        padding: 12px;
+        cursor: pointer;
+        transition: border-color .2s ease, background-color .2s ease;
     }
 
-    .file-drop-zone p {
-    font-size: 1rem;
-    color: #333;
-    }
-
-    .file-drop-zone:hover,
-    .hover {
-    border-color: #00ca71;
-    background-color: #e6ffe6;
-    }
+        .file-drop-zone:hover,
+        .hover {
+            border-color: #0d6efd;
+            background-color: #eef4ff;
+        }
 </style>
 
 <EditForm Model="bill" OnValidSubmit="Add">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <!-- Number Bill-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputText @bind-Value="bill.BillNumber" class="form-control" id="BillNumber" />
-            <label class="form-label" for="BillNumber">Número de Factura</label>
+
+    <!-- ===================================== -->
+    <!-- INFORMACIÓN DE FACTURA -->
+    <!-- ===================================== -->
+    <h5 class="text-center fw-bold mb-4">Información de la Factura</h5>
+
+    <div class="p-2">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputText id="BillNumber" class="form-control shadow-sm"
+                               @bind-Value="bill.BillNumber" />
+                    <label for="BillNumber">Número de Factura</label>
+                </div>
+                <ValidationMessage For="@(() => bill.BillNumber)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputDate id="BillDate" class="form-control shadow-sm"
+                               @bind-Value="bill.BillDate" />
+                    <label for="BillDate">Fecha de Factura</label>
+                </div>
+                <ValidationMessage For="@(() => bill.BillDate)" class="text-danger small" />
+            </div>
         </div>
-        <ValidationMessage For="@(() => bill.BillNumber)" class="text-danger" />
-    </div>
-    <!-- Amount-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputNumber @bind-Value="bill.Amount" class="form-control" id="Amount" step="0.001" />
-            <label class="form-label" for="Amount">Importe</label>
+
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputNumber id="Amount" class="form-control shadow-sm"
+                                 step="0.001" @bind-Value="bill.Amount" />
+                    <label for="Amount">Importe</label>
+                </div>
+                <ValidationMessage For="@(() => bill.Amount)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputSelect class="form-select shadow-sm"
+                                 @bind-Value="bill.Currency">
+                        <option value="">Seleccione</option>
+                        <option value="en-US">Dólar</option>
+                        <option value="es-CR">Colón</option>
+                    </InputSelect>
+                    <label>Moneda</label>
+                </div>
+                <ValidationMessage For="@(() => bill.Currency)" class="text-danger small" />
+            </div>
         </div>
-        <ValidationMessage For="@(() => bill.Amount)" class="text-danger" />
     </div>
-    <!-- Note-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputTextArea @bind-Value="bill.Note" class="form-control" id="Note" />
-            <label class="form-label" for="Note">Nota</label>
+
+    <hr class="my-4" />
+
+    <!-- ===================================== -->
+    <!-- DATOS OPERATIVOS -->
+    <!-- ===================================== -->
+    <h5 class="text-center fw-bold mb-4">Datos Operativos</h5>
+
+    <div class="p-2">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputNumber id="TaskNumber" class="form-control shadow-sm"
+                                 @bind-Value="bill.TaskNumber" />
+                    <label for="TaskNumber">Tarea de Facturación</label>
+                </div>
+                <ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger small" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <InputText id="Author" class="form-control shadow-sm"
+                               @bind-Value="bill.Author" />
+                    <label for="Author">Autor</label>
+                </div>
+                <ValidationMessage For="@(() => bill.Author)" class="text-danger small" />
+            </div>
         </div>
-        <ValidationMessage For="@(() => bill.Note)" class="text-danger" />
-    </div>
-    <!--Currency Type-->
-    <div class="form-group">
-        <div class=" form-floating mt-1 mb-1">
-            <InputSelect class="form-select form-select-sm" @bind-Value="bill.Currency">
-                <option value="">Seleccione</option>
-                <option value="en-US">Dolar</option>
-                <option value="es-CR">Colon</option>
-            </InputSelect>
-            <label class="form-label" for="IsCompleted">Moneda (Original)</label>
+
+        <div class="mt-3">
+            <div class="form-floating">
+                <InputTextArea id="Note" class="form-control shadow-sm"
+                               @bind-Value="bill.Note" />
+                <label for="Note">Nota</label>
+            </div>
+            <ValidationMessage For="@(() => bill.Note)" class="text-danger small" />
         </div>
-        <ValidationMessage For="@(() => bill.Currency)" />
     </div>
-    <!-- Facturation Task-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputNumber @bind-Value="bill.TaskNumber" class="form-control" id="TaskNumber" />
-            <label class="form-label" for="TaskNumber">Número de Tarea de Facturacion</label>
+
+    <hr class="my-4" />
+
+    <!-- ===================================== -->
+    <!-- ARCHIVOS -->
+    <!-- ===================================== -->
+    <h5 class="text-center fw-bold mb-4">Archivos Adjuntos</h5>
+
+    <div class="p-2">
+        <div class="file-drop-zone mb-3">
+            <p class="mb-2 text-muted">
+                Arrastra archivos aquí o haz clic para seleccionarlos
+            </p>
+
+            <InputFile multiple
+                       OnChange="OnChange"
+                       @ondragenter="OnDragEnter"
+                       @ondragleave="OnDragLeave"
+                       @ondragover="OnDragEnter"
+                       MaxFileSize="20971520"
+                       class="@($"custom-file-input {HoverClass}")" />
         </div>
-        <ValidationMessage For="@(() => bill.TaskNumber)" class="text-danger" />
+
+        @if (files.Any())
+        {
+            <div class="border rounded shadow-sm p-2">
+                <h6 class="fw-semibold mb-2">Archivos por subir</h6>
+                <ul class="list-unstyled mb-0">
+                    @foreach (var file in files)
+                    {
+                        <li class="d-flex justify-content-between align-items-center border-bottom py-1">
+                            <span class="small">@file.Name</span>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => DeleteFile(file)">
+                                <Icon Name="IconName.Trash3Fill" />
+                            </button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     </div>
-    <!-- Author-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputText @bind-Value="bill.Author" class="form-control" id="Author" />
-            <label class="form-label" for="Author">Autor</label>
+
+    <hr class="my-4" />
+
+    <!-- ===================================== -->
+    <!-- INTEGRACIÓN -->
+    <!-- ===================================== -->
+    <div class="p-2">
+        <div class="d-flex justify-content-between align-items-center border rounded shadow-sm p-3">
+            <span class="fw-semibold">Enviar datos al CRM</span>
+            <InputCheckbox class="form-check-input"
+                           @bind-Value="SendData" />
         </div>
-        <ValidationMessage For="@(() => bill.Author)" class="text-danger" />
     </div>
-    <!-- Bill Date-->
-    <div class="form-group">
-        <div class="form-floating mt-1">
-            <InputDate @bind-Value="bill.BillDate" class="form-control" id="BillDate" />
-            <label class="form-label" for="BillDate">Fecha de Factura</label>
-        </div>
-        <ValidationMessage For="@(() => bill.BillDate)" class="text-danger" />
-    </div>
-    <!-- Files-->
-    <div class="border mt-1 shadow-sm rounded p-3 text-center">
-        <p class="mb-2">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
-        <InputFile multiple OnChange="@OnChange"
-        @ondragenter="OnDragEnter"
-        @ondragleave="OnDragLeave"
-        @ondragover="OnDragEnter"
-        MaxFileSize="20971520"
-        class="@($"file-drop-zone custom-file-input {HoverClass}")" />
-    </div>
-    <!-- File List-->
-    <div class="border shadow-sm rounded p-2 m-1">
-        <h6 class="fw-bold mb-2">Archivos por Subir</h6>
-        <ul class="list-unstyled">
-            @foreach (var file in files)
-            {
-                <li class="d-flex align-items-center justify-content-between p-1 border-bottom">
-                    <span>@file.Name</span>
-                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteFile(file)"><Icon Name="IconName.Trash3Fill" /></button>
-                </li>
-            }
-        </ul>
-    </div>
-    <!-- Send CRM-->
-    <div class="border shadow-sm rounded p-2 m-1 d-flex flex-row gap-1 justify-content-around align-items-center">
-        <label class="form-label">Enviar Datos a CRM</label>
-        <InputCheckbox class="form-control-sm" @bind-Value="SendData" />
-    </div>
-    <div class="d-flex flex-row justify-content-center align-items-center">
-        <!-- Submit Button-->
-        <button type="submit" class="btn btn-outline-success justify-content-center m-1">Agregar Factura</button>
-        @if(IsLoading){
-            <Spinner Color="SpinnerColor.Success" />
+
+    <!-- ===================================== -->
+    <!-- ACCIONES -->
+    <!-- ===================================== -->
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-outline-success px-5">
+            Agregar Factura
+        </button>
+
+        @if (IsLoading)
+        {
+            <div class="mt-2">
+                <Spinner Color="SpinnerColor.Success" />
+            </div>
         }
     </div>
 </EditForm>
 
 <Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
 
 @code {
     #region Parameter
@@ -198,7 +259,7 @@
         bill.Note = string.IsNullOrEmpty(bill.Note) ? "" : bill.Note;
         bill.Currency = CurrencyType;
         bill.ProjectId = ProjectId;
-		db = DbContextFactory.CreateDbContext();
+        db = DbContextFactory.CreateDbContext();
         db.Bill.Add(bill);
         await db.SaveChangesAsync();
         await UploadFiles();
@@ -209,9 +270,9 @@
 				LastEditionDate = DateTime.Now,
 				BillDate = DateTime.Now
 			};
-		IsLoading = false;
-		files.Clear();
-		this.StateHasChanged();
+        IsLoading = false;
+        files.Clear();
+        this.StateHasChanged();
 
 
         await OnAdded.InvokeAsync(null);
@@ -229,45 +290,61 @@
                 if (bill.TaskNumber != 0)
                 {
                     string Message = $"\nInformacion Ingresada en App de Proyectos \nMonto: {bill.Amount.ToString("n2")} \nMoneda: {bill.Currency} \nCreacion: {bill.BillDate} \nProyectoId: {bill.ProjectId} \nDescripcion: {bill.Note}\nTarea: {bill.TaskNumber}";
-                    await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 107, files);
+                    await Bitrix24Client.SendTaskCommentAsync(bill.TaskNumber, Message, 252, files);
                 }
             }
         }
         catch (Exception ef)
         {
-			Console.WriteLine(ef.Message);
+            Console.WriteLine(ef.Message);
         }
     }
 
     async Task UploadFiles()
     {
-        await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
-        foreach(var i in files)
+       try
         {
-            BillFile tmpBill = new BillFile();
-            tmpBill.FileName = i.Name;
-            tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
-            tmpBill.FileExtension = Path.GetExtension(i.Name);
-            tmpBill.Creation	= DateTime.Now;
-            tmpBill.BillId = bill.BillId;
-            tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId,tmpBill.FileName, tmpBill.FilePath);
-            db.BillFiles.Add(tmpBill);
-            await db.SaveChangesAsync();
+            await FileStorageService.GenerateBillDirectoryAsync(ProjectId, bill.BillNumber);
+            foreach (var i in files)
+            {
+                BillFile tmpBill = new BillFile();
+                tmpBill.FileName = i.Name;
+                tmpBill.FilePath = await FileStorageService.UploadBillsFilesAsync(ProjectId, bill.BillNumber, i);
+                tmpBill.FileExtension = Path.GetExtension(i.Name);
+                tmpBill.Creation = DateTime.Now;
+                tmpBill.BillId = bill.BillId;
+                tmpBill.B24FileId = await TaskUploadFileToBitrixAsync(FolderId, tmpBill.FileName, tmpBill.FilePath);
+                db.BillFiles.Add(tmpBill);
+                await db.SaveChangesAsync();
+            }
+            files.Clear();
         }
-        files.Clear();
+        catch (Exception efe)
+        {
+			Console.WriteLine(efe.Message);
+            
+        }
     }
 
     async Task<string> TaskUploadFileToBitrixAsync(int folderId,string Name,string pathFile )
     {
-        byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
-        var response =await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
+        try{
+            if (SendData)
+            {
+                byte[] fileBytes = await File.ReadAllBytesAsync(pathFile);
+                var response = await Bitrix24Client.UploadFileAsync(folderId, Name, fileBytes);
 
-        if(response != null)
-        {
-            var ResponseObject = JsonConvert.DeserializeObject<BitrixFileResponse>(response);
-            return ResponseObject.result.ID.ToString();    
-		 }	
-		return "";
+                if (response != null)
+                {
+                    var ResponseObject = JsonConvert.DeserializeObject<BitrixFileResponse>(response);
+                    return ResponseObject.result.ID.ToString();
+                }
+            }
+            return "";
+       }catch(Exception afs){
+			Console.WriteLine(afs.Message);
+			return "";
+       }
 	}
 
 	async Task OnChange(InputFileChangeEventArgs e)

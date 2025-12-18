@@ -1,7 +1,4 @@
-﻿
-
-
-@page "/project-edit"
+﻿@page "/project-edit"
 @inject ProjectsDBContext db
 @inject IJSRuntime JS
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
@@ -16,279 +13,352 @@
 {
     <EditForm Model="project" OnValidSubmit="Update">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+        <ValidationSummary class="mb-3" />
 
-        <table class="table table-hover border">
-            <tbody>
-                <tr>
-                    <th>Número Proyecto</th>
-                    <td>@project.ProjectId</td>
-                </tr>
-                <tr>
-                    <th>Titulo</th>
-                    <td>
-                        <InputText @bind-Value="project.Title" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Title)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Descripción</th>
-                    <td>
-                        <InputText @bind-Value="project.Description" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Description)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Tarea</th>
-                    <td>
-                        <InputText @bind-Value="project.TaskNumber" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.TaskNumber)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Cliente</th>
-                    <td>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
 
+                <!-- INFORMACIÓN BÁSICA -->
+                <div class="mb-4">
+                    <h6 class="text-muted small fw-semibold mb-3">INFORMACIÓN DEL PROYECTO</h6>
 
-                        <AutoComplete @bind-Value="customerName"
-                        TItem="Customer"
-                        class="text-danger"
-                        DataProvider="CustomersDataProvider"
-                        PropertyName="Name"
-                        Placeholder="Search a customer..."
-                        OnChanged="(Customer customer) => OnAutoCompleteChanged(customer)" />
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Número</label>
+                            <div class="fw-semibold">@project.ProjectId</div>
+                        </div>
 
-                    </td>
-                </tr>
-                <tr>
-                    <th>Ubicación</th>
-                    <td>
-                        <InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Ubication)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <label for="Province">Provincia</label>
-                    </th>
-                    <th>
-                        <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
-                            <option value="San José">San Jose</option>
-                            <option value="Heredia">Heredia</option>
-                            <option value="Alajuela">Alajuela</option>
-                            <option value="Cartago">Cartago</option>
-                            <option value="Puntarenas">Puntarenas</option>
-                            <option value="Guanacaste">Guanacaste</option>
-                            <option value="Limón">Limón</option>
-                        </InputSelect>
-                        <ValidationMessage For="@(() => project.Province)" />
+                        <div class="col-md-9">
+                            <label class="form-label small">Título</label>
+                            <InputText @bind-Value="project.Title" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.Title)" />
+                        </div>
 
-                    </th>
-                </tr>
-                <tr>
-                    <th>Monto</th>
-                    <td>
-                        <InputNumber @bind-Value="project.Amount" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.Amount)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Creación</th>
-                    <td>
-                        <InputDate @bind-Value="project.CreationDate" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.CreationDate)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Estado</th>
-                    <td>
-                        <InputSelect @bind-Value="project.StateId" class="form-control form-control-sm">
-                            <option value="">Seleccionar estado</option>
-                            @foreach (var item in States)
-                            {
-                                <option value="@item.Key">@item.Value</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => project.StateId)" />
-                    </td>
-                </tr>
-                <div class="form-group mt-2 mb-2">
-                    <div class="form-check">
-                        <InputCheckbox id="RequiredCoordination" class="form-check-input" @bind-Value="project.RequiredCoordination" />
-                        <label class="form-check-label" for="RequiredCoordination">
-                            Requiere Coordinación
-                        </label>
+                        <div class="col-12">
+                            <label class="form-label small">Descripción</label>
+                            <InputText @bind-Value="project.Description" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.Description)" />
+                        </div>
                     </div>
-                    <ValidationMessage For="@(() => project.RequiredCoordination)" class="text-danger" />
+                </div>
+                <hr/>
+                <!-- RELACIONES -->
+                <div class="mb-4">
+                    <h6 class="text-muted small fw-semibold mb-3">RELACIONES</h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">Tarea</label>
+                            <InputText @bind-Value="project.TaskNumber" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.TaskNumber)" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Cliente</label>
+                            <AutoComplete @bind-Value="customerName"
+                                          TItem="Customer"
+                                          DataProvider="CustomersDataProvider"
+                                          PropertyName="Name"
+                                          Placeholder="Buscar cliente..."
+                                          OnChanged="(Customer c) => OnAutoCompleteChanged(c)" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Compañía</label>
+                            <InputSelect @bind-Value="project.CompanyId" class="form-select form-select-sm">
+                                @foreach (var item in companies)
+                                {
+                                    <option value="@item.CompanyId">@item.CompanyName</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <!-- UBICACIÓN -->
+                <div class="mb-4">
+                    <h6 class="text-muted small fw-semibold mb-3">UBICACIÓN</h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label small">Ubicación</label>
+                            <InputText @bind-Value="project.Ubication" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.Ubication)" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Provincia</label>
+                            <InputSelect class="form-select form-select-sm" @bind-Value="project.Province">
+                                <option value="">Seleccionar</option>
+                                <option>San José</option>
+                                <option>Heredia</option>
+                                <option>Alajuela</option>
+                                <option>Cartago</option>
+                                <option>Puntarenas</option>
+                                <option>Guanacaste</option>
+                                <option>Limón</option>
+                            </InputSelect>
+                            <ValidationMessage For="@(() => project.Province)" />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+
+                <!-- DATOS COMERCIALES -->
+                <div class="mb-4">
+                    <h6 class="text-muted small fw-semibold mb-3">DATOS COMERCIALES</h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small">Monto</label>
+                            <InputNumber @bind-Value="project.Amount" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.Amount)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Tipo Cambio</label>
+                            <InputNumber @bind-Value="project.TypeOfChange" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.TypeOfChange)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Oferta</label>
+                            <InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.OfferId)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Orden Compra</label>
+                            <InputText @bind-Value="project.OC" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.OC)" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Fecha OC</label>
+                            <InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
+                            <ValidationMessage For="@(() => project.OCDate)" />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <!-- ESTADO -->
+                <div class="mb-4">
+                    <h6 class="text-muted small fw-semibold mb-3">ESTADO</h6>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">Estado</label>
+                            <InputSelect @bind-Value="project.StateId" class="form-select form-select-sm">
+                                <option value="">Seleccionar</option>
+                                @foreach (var item in States)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => project.StateId)" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Tipo Proyecto</label>
+                            <InputSelect @bind-Value="project.TypeId" class="form-select form-select-sm">
+                                <option value="">Seleccionar</option>
+                                @foreach (var item in types)
+                                {
+                                    <option value="@item.Key">@item.Value</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => project.TypeId)" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Vendedor</label>
+                            <InputSelect @bind-Value="project.SellerId" class="form-select form-select-sm">
+                                @foreach (var item in sellers)
+                                {
+                                    <option value="@item.SellerId">@item.SellerName</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <!-- ACCIONES -->
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <button type="button" class="btn btn-sm btn-light" @onclick="CancelEdit">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        Actualizar
+                    </button>
                 </div>
 
-                <tr>
-                    <th>Tipo Proyecto</th>
-                    <InputSelect @bind-Value="project.TypeId" class="form-control form-control-sm">
-                        <option value="">Seleccionar un tipo</option>
-                        @foreach (var item in types)
-                        {
-                            <option value="@item.Key">@item.Value</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="@(() => project.TypeId)" />
-                </tr>
-                <tr>
-                    <th>Orden de Compra</th>
-                    <td>
-                        <InputText @bind-Value="project.OC" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OC)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Fecha Orden Compra</th>
-                    <td>
-                        <InputDate @bind-Value="project.OCDate" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OCDate)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Número de Oferta</th>
-                    <td>
-                        <InputText @bind-Value="project.OfferId" class="form-control form-control-sm" />
-                        <ValidationMessage For="@(() => project.OfferId)" />
-                    </td>
-                </tr>
-                <tr>
-                    <th>Compañia</th>
-                    <td>
-                        <InputSelect @bind-Value="project.CompanyId" class="form-control form-control-sm">
-                            @foreach (var item in companies )
-                            {
-                                <option value="@item.CompanyId">@item.CompanyName</option>
-                            }
-                        </InputSelect>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Vendedor</th>
-                    <td>
-                        <InputSelect @bind-Value="project.SellerId" class="form-control form-control-sm">
-                            @foreach (var item in sellers)
-                            {
-                                <option value="@item.SellerId">@item.SellerName</option>
-                            }
-                        </InputSelect>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <button type="submit" class="btn btn-sm btn-outline-info">Actualizar</button>
-        <button type="button" class="btn btn-sm btn-outline-danger" @onclick="CancelEdit">Cancelar</button>
-
+            </div>
+        </div>
     </EditForm>
+
 }
 else
 {
-    <table class="table  table-hover border table-striped">
-        <tbody>
-            <tr>
-                <th>Número Proyecto</th>
-                <td>@project.ProjectId</td>
-            </tr>
-            <tr>
-                <th>Titulo Proyecto</th>
-                <td>@project.Title</td>
-            </tr>
-            <tr>
-                <th>Descripción</th>
-                <td>@project.Description</td>
-            </tr>
-            <tr>
-                <th>Número Tarea</th>
-                <td>
-                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body px-4 py-3">
+
+            <!-- INFO -->
+            <div class="mb-3">
+                <div class="text-muted small fw-semibold mb-2">
+                    INFORMACIÓN DEL PROYECTO
+                </div>
+
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Número</div>
+                    <div class="fw-semibold">@project.ProjectId</div>
+                </div>
+
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Título</div>
+                    <div class="fw-semibold">@project.Title</div>
+                </div>
+
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Descripción</div>
+                    <div class="text-muted">@project.Description</div>
+                </div>
+
+                <div class="d-flex py-1">
+                    <div class="text-muted small w-25">Tipo</div>
+                    <div class="text-muted">@project.Type.Name</div>
+                </div>
+
+            </div>
+
+            <!-- RELACIONES -->
+            <div class="mb-3 pt-2 border-top">
+                <div class="text-muted small fw-semibold mb-2">
+                    RELACIONES
+                </div>
+
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Tarea</div>
+                    <a class="fw-semibold text-decoration-none"
+                       target="_blank"
+                       href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@project.TaskNumber/">
                         @project.TaskNumber
                     </a>
-                </td>
-            </tr>
-            <tr>
-                <th>Cliente</th>
-                <td>
-                    <a href="/customers/@project.CustomerId" class="btn btn-sm btn-outline-success">
+                </div>
+
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Cliente</div>
+                    <a class="fw-semibold text-decoration-none"
+                       href="/customers/@project.CustomerId">
                         @project.Customer?.Name
                     </a>
-                </td>
-            </tr>
-            <tr>
-                <th>Ubicación</th>
-                <td>@project.Ubication</td>
-            </tr>
-            <tr>
-                <th>Monto</th>
-                <td>@project.Amount.ToString("N2")</td>
-            </tr>
-            <tr>
-                <th>Tipo de Cambio</th>
-                <td>@project.TypeOfChange.ToString("N2")</td>
-            </tr>
-            <tr>
-                <th>Fecha Registro</th>
-                <td>@project.CreationDate.ToLongDateString()</td>
-            </tr>
-            <tr>
-                <th>Oferta</th>
-                <td>@project.OfferId</td>
-            </tr>
-            <tr>
-                <th>Estado del Proyecto</th>
-                <td>@project.State?.StateName</td>
-            </tr>
-            <tr>
-                <th>Tipo de Proyecto</th>
-                <td>@project.Type?.Name</td>
-            </tr>
-            <tr>
-                <th>Orden de Compra</th>
-                <td>@project.OC</td>
-            </tr>
-            <tr>
-                <th>Fecha Orden de Compra</th>
-                <td>@project.OCDate.ToLongDateString()</td>
-            </tr>
-            <tr>
-                <th>Compañia</th>
-                <td>@project.Company.CompanyName</td>
-            </tr>
-            <tr>
-                <th>Vendedor</th>
-                <td>@project.Seller.SellerName</td>
-            </tr>
-            <tr>
-                <th>Estado Facturación Proyecto</th>
-                <td>
-                    @if (project.Isfactured)
-                    {
-                        <label>Facturado</label>
-                    }
-                    else
-                    {
-                        <label>Pendiente de Completar facturación</label>
-                    }
-                </td>
-            </tr>
-            <tr>
-                <th>¿Proyecto Completado?</th>
-                <td>
-                    @if (project.IsCompleted)
-                    {
-                        <label>Proyecto Completo operativamente</label>
-                    }
-                    else
-                    {
-                        <label>Proyecto Incompleto (Revise la etapa y anotaciones)</label>
-                    }
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </div>
 
-    <div class="d-flex flex-row gap-2">
+                <div class="d-flex py-1 border-bottom">
+                    <div class="text-muted small w-25">Compañía</div>
+                    <div>@project.Company.CompanyName</div>
+                </div>
+
+                <div class="d-flex py-1">
+                    <div class="text-muted small w-25">Encargado</div>
+                    <div>@project.Seller.SellerName</div>
+                </div>
+            </div>
+
+            <!-- COMERCIAL -->
+            <div class="mb-3 pt-2 border-top">
+                <div class="text-muted small fw-semibold mb-2">
+                    DATOS COMERCIALES
+                </div>
+
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <div class="text-muted small">Monto</div>
+                        <div class="fw-semibold">
+                            @if (project.CurrencyType.Equals("ES-CR"))
+                            {
+                                <label>₡ @project.Amount.ToString("N2") </label>
+                            }
+                            else
+                            {
+                                <label>	$ @project.Amount.ToString("N2")</label>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">Tipo Cambio</div>
+                        <div>@project.TypeOfChange</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="text-muted small">Oferta</div>
+                        <div>@project.OfferId</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="text-muted small">OC</div>
+                        <div>@project.OC</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="text-muted small">Fecha OC</div>
+                        <div>@project.OCDate.ToLongDateString()</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO -->
+            <div class="pt-2 border-top">
+                <div class="text-muted small fw-semibold mb-2">
+                    ESTADO
+                </div>
+
+                <div class="d-flex gap-4 flex-wrap">
+                    <div>
+                        <div class="text-muted small">Proyecto</div>
+                        <span class="badge bg-light text-dark">
+                            @project.State?.StateName
+                        </span>
+                    </div>
+
+                    <div>
+                        <div class="text-muted small">Facturación</div>
+                        @if (project.Isfactured)
+                        {
+                            <span class="badge bg-success-subtle text-success">
+                                Facturado
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning-subtle text-warning">
+                                Pendiente
+                            </span>
+                        }
+                    </div>
+
+                    <div>
+                        <div class="text-muted small">Completado</div>
+                        @if (project.IsCompleted)
+                        {
+                            <span class="badge bg-success-subtle text-success">
+                                Completo
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary-subtle text-secondary">
+                                Incompleto
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="d-flex flex-row  mt-3 gap-2">
         <AuthorizeView Roles="administrador,ingeniero,contabilidad">
             <Authorized>
 
@@ -301,21 +371,21 @@ else
                 <div>
                     @if (!project.Isfactured)
                     {
-                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{UpdateIsFactured(true);}">Facturación Completa</button>
+                        <button class="btn btn-sm btn-outline-success" @onclick="() => { UpdateIsFactured(true); }">Facturación Completa</button>
                     }
                     @if (project.Isfactured)
                     {
-                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{UpdateIsFactured(false);}">Facturación Incompleta</button>
+                        <button class="btn btn-sm btn-outline-warning" @onclick="() => { UpdateIsFactured(false); }">Facturación Incompleta</button>
                     }
                 </div>
                 <div>
                     @if (!project.IsCompleted)
                     {
-                        <button class="btn btn-sm btn-outline-success" @onclick="()=>{ UpdateIsComplete(true);}">Marcar como Completo (Operativamente)</button>
+                        <button class="btn btn-sm btn-outline-success" @onclick="() => { UpdateIsComplete(true); }">Marcar como Completo (Operativamente)</button>
                     }
                     @if (project.IsCompleted)
                     {
-                        <button class="btn btn-sm btn-outline-warning" @onclick="()=>{ UpdateIsComplete(false);}">Marcar Como Incompleto</button>
+                        <button class="btn btn-sm btn-outline-warning" @onclick="() => { UpdateIsComplete(false); }">Marcar Como Incompleto</button>
                     }
                 </div>
 

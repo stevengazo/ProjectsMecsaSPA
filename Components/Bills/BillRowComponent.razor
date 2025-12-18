@@ -1,7 +1,8 @@
 ﻿@using System.Globalization
+@using ProjectsMecsaSPA.Components.Shared
 @inject ProjectsDBContext db
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@inject Bitrix24ClientService Bitrix24Client
+
 
 <ConfirmDialog @ref="dialog" />
 @if (IsEditing)
@@ -9,7 +10,7 @@
     <tr>
         <td>
             <EditForm Model="item">
-                <InputText @bind-Value="item.BillNumber" class="form-control form-control-sm" ></InputText>
+                <InputText @bind-Value="item.BillNumber" class="form-control form-control-sm"></InputText>
             </EditForm>
         </td>
         <td>
@@ -33,7 +34,7 @@
             </EditForm>
         </td>
         <td>
-            <button class="btn btn-outline-danger btn-sm" @onclick="()=>IsEditing=false">
+            <button class="btn btn-outline-danger btn-sm" @onclick="() => IsEditing = false">
                 Cancelar
             </button>
             <button class="btn btn-outline-success  btn-sm" @onclick="Update">
@@ -62,15 +63,29 @@ else
             @item.Note
         </td>
         <td>
-            <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
-                Archivos
-            </button>
-            <button class="btn btn-outline-success" @onclick="()=>IsEditing=true">
-                Editar
-            </button>
-            <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
-                Borrar
-            </button>
+
+            <Tooltip Class="" Title="Mostrar Archivos" Placement="TooltipPlacement.Top">
+                <button class="btn btn-outline-info" @onclick="ToggleContentAsync">
+                    <Icon Name="IconName.Files"></Icon>
+                </button>
+            </Tooltip>
+       
+
+            <AuthorizeView Roles="administrador,ingeniero,contabilidad">
+                <Authorized>
+                    <Tooltip Class="" Title="Editar Factura" Placement="TooltipPlacement.Top">
+                        <button class="btn btn-outline-success" @onclick="() => IsEditing = true">
+                            <Icon Name="IconName.Pencil"></Icon>
+                        </button>
+                    </Tooltip>
+
+                    <Tooltip Class="" Title="Eliminar Factura" Placement="TooltipPlacement.Top">
+                        <button class="btn btn-outline-danger" @onclick="ShowConfirmationAsync">
+                            <Icon Name="IconName.Trash"></Icon>
+                        </button>
+                    </Tooltip>
+                </Authorized>
+            </AuthorizeView>
         </td>
     </tr>
     <tr>
@@ -161,21 +176,18 @@ else
     }
     private async Task ShowConfirmationAsync()
     {
-        var confirmation = await dialog.ShowAsync(
-            title: "Deseas borrar este archivo?",
-            message1: "Una vez haya sido borrado, no se podra recuperar. La información ingresada en Bitrix24 no será eliminada.",
-            message2: "Quieres proceder?");
-
-        if (confirmation)
+        try
         {
-            await Bitrix24Client.SendTaskCommentAsync(item.TaskNumber, $"Se ha eliminado una factura del app de proyectos \n Numero Factura:{item.BillNumber}\n Tarea Facturacion:{item.TaskNumber}\n Proyecto: {item.ProjectId}\nMonto:{ item.Amount}", 107);
-			await OnDelete.InvokeAsync(item);
+            item.IsDeleted = true;
+            await OnDelete.InvokeAsync(item);
         }
-        else
+        catch (Exception ex)
         {
-            // do something
+            Console.WriteLine(ex);
+            throw;
         }
     }
+
 
     private async Task ToggleContentAsync() => await collapse1.ToggleAsync();
 }

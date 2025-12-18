@@ -3,37 +3,139 @@
 @inject IConfiguration Configuration
 @inject IWebHostEnvironment Env
 
-<h3>Configuración</h3>
+<h3 class="mb-3">Configuración</h3>
 
 @if (settings != null)
 {
     <EditForm Model="settings" OnValidSubmit="GuardarCambios">
         <DataAnnotationsValidator />
-        <div class="m-1 border rounded-sm shadow p-1">
-            <h4>Banco Central</h4>
-            <p>Datos basicos para conexion con el API del Banco central de costa rica</p>
-            <InputText @bind-Value="settings.BancoCentral.Nombre" class="form-control w-50 m-1" placeholder="Nombre" />
-            <InputText @bind-Value="settings.BancoCentral.CorreoElectronico" class="form-control w-50 m-1" placeholder="Correo Electrónico" />
-            <InputText @bind-Value="settings.BancoCentral.Token" class="form-control w-50 m-1" placeholder="Token" />
 
+        <!-- BANCO CENTRAL -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Banco Central</h5>
+                <p class="text-muted small">
+                    Datos básicos para conexión con el API del Banco Central de Costa Rica
+                </p>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText class="form-control"
+                                       id="bcNombre"
+                                       @bind-Value="settings.BancoCentral.Nombre" />
+                            <label for="bcNombre">Nombre</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText class="form-control"
+                                       id="bcCorreo"
+                                       @bind-Value="settings.BancoCentral.CorreoElectronico" />
+                            <label for="bcCorreo">Correo electrónico</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <InputText class="form-control"
+                                       id="bcToken"
+                                       @bind-Value="settings.BancoCentral.Token" />
+                            <label for="bcToken">Token</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="m-1 border rounded-sm shadow p-1">
-        <h4>Telegram</h4>
-        <p>Datos para conexión con Bot de telegram</p>
-            <InputText @bind-Value="settings.TelegramSettings.BotToken" class="form-control w-75 m-1" placeholder="Bot Token" />
+
+        <!-- TELEGRAM -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Telegram</h5>
+                <p class="text-muted small">
+                    Datos para conexión con el bot de Telegram
+                </p>
+
+                <div class="form-floating">
+                    <InputText class="form-control"
+                               id="telegramToken"
+                               @bind-Value="settings.TelegramSettings.BotToken" />
+                    <label for="telegramToken">Bot Token</label>
+                </div>
+            </div>
         </div>
-        <div class="m-1 border rounded-sm shadow p-1">
-        <h4>SMTP</h4>
-        <p>Datos basicos para el envio de correo electronico</p>
-        <InputText @bind-Value="settings.Smtp.Host" class="form-control w-75 m-1" placeholder="Host" />
-            <InputNumber @bind-Value="settings.Smtp.Port" class="form-control w-75 m-1" placeholder="Puerto" />
-            <InputText @bind-Value="settings.Smtp.Username" class="form-control w-75 m-1" placeholder="Usuario" />
-            <InputText @bind-Value="settings.Smtp.Password" class="form-control w-75 m-1" placeholder="Contraseña" />
-        <InputCheckbox @bind-Value="settings.Smtp.EnableSsl" /> Habilitar SSL
+
+        <!-- SMTP -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h5 class="card-title">SMTP</h5>
+                <p class="text-muted small">
+                    Datos básicos para el envío de correo electrónico
+                </p>
+
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText class="form-control"
+                                       id="smtpHost"
+                                       @bind-Value="settings.Smtp.Host" />
+                            <label for="smtpHost">Host</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <InputNumber class="form-control"
+                                         id="smtpPort"
+                                         @bind-Value="settings.Smtp.Port" />
+                            <label for="smtpPort">Puerto</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText class="form-control"
+                                       id="smtpUser"
+                                       @bind-Value="settings.Smtp.Username" />
+                            <label for="smtpUser">Usuario</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <InputText type="password"
+                                       class="form-control"
+                                       id="smtpPassword"
+                                       @bind-Value="settings.Smtp.Password" />
+                            <label for="smtpPassword">Contraseña</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-check mt-2">
+                            <InputCheckbox class="form-check-input"
+                                           id="smtpSsl"
+                                           @bind-Value="settings.Smtp.EnableSsl" />
+                            <label class="form-check-label" for="smtpSsl">
+                                Habilitar SSL
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+
+        <!-- ACCIÓN -->
+        <div class="d-flex justify-content-end">
+            <button type="submit"
+                    class="btn btn-outline-primary px-4">
+                Guardar cambios
+            </button>
+        </div>
     </EditForm>
 }
+
 
 @code {
     private AppSettings settings;

@@ -85,6 +85,7 @@ namespace ProjectsMecsaSPA.Model
         public ICollection<FileModel> Files { get; set; }
         public ICollection<Commentary> Commentaries { get; set; }
         public ICollection<Bill> Bills { get; set; }
+        public ICollection<Schedule> Schedules { get; set; }
         #endregion
     }
 }

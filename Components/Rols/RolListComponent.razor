@@ -2,52 +2,105 @@
 @inject ApplicationDbContext dbContext;
 @inject ProjectsDBContext db;
 
-@if (seller != null)
-{
-    <button class="ml-1 btn btn-sm btn-outline-@(seller.IsActive ? "danger" : "info")"
-            @onclick="seller.IsActive ? DisableSeller : SuscribeSeller">
-        @(seller.IsActive ? "Eliminar como Vendedor" : "Suscribir como Vendedor")
-    </button>
-}
-else
-{
-    <button class="ml-1 btn btn-sm btn-outline-info" @onclick="SuscribeSeller">
-        Suscribir como Vendedor
-    </button>
-}
 
-<h3>Roles</h3>
 
-<div class="d-flex flex-row gap-2 h-50">
-    <label>Roles</label>
-    <select class="form-control-sm" @bind="idSelected">
-        @foreach (var role in Roles)
+<div class="border rounded shadow-sm p-3 mt-4 mb-4">
+
+    <!-- PERFIL VENDEDOR -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Perfil de Vendedor</h5>
+
+        @if (seller != null)
         {
-            <option value="@role.Id">@role.Name</option>
+            <button class="btn btn-sm btn-outline-@(seller.IsActive ? "danger" : "success")"
+                    @onclick="seller.IsActive? DisableSeller : SuscribeSeller">
+                @(seller.IsActive ? "Desactivar Vendedor" : "Activar como Vendedor")
+            </button>
         }
-    </select>
-    <button class="btn btn-outline-info" @onclick="AddRol">Agregar Rol</button>
+        else
+        {
+            <button class="btn btn-sm btn-outline-success"
+                    @onclick="SuscribeSeller">
+                Activar como Vendedor
+            </button>
+        }
+    </div>
+
+    @if (seller != null)
+    {
+        <div class="small text-muted">
+            Estado actual:
+            <span class="fw-semibold @(seller.IsActive ? "text-success" : "text-danger")">
+                @(seller.IsActive ? "Activo" : "Inactivo")
+            </span>
+        </div>
+    }
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Rol</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var role in usedRoles)
-        {
+<!-- ROLES -->
+<div class="border rounded shadow-sm p-3">
+
+    <h5 class="fw-bold mb-3">Gestión de Roles</h5>
+
+    <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-6">
+            <label class="form-label small fw-semibold">Roles disponibles</label>
+            <select class="form-select form-select-sm shadow-sm"
+                    @bind="idSelected">
+                @foreach (var role in Roles)
+                {
+                    <option value="@role.Id">@role.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-sm btn-outline-info w-100"
+                    @onclick="AddRol">
+                Agregar Rol
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
             <tr>
-                <td>@role.Name</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-danger" @onclick="() => RemoveRole(role.Id)">Eliminar</button>
-                </td>
+                <th>Rol Asignado</th>
+                <th class="text-end">Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @if (!usedRoles.Any())
+            {
+                <tr>
+                    <td colspan="2" class="text-center text-muted small">
+                        No hay roles asignados
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var role in usedRoles)
+                {
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">@role.Name</span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger"
+                                    @onclick="() => RemoveRole(role.Id)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
 
 @code {
     [Parameter]

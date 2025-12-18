@@ -1,0 +1,227 @@
+﻿@using ProjectsMecsaSPA.Utilities
+@inject ProjectsDBContext db
+
+@inject IJSRuntime JS
+
+
+
+<div class="d-flex justify-content-start align-items-center mb-3">
+    <button class="btn btn-outline-primary m-1" @onclick="PrevWeek">⟨ Semana anterior</button>
+    <button class="btn btn-outline-primary m-1" @onclick="NextWeek">Semana siguiente ⟩</button>
+
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            Acciones
+        </button>
+
+        <ul class="dropdown-menu">
+            <li>
+                <button class="btn btn-sm m-1" @onclick="DownloadAsImage">
+                    Imagen
+                </button>
+            </li>
+            <li>
+                <button class="btn btn-sm m-1" @onclick="DownloadAsXlsx">
+                    Excel
+                </button>
+            </li>
+           
+        </ul>
+    </div>
+
+
+
+</div>
+
+<div id="weekTable">
+    <h4 class="mb-0">
+        Semana del @CurrentMonday.ToString("dd MMM yyyy") al @CurrentMonday.AddDays(6).ToString("dd MMM yyyy")
+    </h4>
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>Empleado</th>
+                @foreach (var day in weekDays)
+                {
+                    <th>@day.ToString("dddd")<br /><small>@day.ToString("dd/MM")</small></th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var employee in employees)
+            {
+                var itemsByEmployee = Schedules
+                .Where(s => s.SchEmpls.Any(se => se.EmployeeId == employee.EmployeeId))
+                .ToList();
+
+                <tr>
+                    <td>
+                        <strong>@employee.FirstName @employee.LastName</strong>
+                        - @if (employee.Position.Equals("Tecnico"))
+                        {
+                            <label>Tecnico</label>
+                        }
+                    </td>
+
+                    @foreach (var day in weekDays)
+                    {
+                        var dayItems = itemsByEmployee
+                        .Where(s => s.Start.Date <= day.Date && s.End.Date >= day.Date)
+                        .ToList();
+
+                        <td class="align-top">
+                            @if (dayItems.Count == 0)
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                            else
+                            {
+                                @foreach (var sched in dayItems)
+                                {
+                                    <div class="mb-2 p-2 border rounded shadow-sm fs-5"
+                                         style="background-color: @(sched.Color ?? "#ffffff")">
+
+                                        <!-- Título del proyecto -->
+                                        <div class="fw-bold mb-1">
+                                            @sched.Project?.ProjectId - @sched.Project?.Title
+                                        </div>
+
+                                        <!-- Badges -->
+                                        <div class="d-flex text-md flex-column gap-1">
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                @sched.Project?.Province
+                                            </Badge>
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                @sched.Project?.Type?.Name
+                                            </Badge>
+
+                                            <Badge Color="BadgeColor.Secondary">
+                                                Vehículo: @sched.Car
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+@code {
+    #region Properties
+
+    [Parameter]
+    public List<Schedule> Schedules { get; set; } = new();
+
+    private List<Employee> employees = new();
+
+    private List<DateTime> weekDays = new();
+
+    private DateTime CurrentMonday;
+
+    #endregion
+
+    protected override void OnParametersSet()
+    {
+        // Obtener empleados únicos
+        employees = Schedules
+           .SelectMany(s => s.SchEmpls.Select(se => se.Employee))
+           .DistinctBy(e => e.EmployeeId)     
+           .ToList();
+
+        // Si es primera carga: calcular lunes actual
+        if (CurrentMonday == default)
+            CurrentMonday = GetMonday(DateTime.Today);
+
+        BuildWeek(CurrentMonday);
+
+        base.OnParametersSet();
+    }
+
+
+
+    #region Week Logic
+    private DateTime GetMonday(DateTime date)
+    {
+        int diff = (7 + (date.DayOfWeek - DayOfWeek.Monday)) % 7;
+        return date.AddDays(-diff);
+    }
+
+    private void BuildWeek(DateTime monday)
+    {
+        weekDays = Enumerable.Range(0, 7).Select(i => monday.AddDays(i)).ToList();
+    }
+
+    private void PrevWeek()
+    {
+        CurrentMonday = CurrentMonday.AddDays(-7);
+        BuildWeek(CurrentMonday);
+    }
+
+    private void NextWeek()
+    {
+        CurrentMonday = CurrentMonday.AddDays(7);
+        BuildWeek(CurrentMonday);
+    }
+
+    /* // Genera y descarga el reporte
+    private async Task DownloadReportAsync()
+    {
+
+        // var data =  agrega la imagen
+        //  var pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadpdf", pdfBase64, $"Calendario_{DateTime.Now:yyyyMMdd_HHmm}.jpg");
+        }*/
+
+    #endregion
+
+
+    #region Downloads 
+    private async Task DownloadAsImage()
+    {
+        // Capturar la tabla como imagen Base64
+        string? base64Image = await JS.InvokeAsync<string>("captureElementAsImage", "weekTable");
+
+        if (string.IsNullOrEmpty(base64Image))
+            return;
+
+        // Usar tu método de descarga
+        await JS.InvokeVoidAsync(
+            "downloadImage",
+            base64Image,
+            $"Calendario_{DateTime.Now:yyyyMMdd_HHmm}.png",
+            "image/png"
+        );
+    }
+
+    private async Task DownloadAsXlsx()
+    {
+        var bytes = await XmlsGenerate.GenerateWeekResumeAsync(employees, Schedules);
+        var base64 = Convert.ToBase64String(bytes);
+
+        await JS.InvokeVoidAsync(
+    "downloadFile",
+    base64,
+    "Reporte Semanal.xlsx",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    }
+
+    #endregion
+
+
+}

@@ -4,40 +4,12 @@
         <Tabs EnableFadeEffect="true">
             <Tab Title="Proyectos" Active="true">
                 <Content>
-                    <div class="m-1">
-                        <div class="container gap-3">
-                            <div class="row mb-3">
-                                <div class="col border p-2">
-                                    <ChartLineCountProjectsComponent />
-                                </div>
-                            </div>
-                      
-                            <div class="row mb-3">
-                                <div class="col border  m-1 p-2">
-
-                                    <ChartLineAmountInYear />
-                                </div>
-                                <div class="col border  m-1 p-2">
-                                   <ChartLineAVGProjectsComponent />
-                                </div>
-                            </div>
-                           <div class="row mb-3">
-                                <div class="col border  m-1 p-2">
-                                    <ChartCountByStateComponent />
-                                </div>
-                                <div class="col border  m-1 p-2">
-                                    <ChartAmountByState />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col border m-1 p-2">
-                                    <ChartProjectsCountBySeller />
-                                </div>
-                                <div class="col border  m-1 p-2">
-                                    <ChartAmountBySellerComponent />
-                                </div>
-                            </div>
-                        </div>
+                    <div class="m-2 p-2 shadow shadow-sm">
+                        <ChartLineCountProjectsComponent />
+                    </div>
+                    <hr />
+                    <div class="m-2 p-2 shadow shadow-sm">
+                        <ChartLineAmountInYear />
                     </div>
                 </Content>
             </Tab>

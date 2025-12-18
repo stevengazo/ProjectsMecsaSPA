@@ -1,0 +1,162 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<h4 class="mb-3 text-primary">Lista de Empleados</h4>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        @if (employees is null || employees.Count == 0)
+        {
+            <p class="text-muted">No hay empleados registrados.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Posición</th>
+                            <th>Teléfono</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var emp in employees)
+                        {
+                            <tr>
+                                <td>@emp.FirstName @emp.LastName</td>
+                                <td>@emp.Position</td>
+                                <td>@emp.PhoneNumber</td>
+                                <td class="text-center">
+
+                                    <!-- Botón Editar -->
+                                    <button class="btn btn-sm btn-warning me-2"
+                                            @onclick="() => EditEmployee(emp)">
+                                        Editar
+                                    </button>
+
+                                    <!-- Botón Borrar -->
+                                    <button class="btn btn-sm btn-danger"
+                                            @onclick="() => DeleteEmployee(emp.EmployeeId)">
+                                        Borrar
+                                    </button>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+@if (editingEmployee is not null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Empleado</h5>
+                    <button class="btn-close" @onclick="CloseModal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <EditForm Model="editingEmployee" OnValidSubmit="SaveEdit">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <InputText class="form-control" @bind-Value="editingEmployee.FirstName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Apellido</label>
+                            <InputText class="form-control" @bind-Value="editingEmployee.LastName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Posición</label>
+                            <InputSelect class="form-select" @bind-Value="editingEmployee.Position">
+                                <option value="Tecnico">Técnico</option>
+                                <option value="Operativo">Operativo</option>
+                            </InputSelect>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <InputText class="form-control" @bind-Value="editingEmployee.PhoneNumber" />
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                    </EditForm>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    private List<Employee> employees = new();
+    private Employee? editingEmployee;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEmployees();
+    }
+
+    private async Task LoadEmployees()
+    {
+        using var db = DbContextFactory.CreateDbContext();
+        employees = await db.Employees
+                            .Where(e => !e.Deleted)
+                            .ToListAsync();
+    }
+
+    private void EditEmployee(Employee emp)
+    {
+        editingEmployee = new Employee
+        {
+            EmployeeId = emp.EmployeeId,
+            FirstName = emp.FirstName,
+            LastName = emp.LastName,
+            Position = emp.Position,
+            PhoneNumber = emp.PhoneNumber
+        };
+    }
+
+    private void CloseModal()
+    {
+        editingEmployee = null;
+    }
+
+    private async Task SaveEdit()
+    {
+        using var db = DbContextFactory.CreateDbContext();
+        db.Employees.Update(editingEmployee);
+        await db.SaveChangesAsync();
+
+        editingEmployee = null;
+        await LoadEmployees();
+    }
+
+    private async Task DeleteEmployee(int id)
+    {
+        
+        using var db = DbContextFactory.CreateDbContext();
+        var emp = await db.Employees.FindAsync(id);
+
+        if (emp is not null)
+        {
+            emp.Deleted = true;
+            db.Employees.Update(emp);
+            await db.SaveChangesAsync();
+        }
+
+        await LoadEmployees();
+    }
+}
