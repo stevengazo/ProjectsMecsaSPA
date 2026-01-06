@@ -1,16 +1,17 @@
 ﻿@page "/billslist"
 
 
-<h3>Lista de Facturas</h3>
 
-<div class="d-flex flex-row">
-    <select class="form-select w-auto" @bind="SeletedYear">
-        @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 5; year++)
-        {
-            <option value="@year">@year</option>
-        }
-    </select>
-    <button class="btn btn-sm" @onclick="FilterValues">Filtrar</button>
+<div class="d-flex flex-row justify-content-between">
+    <h3>Lista de Facturas</h3>
+    <div class="d-flex flex-row">
+        <select class="form-select w-auto" @bind="SelectedYear">
+            @for (int year = DateTime.Now.Year - 5; year <= DateTime.Now.Year + 5; year++)
+            {
+                <option value="@year">@year</option>
+            }
+        </select>
+    </div>
 </div>
 
 
@@ -19,17 +20,17 @@
         <Tabs EnableFadeEffect="true">
             <Tab Title="Facturas Cargadas" Active="true">
                 <Content>
-                    <BillsByYear />
+                    <BillsByYear SelectedYear="SelectedYear" />
                 </Content>
             </Tab>
             <Tab Title="Estado de Proyectos">
                 <Content>
-                    <BillsResumeByYear SeletedYear="2025" />
+                    <BillsResumeByYear SelectedYear="SelectedYear" />
                 </Content>
             </Tab>
             <Tab Title="Sin Facturación">
                 <Content>
-                    <ProjectsWithoutBills />
+                    <ProjectsWithoutBills SelectedYear="SelectedYear" />
                 </Content>
             </Tab>
         </Tabs>
@@ -45,7 +46,7 @@
 
     List<Bill> bills = new List<Bill>();
 
-    private int SeletedYear = DateTime.Now.Year;
+    private int SelectedYear = DateTime.Now.Year;
 
     public class ProjectBillSummary
     {

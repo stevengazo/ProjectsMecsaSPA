@@ -1,66 +1,100 @@
-﻿@inject ProjectsDBContext db
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<p>Facturas del año en curso</p>
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Proyecto Id</th>
-            <th>Tarea</th>
-            <th>Id</th>
-            <th>Proyecto</th>
-            <th>Autor</th>
-            <th>Monto</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var bill in bills)
-        {
+<p class="fw-bold mt-3">
+    Se muestran las facturas del año @SelectedYear, considerando la fecha de la factura y omitiendo registros dados de baja.
+</p>
+
+
+@if (isLoading)
+{
+    <p>Cargando información...</p>
+}
+else if (bills.Any())
+{
+    <table class="table table-striped table-hover align-middle">
+        <thead class="table-light">
             <tr>
-                <td>
-                    <a href="/projects/@bill.Project?.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
-                        @bill.Project?.ProjectId
-                    </a>
-                </td>
-                <td>
-                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
-                        @bill.Project?.TaskNumber
-                    </a>
-                </td>
-                <td>@bill.BillDate.ToShortDateString()</td>
-                <td>@bill.Project?.Title</td>
-                <td>@bill.Author</td>
-                <td>@bill.Amount.ToString("N2")</td>
-
+                <th>Proyecto ID</th>
+                <th>Tarea</th>
+                <th>Fecha</th>
+                <th>Proyecto</th>
+                <th>Autor</th>
+                <th class="text-end">Monto</th>
             </tr>
-        }
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            @foreach (var bill in bills)
+            {
+                <tr>
+                    <td>
+                        <a href="/projects/@bill.Project?.ProjectId"
+                           class="btn btn-sm btn-outline-success"
+                           target="_blank">
+                            @bill.Project?.ProjectId
+                        </a>
+                    </td>
+                    <td>
+                        <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/"
+                           class="btn btn-sm btn-outline-success"
+                           target="_blank">
+                            @bill.Project?.TaskNumber
+                        </a>
+                    </td>
+                    <td>@bill.BillDate.ToString("dd/MM/yyyy")</td>
+                    <td>@bill.Project?.Title</td>
+                    <td>@bill.Author</td>
+                    <td class="text-end">@bill.Amount.ToString("N2")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-secondary">
+        No hay información registrada para @SelectedYear.
+    </div>
+}
 
 @code {
 
-    List<Bill> bills = new List<Bill>();
+    private List<Bill> bills = new();
+    private bool isLoading;
 
-    protected override Task OnInitializedAsync()
+    [Parameter]
+    public int SelectedYear { get; set; } = DateTime.Now.Year;
+
+    protected override async Task OnParametersSetAsync()
     {
-        LoadData();
-        return base.OnInitializedAsync();
+        await LoadDataAsync();
     }
 
-    private async Task LoadData()
+    private async Task LoadDataAsync()
     {
+        isLoading = true;
+
         try
         {
-            bills = db.Bill.AsNoTracking()
-                          .Include(e => e.Project)
-                          .Where(e => !e.IsDeleted)
-                          .OrderByDescending(e => e.BillDate).ToList();
-
+            using(var db = DbContextFactory.CreateDbContext())
+            {
+                bills = await db.Bill
+                    .AsNoTracking()
+                    .Include(b => b.Project)
+                    .Where(b =>
+                        !b.IsDeleted &&
+                        b.BillDate.Year == SelectedYear)
+                    .OrderByDescending(b => b.BillDate)
+                    .ToListAsync();
+            }
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.Write(e.Message);
-            throw;
+            Console.WriteLine($"Error cargando facturas: {ex.Message}");
+            bills = new();
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 }
