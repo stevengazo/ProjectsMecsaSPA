@@ -1,0 +1,113 @@
+﻿@using static ProjectsMecsaSPA.Pages.Bill.BillsListPage
+@inject ProjectsDBContext db
+
+<div class="p-1 d-flex flex-column">
+    <h3>Resumen de Facturas por Proyecto</h3>
+    <p>Facturas del año en curso y los ultimos 4 meses del anterior</p>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tarea</th>
+                <th>Proyecto</th>
+                <th>Estado</th>
+                <th>Fecha de Proyecto</th>
+                <th>Monto Registrado</th>
+                <th>Total Facturado</th>
+                <th>Porcentaje de Facturación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in TotalByProject)
+            {
+                // Calcular el porcentaje asegurando que no haya excedentes
+                var porcentaje = item.ProjectAmount > 0 ? ((item.BillsTotalAmount / item.ProjectAmount) * 100) : 0;
+                <tr>
+                    <td>
+                        <a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+                            @item.ProjectId
+                        </a>
+                    </td>
+                    <td>
+                        <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+                            @item.TaskNumber
+                        </a>
+                    </td>
+                    <td>@item.ProjectName</td>
+                    <td>@item.status</td>
+                    <td>@item.CreationDate.ToShortDateString()</td>
+                    <td>@item.ProjectAmount.ToString("N2")</td>
+                    <td>@item.BillsTotalAmount.ToString("N2")</td>
+                    <td>
+                        @if (porcentaje > 100)
+                        {
+                            <Progress Class="mb-3">
+                                <ProgressBar Color="ProgressColor.Warning" Width="100" label="@porcentaje.ToString("F2")" />
+                            </Progress>
+                        }
+                        else if (item.ProjectAmount == 0)
+                        {
+                            <Progress Class="mb-3">
+                                <ProgressBar Width="100" Color="ProgressColor.Danger" label="Monto de Proyecto no Indicado" />
+                            </Progress>
+
+                        }
+                        else
+                        {
+                            <Progress Class="mb-3">
+                                <ProgressBar Width="@double.Parse(porcentaje.ToString("F2"))" label="@porcentaje.ToString("F2")" />
+                            </Progress>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+@code {
+    [Parameter]
+    public int SeletedYear { get; set; } 
+    List<ProjectBillSummary> TotalByProject = new List<ProjectBillSummary>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadDataAsync();
+       //return base.OnInitializedAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        var currentYear = SeletedYear;  // Año actual
+        var lastYear = currentYear - 1;       // Año anterior
+
+        // Obtener las fechas de inicio para los filtros
+        var startDateCurrentYear = new DateTime(currentYear, 1, 1);  // 1 de enero del año en curso
+        var startDateLastYear = new DateTime(lastYear, 9, 1);       // 1 de septiembre del año anterior
+
+        // Filtrar las facturas que están en el rango de fechas adecuado
+        TotalByProject = db.Bill
+            .Include(e => e.Project)
+            .Include(e => e.Project.State)
+            .Where(b => (b.BillDate >= startDateCurrentYear && b.BillDate <= DateTime.Now) ||
+                        (b.BillDate >= startDateLastYear && b.BillDate < new DateTime(lastYear, 12, 31))
+                        && !b.IsDeleted
+            )
+            .GroupBy(b => b.Project.ProjectId)
+            .Select(g => new ProjectBillSummary
+            {
+                ProjectId = g.Key,
+                TaskNumber = g.First().Project.TaskNumber,
+                CreationDate = g.First().Project.CreationDate,
+                ProjectAmount = g.First().Project.Amount,
+                status = g.First().Project.State.StateName,
+                ProjectName = g.First().Project.Title,
+                billMark = g.First().Project.Isfactured,
+                BillsTotalAmount = g.Sum(b => b.Amount)
+            })
+            .OrderByDescending(e => e.ProjectId)
+            .ToList();
+    }
+}

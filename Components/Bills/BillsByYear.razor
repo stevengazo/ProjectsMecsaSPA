@@ -1,0 +1,66 @@
+﻿@inject ProjectsDBContext db
+
+<p>Facturas del año en curso</p>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Proyecto Id</th>
+            <th>Tarea</th>
+            <th>Id</th>
+            <th>Proyecto</th>
+            <th>Autor</th>
+            <th>Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bill in bills)
+        {
+            <tr>
+                <td>
+                    <a href="/projects/@bill.Project?.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+                        @bill.Project?.ProjectId
+                    </a>
+                </td>
+                <td>
+                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@bill.Project?.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+                        @bill.Project?.TaskNumber
+                    </a>
+                </td>
+                <td>@bill.BillDate.ToShortDateString()</td>
+                <td>@bill.Project?.Title</td>
+                <td>@bill.Author</td>
+                <td>@bill.Amount.ToString("N2")</td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+
+    List<Bill> bills = new List<Bill>();
+
+    protected override Task OnInitializedAsync()
+    {
+        LoadData();
+        return base.OnInitializedAsync();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            bills = db.Bill.AsNoTracking()
+                          .Include(e => e.Project)
+                          .Where(e => !e.IsDeleted)
+                          .OrderByDescending(e => e.BillDate).ToList();
+
+        }
+        catch (Exception e)
+        {
+            Console.Write(e.Message);
+            throw;
+        }
+    }
+}

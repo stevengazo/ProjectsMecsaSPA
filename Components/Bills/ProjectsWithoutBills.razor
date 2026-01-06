@@ -1,0 +1,112 @@
+﻿@using ProjectsMecsaSPA.Utilities
+@using static ProjectsMecsaSPA.Pages.Bill.BillsListPage
+
+@inject ProjectsDBContext db
+@inject IJSRuntime JS
+
+
+<p>Facturas del año en curso. Esto incluye todos los proyectos que no posean una factura registrada.</p>
+<button class=" btn btn-sm btn-outline-success" @onclick="DownloadPWithOutBill">Descargar Hoja de calculo</button>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Tarea</th>
+            <th>Proyecto</th>
+            <th>Fecha de Creación</th>
+            <th>Monto Registrado</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in projectsWithoutBilling)
+        {
+            <tr>
+                <td>
+                    <a href="/projects/@item.ProjectId" class="btn btn-sm btn-outline-success" target="_blank">
+                        @item.ProjectId
+                    </a>
+                </td>
+                <td>
+                    <a href="https://grupomecsa.bitrix24.es/company/personal/user/107/tasks/task/view/@item.TaskNumber/" class="btn btn-sm btn-outline-success" target="_blank">
+                        @item.TaskNumber
+                    </a>
+                </td>
+                <td>@item.ProjectName</td>
+                <td>@item.status</td>
+                <td>@item.CreationDate.ToShortDateString()</td>
+
+                @if (item.ProjectAmount == 0)
+                {
+                    <td class="text-danger">@item.ProjectAmount.ToString("N2")</td>
+                }
+                else
+                {
+                    <td>@item.ProjectAmount.ToString("N2")</td>
+                }
+
+                <td>
+                    @if (item.billMark)
+                    {
+                        <label>
+                            Marcado como Facturado
+                        </label>
+                    }
+                    else
+                    {
+                        <label>
+                            No ha sido marcado como facturado
+                        </label>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    List<ProjectBillSummary> projectsWithoutBilling = new List<ProjectBillSummary>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        LoadDataAsync();
+        //return base.OnInitializedAsync();
+    }
+
+    private async void DownloadPWithOutBill(MouseEventArgs args)
+    {
+        var data = await XmlsGenerate.GenerateFileProjects(projectsWithoutBilling);
+        var pdfBase64 = Convert.ToBase64String(data);
+
+        // Invocar una función JavaScript para iniciar la descarga del PDF
+        await JS.InvokeVoidAsync("downloadPDF", pdfBase64, $"Proyectos Sin Facturas_{DateTime.Now:yyyyMMdd_HHmm}.xlsx");
+
+    }
+
+
+    private async Task LoadDataAsync()
+    {
+        var currentYear = DateTime.Now.Year;
+
+        // Filtrar los proyectos que no tienen facturación registrada
+        projectsWithoutBilling = await db.Projects
+        .Include(e => e.State)
+        .AsNoTracking()
+            .Where(p => p.CreationDate.Year == currentYear && !db.Bill.Any(b => b.ProjectId == p.ProjectId && !b.IsDeleted)) // Proyectos sin facturas
+            .Select(p => new ProjectBillSummary
+            {
+                ProjectId = p.ProjectId,
+                ProjectName = p.Title,
+                CreationDate = p.CreationDate,
+                ProjectAmount = p.Amount,
+                TaskNumber = p.TaskNumber,
+                status = p.State.StateName,
+                billMark = p.Isfactured,
+                BillsTotalAmount = 0 // No hay facturación registrada
+            })
+                .OrderByDescending(e => e.ProjectId)
+            .ToListAsync(); // Se usa ToListAsync para trabajar de manera asincrónica
+    }
+}
