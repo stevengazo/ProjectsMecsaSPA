@@ -124,5 +124,6 @@ else
                 .OrderByDescending(x => x.ProjectId)
                 .ToListAsync();
         }
+        StateHasChanged();
     }
 }

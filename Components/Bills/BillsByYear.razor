@@ -85,6 +85,7 @@ else
                         b.BillDate.Year == SelectedYear)
                     .OrderByDescending(b => b.BillDate)
                     .ToListAsync();
+            
             }
         }
         catch (Exception ex)
@@ -95,6 +96,7 @@ else
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 }
