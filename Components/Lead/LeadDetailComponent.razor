@@ -1,0 +1,167 @@
+﻿@using ProjectsMecsaSPA.Model
+
+
+
+@if (Lead == null)
+{
+    <div class="alert alert-secondary small text-center">
+        No hay información del lead para mostrar.
+    </div>
+}
+else
+{
+    <div class="card mb-3 shadow-sm border-light rounded-3">
+
+        <!-- Header -->
+        <div class="card-header bg-white border-0 text-center fw-bold">
+            Información del Lead
+        </div>
+
+        <!-- Body -->
+        <div class="card-body p-3">
+            <table class="table table-borderless table-sm mb-0 align-middle">
+                <tbody>
+
+                    <tr>
+                        <th class="text-muted">ID</th>
+                        <td>@Lead.LeadId</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Contacto</th>
+                        <td>@Lead.ContactName</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Cliente</th>
+                        <td>@Lead.CustomerName</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">País</th>
+                        <td>@Lead.Country</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Estado</th>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                @Lead.LeadState?.Name
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Origen</th>
+                        <td>@Lead.Origin?.LeadOriginName</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Tipo de Solicitud</th>
+                        <td>@Lead.LeadRequest?.RequestName</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Vendedor</th>
+                        <td>@Lead.Seller?.SellerName</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Número de Deal</th>
+                        <td>@Lead.DealNumber</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Prioridad</th>
+                        <td>
+                            @if (Lead.Prioritized > 0)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Prioritario
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Normal</span>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Nuevo</th>
+                        <td>
+                            @if (Lead.IsNew)
+                            {
+                                <span class="badge bg-success">Sí</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No</span>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Contactado</th>
+                        <td>
+                            @if (Lead.ContactedBySeller)
+                            {
+                                <span class="badge bg-success">Sí</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No</span>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Llamada realizada</th>
+                        <td>
+                            @if (Lead.isCalled)
+                            {
+                                <span class="badge bg-success">Sí</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">No</span>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Creado por</th>
+                        <td>@Lead.CreatedBy</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Fecha de creación</th>
+                        <td>@Lead.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-muted">Última actualización</th>
+                        <td>@Lead.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+
+                    @if (!string.IsNullOrWhiteSpace(Lead.Description))
+                    {
+                        <tr>
+                            <th class="text-muted align-top">Descripción</th>
+                            <td class="text-wrap">
+                                @Lead.Description
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public Lead Lead { get; set; } = default!;
+}

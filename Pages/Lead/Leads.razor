@@ -1,19 +1,31 @@
 ﻿@page "/leads"
 
-
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
+<div class="d-flex justify-content-between align-items-center">
+    <h3>Prospectos Recepción</h3>
 
-<h3>Leads</h3>
+    <button class="btn btn-primary" @onclick="ShowLeadComponent">
+        Agregar Lead
+    </button>
+</div>
 
-<TableLeadComponent Leads="leads"/>
+<hr />
 
+<Tabs>
+    <Tab Title="Tabla" Active="true">
+        <Content>
+            <TableLeadComponent Leads="leads" OnSelect="HandleLeadSelected" />
+        </Content>
+    </Tab>
 
-
-
-<button class="btn btn-primary" @onclick="ShowLeadComponent">
-    Agregar Lead
-</button>
+    <Tab Title="Etapas">
+        <Content>
+            <LeadKanban Leads="leads"
+                        OnSelect="HandleLeadSelected" />
+        </Content>
+    </Tab>
+</Tabs>
 
 <Offcanvas @ref="offcanvas" />
 
@@ -25,6 +37,7 @@
 }
 
 @code {
+
     private Offcanvas offcanvas = default!;
     private string? message;
 
@@ -37,10 +50,13 @@
 
     private async Task LoadData()
     {
-        using (var db = DbContextFactory.CreateDbContext())
-        {
-            leads = db.Leads.Include(e => e.Origin).Include(e => e.LeadRequest).Include(e => e.LeadState).ToList();
-        }
+        using var db = DbContextFactory.CreateDbContext();
+
+        leads = await db.Leads
+            .Include(e => e.Origin)
+            .Include(e => e.LeadRequest)
+            .Include(e => e.LeadState)
+            .ToListAsync();
     }
 
     private async Task ShowLeadComponent()
@@ -48,26 +64,34 @@
         var parameters = new Dictionary<string, object>
         {
             {
-                nameof( AddLeadComponent.OnAdded),
+                nameof(AddLeadComponent.OnAdded),
                 EventCallback.Factory.Create(this, HandleLeadAdded)
             }
         };
 
         await offcanvas.ShowAsync<AddLeadComponent>(
             title: "Agregar Lead",
-           parameters: parameters
+            parameters: parameters
         );
     }
 
     private async Task HandleLeadAdded()
     {
-        //   message = "Lead agregado correctamente.";
-
-        // Aquí puedes recargar la lista de leads si aplica
-        // await LoadLeadsAsync();
-
         await offcanvas.HideAsync();
-        LoadData();
+        await LoadData();
         StateHasChanged();
+    }
+
+    private async Task HandleLeadSelected(Lead lead)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "Lead", lead }
+        };
+
+        await offcanvas.ShowAsync<LeadDetailComponent>(
+            title: "Detalle del Lead",
+            parameters: parameters
+        );
     }
 }

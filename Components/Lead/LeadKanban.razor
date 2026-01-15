@@ -1,0 +1,154 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject Bitrix24ClientService bitrix24
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="d-flex flex-row flex-nowrap gap-3 overflow-auto">
+
+    @foreach (var state in LeadsByState)
+    {
+        <div style="min-width:300px; max-width:300px;">
+
+            <!-- Header -->
+            <div class="text-center fw-bold py-2 bg-light">
+                @state.Key.Name
+            </div>
+
+            <!-- Body -->
+            <div class="p-2">
+
+                <SortableList class="h-100"
+                              TItem="Lead"
+                              Name="@state.Key.Name"
+                              Data="@state.Value"
+                              Context="lead"
+                              OnUpdate="args => OnLeadListUpdateAsync(args, state.Key.Name)"
+                              OnRemove="args => OnLeadListRemoveAsync(args)">
+
+                    <ItemTemplate>
+                        <div class="mb-2 p-2"
+                             style="cursor:pointer"
+                             @onclick="() => OnSelect.InvokeAsync(lead)">
+
+                            <div class="fw-semibold">
+                                @lead.ContactName
+                            </div>
+
+                            <div class="text-muted small">
+                                @lead.CreatedAt.ToString("dd/MM/yyyy")
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(lead.Description))
+                            {
+                                <p class="small mb-1">
+                                    @lead.Description
+                                </p>
+                            }
+
+                            @if (lead.Seller != null)
+                            {
+                                <span class="badge bg-secondary mt-1">
+                                    @lead.Seller.SellerName
+                                </span>
+                            }
+
+                        </div>
+                    </ItemTemplate>
+
+                </SortableList>
+
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+
+    private List<LeadState> states = new();
+
+    private Dictionary<LeadState, List<Lead>> LeadsByState { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Lead> OnSelect { get; set; }
+
+    [Parameter]
+    public List<Lead> Leads { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        LeadsByState.Clear();
+
+        using var db = DbContextFactory.CreateDbContext();
+
+        states = await db.LeadsState
+                         .OrderBy(e => e.Order)
+                         .ToListAsync();
+
+        foreach (var state in states)
+        {
+            LeadsByState[state] = Leads
+                .Where(l => !l.isDeleted && l.LeadStateId == state.LeadStateId)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToList();
+        }
+    }
+
+    private Lead? GetLead(LeadState state, int index)
+    {
+        if (!LeadsByState.ContainsKey(state)) return null;
+        if (index < 0 || index >= LeadsByState[state].Count) return null;
+
+        return LeadsByState[state][index];
+    }
+
+    private Task OnLeadListUpdateAsync(SortableListEventArgs args, string stateName)
+    {
+        var targetState = states.FirstOrDefault(e => e.Name == stateName);
+        if (targetState == null) return Task.CompletedTask;
+
+        var lead = GetLead(targetState, args.OldIndex);
+        if (lead == null) return Task.CompletedTask;
+
+        var list = LeadsByState[targetState];
+        list.RemoveAt(args.OldIndex);
+
+        if (args.NewIndex < list.Count)
+            list.Insert(args.NewIndex, lead);
+        else
+            list.Add(lead);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnLeadListRemoveAsync(SortableListEventArgs args)
+    {
+        var originState = states.FirstOrDefault(e => e.Name == args.FromListName);
+        var targetState = states.FirstOrDefault(e => e.Name == args.ToListName);
+
+        if (originState == null || targetState == null) return;
+
+        var lead = GetLead(originState, args.OldIndex);
+        if (lead == null) return;
+
+        LeadsByState[originState].Remove(lead);
+        LeadsByState[targetState].Insert(0, lead);
+
+        lead.LeadStateId = targetState.LeadStateId;
+
+        using var db = DbContextFactory.CreateDbContext();
+        db.Leads.Update(lead);
+        await db.SaveChangesAsync();
+
+        StateHasChanged();
+    }
+}
