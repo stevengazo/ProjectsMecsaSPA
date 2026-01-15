@@ -1,39 +1,211 @@
-﻿<h3>Agregar Lead</h3>
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-<div class="mb-3">
-    <label class="form-label">Nombre</label>
-    <input class="form-control" @bind="leadName" />
-</div>
 
-<div class="mb-3">
-    <label class="form-label">Correo electrónico</label>
-    <input type="email" class="form-control" @bind="email" />
-</div>
+<h3>Agregar Lead</h3>
 
-<div class="mb-3">
-    <label class="form-label">Teléfono</label>
-    <input class="form-control" @bind="phone" />
-</div>
+<EditForm Model="Lead" OnValidSubmit="SaveAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<button class="btn btn-success" @onclick="SaveAsync">
-    Agregar
-</button>
+    <!-- Cliente -->
+    <div class="mb-3">
+        <label class="form-label">Cliente</label>
+        <InputNumber class="form-control" @bind-Value="Lead.CustomerName" />
+    </div>
+
+    <!-- Nombre de contacto -->
+    <div class="mb-3">
+        <label class="form-label">Nombre del contacto</label>
+        <InputText class="form-control" @bind-Value="Lead.ContactName" />
+    </div>
+
+    <!-- Descripción -->
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <InputTextArea class="form-control" @bind-Value="Lead.Description" />
+    </div>
+
+    <!-- Número de negocio -->
+    <div class="mb-3">
+        <label class="form-label">Número de negocio</label>
+        <InputNumber class="form-control" @bind-Value="Lead.DealNumber" />
+    </div>
+
+    <!-- Prioridad -->
+    <div class="mb-3">
+        <label class="form-label">Prioridad</label>
+        <InputSelect class="form-control"  @bind-Value="Lead.Prioritized" >
+           <option value="1">Alta</option>
+            <option value="2">Media</option>
+            <option value="3">Baja</option>
+
+            </InputSelect>
+    </div>
+
+    <!-- Origen -->
+    <div class="mb-3">
+        <label class="form-label">Origen</label>
+        <InputSelect class="form-select" @bind-Value="Lead.LeadOriginId">
+            <option value="">Seleccione...</option>
+            @foreach (var o in origins)
+            {
+                <option value="@o.LeadOriginId">@o.LeadOriginName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Tipo de solicitud -->
+    <div class="mb-3">
+        <label class="form-label">Tipo de solicitud</label>
+        <InputSelect class="form-select" @bind-Value="Lead.LeadRequestId">
+            <option value="">Seleccione...</option>
+            @foreach (var r in requests)
+            {
+                <option value="@r.LeadRequestId">@r.RequestName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Tipo de solicitud -->
+    @if (sellers.Any())
+    {
+        <div class="mb-3">
+            <label class="form-label">Vendedor</label>
+            <InputSelect class="form-select" @bind-Value="Lead.SellerId">
+                <option value="">Seleccione...</option>
+                @foreach (var r in sellers)
+                {
+                    <option value="@r.SellerId">@r.SellerName</option>
+                }
+            </InputSelect>
+        </div>
+    }
+    else
+    {
+        <label>no hay vendedores disponibles</label>
+    }
+
+
+    <!-- País -->
+    <div class="mb-3">
+        <label class="form-label">País</label>
+        <InputSelect class="form-select" @bind-Value="Lead.Country">
+            <option value="">Seleccione...</option>
+            <option value="Costa Rica">Costa Rica</option>
+            <option value="Panamá">Panamá</option>
+        </InputSelect>
+    </div>
+
+    <!-- Estado -->
+    <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <InputSelect class="form-select" @bind-Value="Lead.LeadStateId">
+            @foreach (var s in states)
+            {
+                <option value="@s.LeadStateId">@s.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Flags -->
+  
+
+
+    <button type="submit" class="btn btn-success">
+        Agregar
+    </button>
+</EditForm>
+
 
 @code {
     [Parameter]
     public EventCallback OnAdded { get; set; }
 
-    private string? leadName;
-    private string? email;
-    private string? phone;
+    private Lead Lead = new();
+    private List<LeadOrigin> origins = new();
+    private List<LeadRequest> requests = new();
+  private List<Seller> sellers = new();
+    private List<LeadState> states = new();
+
+    private string? currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+
+        Lead.CreatedAt = DateTime.UtcNow;
+        Lead.UpdatedAt = DateTime.UtcNow;
+        Lead.IsNew = true;
+        Lead.isDeleted = false;
+        Lead.LeadStateId = 2; // Nuevo
+    }
+
+    private async Task LoadDataAsync()
+    {
+      try
+        {
+            using var db = DbContextFactory.CreateDbContext();
+
+            origins = await db.LeadOrigins.AsNoTracking().ToListAsync();
+            requests = await db.LeadsRequest.AsNoTracking().ToListAsync();
+            states = await db.LeadsState.AsNoTracking().ToListAsync();
+           sellers = await db.Seller.ToListAsync();
+        }
+        catch (Exception s)
+        {
+            
+            throw s;
+        }
+    }
+
+    private async Task LoadUserAsync()
+    {
+      try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            if (user.Identity is not null && user.Identity.IsAuthenticated)
+            {
+                // Usa Name por defecto (Identity)
+                currentUser = user.Identity.Name;
+
+                // Alternativa si usas Claims personalizados:
+                // currentUser = user.FindFirst("email")?.Value;
+                // currentUser = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            }
+        }
+        catch (Exception f)
+        {
+            
+            throw f;
+        }
+    }
 
     private async Task SaveAsync()
     {
-        // Aquí luego puedes guardar en base de datos usando ProjectsDBContext
-
-        if (OnAdded.HasDelegate)
+        try
         {
-            await OnAdded.InvokeAsync();
+            using var db = DbContextFactory.CreateDbContext();
+
+            Lead.CreatedBy = currentUser ?? "";
+            Lead.CreatedAt = DateTime.Now;
+            Lead.LastUpdatedBy = currentUser ?? "";
+
+
+            db.Leads.Add(Lead);
+            await db.SaveChangesAsync();
+
+            if (OnAdded.HasDelegate)
+            {
+                await OnAdded.InvokeAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            
         }
     }
 }

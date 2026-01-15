@@ -1,0 +1,56 @@
+﻿
+<div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Contacto</th>
+                <th>Cliente</th>
+                <th>Fecha Creación</th>
+                <th>Deal</th>
+                <th>Nuevo</th>
+                <th>Prioridad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Leads != null && Leads.Any())
+            {
+                @foreach (var l in Leads)
+                {
+                    <tr>
+                        <td>@l.ContactName</td>
+                        <td>@l.CustomerName</td>
+                        <td>@l.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@l.Country</td>
+                        <td>@l.Origin.LeadOriginName</td>
+                        <td>@l.LeadRequest.RequestName</td>
+                        <td>@l.LeadState.Name</td>
+                        <td>@l.DealNumber</td>
+                        <td>
+                            <span class="badge @(l.IsNew ? "bg-success" : "bg-secondary")">
+                                @(l.IsNew ? "Sí" : "No")
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(l.Prioritized ==1?"bg-danger" : "bg-secondary")">
+                                @(l.Prioritized == 1 ? "Alta" : "Normal")
+                            </span>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">
+                        No hay leads registrados
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public List<Lead> Leads { get; set; } = new();
+}

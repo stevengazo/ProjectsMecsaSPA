@@ -1,6 +1,15 @@
 ﻿@page "/leads"
 
+
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
 <h3>Leads</h3>
+
+<TableLeadComponent Leads="leads"/>
+
+
+
 
 <button class="btn btn-primary" @onclick="ShowLeadComponent">
     Agregar Lead
@@ -19,30 +28,46 @@
     private Offcanvas offcanvas = default!;
     private string? message;
 
+    private List<Lead> leads = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        using (var db = DbContextFactory.CreateDbContext())
+        {
+            leads = db.Leads.Include(e => e.Origin).Include(e => e.LeadRequest).Include(e => e.LeadState).ToList();
+        }
+    }
+
     private async Task ShowLeadComponent()
     {
         var parameters = new Dictionary<string, object>
         {
             {
-                nameof(AddLeadComponent.OnAdded),
+                nameof( AddLeadComponent.OnAdded),
                 EventCallback.Factory.Create(this, HandleLeadAdded)
             }
         };
 
         await offcanvas.ShowAsync<AddLeadComponent>(
             title: "Agregar Lead",
-            parameters: parameters
+           parameters: parameters
         );
     }
 
     private async Task HandleLeadAdded()
     {
-        message = "Lead agregado correctamente.";
+        //   message = "Lead agregado correctamente.";
 
         // Aquí puedes recargar la lista de leads si aplica
         // await LoadLeadsAsync();
 
         await offcanvas.HideAsync();
+        LoadData();
         StateHasChanged();
     }
 }
