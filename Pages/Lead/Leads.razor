@@ -1,6 +1,48 @@
 ﻿@page "/leads"
-<h3>Component</h3>
+
+<h3>Leads</h3>
+
+<button class="btn btn-primary" @onclick="ShowLeadComponent">
+    Agregar Lead
+</button>
+
+<Offcanvas @ref="offcanvas" />
+
+@if (!string.IsNullOrWhiteSpace(message))
+{
+    <div class="alert alert-success mt-3">
+        @message
+    </div>
+}
 
 @code {
+    private Offcanvas offcanvas = default!;
+    private string? message;
 
+    private async Task ShowLeadComponent()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            {
+                nameof(AddLeadComponent.OnAdded),
+                EventCallback.Factory.Create(this, HandleLeadAdded)
+            }
+        };
+
+        await offcanvas.ShowAsync<AddLeadComponent>(
+            title: "Agregar Lead",
+            parameters: parameters
+        );
+    }
+
+    private async Task HandleLeadAdded()
+    {
+        message = "Lead agregado correctamente.";
+
+        // Aquí puedes recargar la lista de leads si aplica
+        // await LoadLeadsAsync();
+
+        await offcanvas.HideAsync();
+        StateHasChanged();
+    }
 }

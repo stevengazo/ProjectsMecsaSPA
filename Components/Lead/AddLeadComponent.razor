@@ -1,0 +1,39 @@
+﻿<h3>Agregar Lead</h3>
+
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input class="form-control" @bind="leadName" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Correo electrónico</label>
+    <input type="email" class="form-control" @bind="email" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Teléfono</label>
+    <input class="form-control" @bind="phone" />
+</div>
+
+<button class="btn btn-success" @onclick="SaveAsync">
+    Agregar
+</button>
+
+@code {
+    [Parameter]
+    public EventCallback OnAdded { get; set; }
+
+    private string? leadName;
+    private string? email;
+    private string? phone;
+
+    private async Task SaveAsync()
+    {
+        // Aquí luego puedes guardar en base de datos usando ProjectsDBContext
+
+        if (OnAdded.HasDelegate)
+        {
+            await OnAdded.InvokeAsync();
+        }
+    }
+}
