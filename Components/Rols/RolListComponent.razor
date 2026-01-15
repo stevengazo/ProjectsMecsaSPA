@@ -187,7 +187,9 @@
                         SellerName = $"{user.Name} {user.LastName}",
                         Email = user.Email,
                         DNI = user.DNI,
-                        IsActive = true
+                        IsActive = true,
+                        PhoneNumber= "",
+                        Bitrix24Id = 0
                     };
                 using (var transaction = await db.Database.BeginTransactionAsync())
                 {

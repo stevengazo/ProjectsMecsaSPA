@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using Microsoft.EntityFrameworkCore;
 using ProjectsMecsaSPA.Model;
 
 namespace ProjectsMecsaSPA.Data
@@ -23,6 +24,12 @@ namespace ProjectsMecsaSPA.Data
         public DbSet<SchEmpl> Schedule_Employee { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
 
+        public DbSet<Lead> Leads { get; set; }
+        public DbSet<LeadRequest> LeadsRequest { get; set; }
+        public DbSet<LeadState> LeadsState { get; set; }
+        public DbSet<LeadOrigin> LeadOrigins { get; set; }
+        public DbSet<LeadNotes> LeadNotes { get; set; }
+
         public ProjectsDBContext(DbContextOptions contextOptions) : base(contextOptions)
         {
         }
@@ -35,18 +42,20 @@ namespace ProjectsMecsaSPA.Data
                 CompanyId = 1,
                 CompanyName = "Default"
             };
-            modelBuilder.Entity<Company>().HasData(company);    
+            modelBuilder.Entity<Company>().HasData(company);
 
             Seller seller = new()
             {
                 SellerId = 1,
                 SellerName = "Sample",
-                Email = ""
+                Email = "",
+                PhoneNumber = "1234567890",
+                Bitrix24Id = 1
 
             };
-          
+
             modelBuilder.Entity<Seller>().HasData(seller);
-            
+
             List<TypeModel> typeModels = new List<TypeModel>() {
                 new TypeModel()
                 {
@@ -186,6 +195,142 @@ namespace ProjectsMecsaSPA.Data
                     IsDeleted = false
                 }
             };
+
+            modelBuilder.Entity<LeadOrigin>().HasData(
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 1,
+           LeadOriginName = "WhatsApp"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 2,
+           LeadOriginName = "Facebook"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 3,
+           LeadOriginName = "Instagram"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 4,
+           LeadOriginName = "Sitio Web"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 5,
+           LeadOriginName = "Llamada Telefónica"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 6,
+           LeadOriginName = "Correo Electrónico"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 7,
+           LeadOriginName = "Referencia / Recomendación"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 8,
+           LeadOriginName = "LinkedIn"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 9,
+           LeadOriginName = "Google Ads"
+       },
+       new LeadOrigin
+       {
+           IsDeleted = false,
+           LeadOriginId = 10,
+           LeadOriginName = "Evento / Feria"
+       }
+   );
+
+
+            modelBuilder.Entity<LeadRequest>().HasData(
+                new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 1,
+                    RequestName = "pararrayos"
+                }
+                );
+            modelBuilder.Entity<LeadState>().HasData(
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 1,
+                      Name = "Atendido"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 2,
+                      Name = "Nuevo"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 3,
+                      Name = "Contactado"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 4,
+                      Name = "En Seguimiento"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 5,
+                      Name = "Cotización Enviada"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 6,
+                      Name = "Negociación"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 7,
+                      Name = "Ganado"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 8,
+                      Name = "Perdido"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 9,
+                      Name = "No Calificado"
+                  },
+                  new LeadState
+                  {
+                      IsDeleted = false,
+                      LeadStateId = 10,
+                      Name = "Pendiente de Respuesta"
+                  }
+              );
+
 
             modelBuilder.Entity<State>().HasData(states);
         }
