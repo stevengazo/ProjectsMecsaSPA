@@ -1,0 +1,137 @@
+﻿<div class="d-flex gap-2 align-items-center">
+
+    <!-- Select principal -->
+    <select class="form-select w-auto" @onchange="OnOptionChanged">
+        <option value="">-- Seleccione rango --</option>
+        <option value="thisweek">Semana actual</option>
+        <option value="lastweek">Semana pasada</option>
+        <option value="thismonth">Mes actual</option>
+        <option value="thisquarter">Trimestre actual</option>
+        <option value="thisyear">Año (seleccionar)</option>
+        <option value="custom">Personalizado</option>
+        <option value="weeknumber">Número de semana</option>
+    </select>
+
+    <!-- Input para seleccionar año, visible solo si selecciona "Año" o "Número de semana" -->
+    @if (showYearPicker)
+    {
+        <input type="number" class="form-control w-auto" min="2000" max="2100"
+               @bind="selectedYear" @bind:after="UpdateYearRange" />
+    }
+
+    <!-- Input para seleccionar número de semana, visible solo si selecciona "Número de semana" -->
+    @if (showWeekPicker)
+    {
+        <input type="number" class="form-control w-auto" min="1" max="53"
+               @bind="selectedWeek" @bind:after="UpdateWeekRange" placeholder="Semana" />
+    }
+
+    <!-- Inputs de fechas personalizados, visibles solo si "Personalizado" -->
+    @if (showCustomDates)
+    {
+        <input type="date" class="form-control" @bind="startDate" @bind:after="OnCustomDateChanged" />
+        <input type="date" class="form-control" @bind="endDate" @bind:after="OnCustomDateChanged" />
+    }
+</div>
+
+@code {
+    private DateTime? startDate;
+    private DateTime? endDate;
+    private int selectedYear = DateTime.Today.Year;
+    private int selectedWeek = 1;
+    private bool showCustomDates = false;
+    private bool showYearPicker = false;
+    private bool showWeekPicker = false;
+
+    [Parameter]
+    public EventCallback<(DateTime? Start, DateTime? End)> OnRangeSelected { get; set; }
+
+    private async Task OnOptionChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        var today = DateTime.Today;
+
+        showCustomDates = false;
+        showYearPicker = false;
+        showWeekPicker = false;
+
+        switch (value)
+        {
+            case "thisweek":
+                var deltaStart = DayOfWeek.Monday - today.DayOfWeek;
+                startDate = today.AddDays(deltaStart);
+                endDate = startDate.Value.AddDays(6);
+                break;
+            case "lastweek":
+                var deltaLast = DayOfWeek.Monday - today.DayOfWeek - 7;
+                startDate = today.AddDays(deltaLast);
+                endDate = startDate.Value.AddDays(6);
+                break;
+            case "thismonth":
+                startDate = new DateTime(today.Year, today.Month, 1);
+                endDate = startDate.Value.AddMonths(1).AddDays(-1);
+                break;
+            case "thisquarter":
+                var quarter = (today.Month - 1) / 3 + 1;
+                startDate = new DateTime(today.Year, (quarter - 1) * 3 + 1, 1);
+                endDate = startDate.Value.AddMonths(3).AddDays(-1);
+                break;
+            case "thisyear":
+                showYearPicker = true;
+                startDate = new DateTime(selectedYear, 1, 1);
+                endDate = new DateTime(selectedYear, 12, 31);
+                break;
+            case "custom":
+                showCustomDates = true;
+                startDate = null;
+                endDate = null;
+                break;
+            case "weeknumber":
+                showWeekPicker = true;
+                showYearPicker = true; // año necesario para calcular la semana
+                selectedWeek = 1;
+                startDate = null;
+                endDate = null;
+                break;
+            default:
+                startDate = null;
+                endDate = null;
+                break;
+        }
+
+        await OnRangeSelected.InvokeAsync((startDate, endDate));
+    }
+
+    private async Task UpdateYearRange()
+    {
+        if (showWeekPicker)
+        {
+            await UpdateWeekRange();
+        }
+        else
+        {
+            startDate = new DateTime(selectedYear, 1, 1);
+            endDate = new DateTime(selectedYear, 12, 31);
+        }
+
+        await OnRangeSelected.InvokeAsync((startDate, endDate));
+    }
+
+    private async Task UpdateWeekRange()
+    {
+        // Calcula la fecha de inicio de la semana según ISO 8601 (lunes)
+        var jan1 = new DateTime(selectedYear, 1, 1);
+        var daysOffset = DayOfWeek.Monday - jan1.DayOfWeek;
+        var firstMonday = jan1.AddDays(daysOffset >= 0 ? daysOffset : daysOffset + 7);
+
+        startDate = firstMonday.AddDays((selectedWeek - 1) * 7);
+        endDate = startDate.Value.AddDays(6);
+
+        await OnRangeSelected.InvokeAsync((startDate, endDate));
+    }
+
+    private async Task OnCustomDateChanged()
+    {
+        await OnRangeSelected.InvokeAsync((startDate, endDate));
+    }
+}

@@ -1,14 +1,129 @@
-﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+﻿@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject IEmailSender EmailSender
 
-
-<!-- Selector de rango de fechas -->
 <div class="flex-grow-1">
+
+    <!-- Selector + acciones -->
+    <div class="d-flex gap-2 m-2 flex-row align-items-end">
+
+        <ProjectsMecsaSPA.Components.Shared.DateRangePicker OnRangeSelected="RecibirRango" />
+
+        <button class="btn btn-primary"
+                @onclick="Search"
+                disabled="@isLoading">
+            @if (isLoading)
+            {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                <label> Buscando...</label>
+                        }
+            else
+            {
+<label>                Buscar
+</label>                        }
+        </button>
+
+        @if (Leads.Any())
+        {
+            <button class="btn btn-success"
+                    @onclick="OpenEmailModal">
+                Enviar correo
+            </button>
+        }
+    </div>
+
+    <!-- Error -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger m-2">
+            @errorMessage
+        </div>
+    }
+
+    <!-- Tabla -->
+    <TableLeadComponent Leads="Leads"
+                        OnSelect="OnSelect" />
 </div>
+
+<!-- MODAL DESTINATARIOS -->
+@if (showEmailModal)
+{
+    <div class="modal fade show d-block" tabindex="-1"
+         style="background-color:rgba(0,0,0,.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Destinatarios del reporte</h5>
+                    <button type="button" class="btn-close"
+                            @onclick="CloseEmailModal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <ul class="list-group mb-3">
+                        @foreach (var email in emails)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @email
+                                <button class="btn btn-sm btn-outline-danger"
+                                        @onclick="() => RemoveEmail(email)">
+                                    Quitar
+                                </button>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="input-group">
+                        <input class="form-control"
+                               placeholder="nuevo@correo.com"
+                               @bind="newEmail" />
+                        <button class="btn btn-outline-primary"
+                                @onclick="AddEmail">
+                            Agregar
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary"
+                            @onclick="CloseEmailModal">
+                        Cancelar
+                    </button>
+
+                    @if (emails.Any())
+                    {
+                        <button class="btn btn-success"
+                        @onclick="TaskSendReport">
+                        Enviar
+
+                        </button>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
 
 @code {
 
+    [Parameter]
+    public EventCallback<Lead> OnSelect { get; set; }
+
     private DateTime? fechaInicio;
     private DateTime? fechaFin;
+
+    private bool isLoading;
+    private bool isSending;
+    private bool showEmailModal;
+
+    private string? errorMessage;
+    private string? newEmail;
+
+    private List<Lead> Leads = new();
+    private List<string> emails = new();
 
     private void RecibirRango((DateTime? Start, DateTime? End) rango)
     {
@@ -16,6 +131,158 @@
         fechaFin = rango.End;
     }
 
+    private async Task Search()
+    {
+        isLoading = true;
+        errorMessage = null;
 
+        try
+        {
+            await using var db = DbContextFactory.CreateDbContext();
 
+            var query = db.Leads
+                .AsNoTracking()
+                .Include(x => x.LeadState)
+                .Include(x => x.Origin)
+                .Include(x => x.LeadRequest)
+                .Include(x => x.Seller)
+                .AsQueryable();
+
+            if (fechaInicio.HasValue)
+                query = query.Where(x => x.CreatedAt >= fechaInicio.Value);
+
+            if (fechaFin.HasValue)
+            {
+                var fin = fechaFin.Value.Date.AddDays(1).AddTicks(-1);
+                query = query.Where(x => x.CreatedAt <= fin);
+            }
+
+            Leads = await query
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
+
+          /* emails = Leads
+                .Where(x => !string.IsNullOrWhiteSpace(x.Seller?.Email))
+                .Select(x => x.Seller!.Email!)
+                .Distinct()
+                .ToList();*/
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al buscar leads: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenEmailModal()
+    {
+        showEmailModal = true;
+    }
+
+    private void CloseEmailModal()
+    {
+        showEmailModal = false;
+        newEmail = null;
+    }
+
+    private void AddEmail()
+    {
+        if (string.IsNullOrWhiteSpace(newEmail) || !newEmail.Contains("@"))
+            return;
+
+        var email = newEmail.Trim();
+
+        if (!emails.Contains(email, StringComparer.OrdinalIgnoreCase))
+            emails.Add(email);
+
+        newEmail = null;
+    }
+
+    private void RemoveEmail(string email)
+    {
+        emails.Remove(email);
+    }
+
+    private async Task TaskSendReport()
+    {
+        if (!emails.Any())
+        {
+            errorMessage = "No hay destinatarios válidos.";
+            return;
+        }
+
+        isSending = true;
+        errorMessage = null;
+
+        try
+        {
+            var body = BuildEmailBody();
+
+            foreach (var email in emails)
+            {
+                await EmailSender.SendEmailAsync(
+                    email,
+                    "Reporte de Recepción",
+                    body);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error al enviar correos: {ex.Message}";
+        }
+        finally
+        {
+            isSending = false;
+            showEmailModal = false;
+        }
+    }
+
+    private string BuildEmailBody()
+    {
+        var inicio = fechaInicio?.ToString("dd/MM/yyyy") ?? "N/A";
+        var fin = fechaFin?.ToString("dd/MM/yyyy") ?? "N/A";
+
+        var body = $@"
+<!DOCTYPE html>
+<html>
+<body style='font-family:Arial; font-size:14px;'>
+
+<h2>Reporte de Entradas de Recepción</h2>
+<p><b>Inicio:</b> {inicio}<br/>
+<b>Fin:</b> {fin}</p>
+
+<table width='100%' cellpadding='6' cellspacing='0'
+       style='border-collapse:collapse; border:1px solid #ccc;'>
+
+<tr style='background:#f2f2f2;'>
+<th>ID</th><th>Contacto</th><th>Teléfono</th><th>Cliente</th>
+<th>Email</th><th>Solicitud</th><th>Vendedor</th><th>Fecha</th>
+</tr>";
+
+        foreach (var item in Leads)
+        {
+            body += $@"
+<tr>
+<td>{item.LeadId}</td>
+<td>{item.ContactName}</td>
+<td>{item.PhoneNumber}</td>
+<td>{item.CustomerName}</td>
+<td>{item.Email}</td>
+<td>{item.LeadRequest?.RequestName}</td>
+<td>{item.Seller?.SellerName}</td>
+<td>{item.CreatedAt:dd/MM/yyyy HH:mm}</td>
+</tr>";
+        }
+
+        body += @"
+</table>
+<p style='font-size:12px;color:#777;'>Correo generado automáticamente.</p>
+</body>
+</html>";
+
+        return body;
+    }
 }
