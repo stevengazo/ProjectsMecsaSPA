@@ -265,7 +265,54 @@ namespace ProjectsMecsaSPA.Data
                 {
                     IsDeleted = false,
                     LeadRequestId = 1,
-                    RequestName = "pararrayos"
+                    RequestName = "Pararrayos"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 2,
+                    RequestName = "Mantenimiento"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 3,
+                    RequestName = "Supresores"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 4,
+                    RequestName = "Contadores de Eventos"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 5,
+                    RequestName = "Torres"
+                },
+                new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 6,
+                    RequestName = "Suministros Varios"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 7,
+                    RequestName = "Puesta a Tierra"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 8,
+                    RequestName = "Punta Franklin"
+                }, new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 9,
+                    RequestName = "Detectores"
+                },
+                new LeadRequest()
+                {
+                    IsDeleted = false,
+                    LeadRequestId = 10,
+                    RequestName = "Mástil"
                 }
                 );
             modelBuilder.Entity<LeadState>().HasData(
@@ -273,62 +320,26 @@ namespace ProjectsMecsaSPA.Data
                   {
                       IsDeleted = false,
                       LeadStateId = 1,
-                      Name = "Atendido"
+                      Name = "Entrante"
                   },
                   new LeadState
                   {
                       IsDeleted = false,
                       LeadStateId = 2,
-                      Name = "Nuevo"
+                      Name = "Asignado a Vendedor"
                   },
                   new LeadState
                   {
                       IsDeleted = false,
-                      LeadStateId = 3,
-                      Name = "Contactado"
+                      LeadStateId = 1,
+                      Name = "Revisión Vendedor"
                   },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 4,
-                      Name = "En Seguimiento"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 5,
-                      Name = "Cotización Enviada"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 6,
-                      Name = "Negociación"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 7,
-                      Name = "Ganado"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 8,
-                      Name = "Perdido"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 9,
-                      Name = "No Calificado"
-                  },
-                  new LeadState
-                  {
-                      IsDeleted = false,
-                      LeadStateId = 10,
-                      Name = "Pendiente de Respuesta"
-                  }
+                    new LeadState
+                    {
+                        IsDeleted = false,
+                        LeadStateId = 1,
+                        Name = "Contactado por Vendedor"
+                    }
               );
 
 

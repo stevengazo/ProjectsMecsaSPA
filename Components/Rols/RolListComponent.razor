@@ -4,38 +4,60 @@
 
 
 
-<div class="border rounded shadow-sm p-3 mt-4 mb-4">
+<div class="border rounded shadow-sm p-4 mt-4 mb-4 bg-white">
 
     <!-- PERFIL VENDEDOR -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">Perfil de Vendedor</h5>
+        <h5 class="fw-semibold mb-0">Perfil de Vendedor</h5>
 
         @if (seller != null)
         {
-            <button class="btn btn-sm btn-outline-@(seller.IsActive ? "danger" : "success")"
+            <button class="btn btn-sm btn-outline-@(seller.IsActive ? "danger" : "success") px-3"
                     @onclick="seller.IsActive? DisableSeller : SuscribeSeller">
                 @(seller.IsActive ? "Desactivar Vendedor" : "Activar como Vendedor")
             </button>
         }
-        else
+        else if (!Suscribing)
         {
-            <button class="btn btn-sm btn-outline-success"
-                    @onclick="SuscribeSeller">
+            <button class="btn btn-sm btn-outline-success px-3"
+                    @onclick="() => Suscribing = true">
                 Activar como Vendedor
             </button>
         }
     </div>
 
+    @if (Suscribing && seller == null)
+    {
+        <div class="border rounded bg-light p-3 mb-3">
+            <label class="form-label small text-muted">Usuario de Bitrix</label>
+            <input class="form-control form-control-sm mb-2"
+                   @bind="bitrixnumber" />
+
+            <div class="d-flex gap-2">
+                <Button class="btn btn-sm btn-success"
+                        @onclick="SuscribeSeller">
+                    Suscribir como vendedor
+                </Button>
+
+                <Button class="btn btn-sm btn-outline-secondary"
+                        @onclick="() => Suscribing = false">
+                    Cancelar
+                </Button>
+            </div>
+        </div>
+    }
+
     @if (seller != null)
     {
         <div class="small text-muted">
             Estado actual:
-            <span class="fw-semibold @(seller.IsActive ? "text-success" : "text-danger")">
+            <span class="fw-semibold @(seller.IsActive ? "text-success" : "text-danger") ms-1">
                 @(seller.IsActive ? "Activo" : "Inactivo")
             </span>
         </div>
     }
 </div>
+
 
 <!-- ROLES -->
 <div class="border rounded shadow-sm p-3">
@@ -110,6 +132,8 @@
     private List<IdentityRole> usedRoles = new();
     private List<IdentityRole> Roles = new();
 
+    private bool Suscribing = false;
+    private int bitrixnumber = 0;
     private UserIdentityEx user = new();
     private Seller seller = null;
 
@@ -189,7 +213,7 @@
                         DNI = user.DNI,
                         IsActive = true,
                         PhoneNumber= "",
-                        Bitrix24Id = 0
+                        Bitrix24Id = bitrixnumber
                     };
                 using (var transaction = await db.Database.BeginTransactionAsync())
                 {

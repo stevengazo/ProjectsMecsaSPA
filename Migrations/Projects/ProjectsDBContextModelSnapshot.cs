@@ -319,38 +319,36 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadId"), 1L, 1);
 
                     b.Property<string>("ContactName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("ContactedBySeller")
                         .HasColumnType("bit");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CustomerName")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DealNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsNew")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastUpdatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LeadOriginId")
@@ -362,6 +360,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<int>("LeadStateId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PhoneNumber")
+                        .HasColumnType("int");
+
                     b.Property<int>("Prioritized")
                         .HasColumnType("int");
 
@@ -370,6 +371,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("WebSite")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isCalled")
                         .HasColumnType("bit");

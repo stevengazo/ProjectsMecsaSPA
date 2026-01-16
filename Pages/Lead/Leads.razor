@@ -25,6 +25,16 @@
                         OnSelect="HandleLeadSelected" />
         </Content>
     </Tab>
+    <Tab Title="Reporte">
+        <Content>
+          <LeadReportComponent />
+        </Content>
+    </Tab>
+    <Tab Title="Graficas">
+        <Content>
+      
+        </Content>
+    </Tab>
 </Tabs>
 
 <Offcanvas @ref="offcanvas" />
@@ -55,6 +65,7 @@
         leads = await db.Leads
             .Include(e => e.Origin)
             .Include(e => e.LeadRequest)
+                        .Include(e => e.Seller)
             .Include(e => e.LeadState)
             .ToListAsync();
     }

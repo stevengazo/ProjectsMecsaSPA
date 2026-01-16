@@ -86,7 +86,6 @@ namespace ProjectsMecsaSPA.Services
             }
         }
 
-
         /// <summary>
         /// Create a new subfolder in a parent folder in Bitrix24
         /// </summary>
@@ -223,6 +222,52 @@ namespace ProjectsMecsaSPA.Services
                 throw;
             }
         }
+
+        public async Task<int> SendMessageToUser(int userId, string message)
+        {
+            try
+            {
+                var url = configuration["Bitrix24:UrlImMessageAdd"]
+                ?? throw new ArgumentNullException("Bitrix24:UrlImMessageAdd no configurado");
+
+                var payload = new
+                {
+                    DIALOG_ID = userId.ToString(),
+                    MESSAGE = message,
+                    SYSTEM = "N",
+                    URL_PREVIEW = "Y"
+                };
+
+                var json = JsonSerializer.Serialize(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Error enviando mensaje IM: {response.StatusCode} - {error}");
+                }
+
+                var responseBody = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(responseBody);
+
+                if (doc.RootElement.TryGetProperty("result", out var result))
+                {
+                    return result.GetInt32(); // ID del mensaje
+                }
+
+                throw new Exception("Respuesta inesperada de Bitrix24");
+            }
+            catch (Exception f)
+            {
+
+                throw f;
+            }
+        }
+
+
+
     }
 
 }

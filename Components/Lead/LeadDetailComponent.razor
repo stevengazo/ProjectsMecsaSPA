@@ -1,6 +1,9 @@
 ﻿@using ProjectsMecsaSPA.Model
-
-
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@inject Bitrix24ClientService Bitrix24Client
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (Lead == null)
 {
@@ -10,158 +13,459 @@
 }
 else
 {
+    <!-- ================= LEAD INFO ================= -->
     <div class="card mb-3 shadow-sm border-light rounded-3">
 
-        <!-- Header -->
-        <div class="card-header bg-white border-0 text-center fw-bold">
+        <div class="card-header bg-white fw-bold">
             Información del Lead
         </div>
 
-        <!-- Body -->
-        <div class="card-body p-3">
-            <table class="table table-borderless table-sm mb-0 align-middle">
-                <tbody>
 
-                    <tr>
-                        <th class="text-muted">ID</th>
-                        <td>@Lead.LeadId</td>
-                    </tr>
 
-                    <tr>
-                        <th class="text-muted">Contacto</th>
-                        <td>@Lead.ContactName</td>
-                    </tr>
+        @if (Editing)
+        {
 
-                    <tr>
-                        <th class="text-muted">Cliente</th>
-                        <td>@Lead.CustomerName</td>
-                    </tr>
+            <div class="card-body p-3">
+                <EditForm Model="Lead">
+                    <table class="table table-borderless table-sm mb-0 align-middle">
+                        <tbody>
+                            <tr>
+                                <th class="text-muted small">ID</th>
+                                <td class="fw-semibold">@Lead.LeadId</td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">País</th>
-                        <td>@Lead.Country</td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted small">Contacto</th>
+                                <td>
+                                    <InputText class="form-control form-control-sm"
+                                               @bind-Value="Lead.ContactName" />
+                                </td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Estado</th>
-                        <td>
-                            <span class="badge bg-light text-dark border">
-                                @Lead.LeadState?.Name
-                            </span>
-                        </td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted small">Cliente</th>
+                                <td>
+                                    <InputText class="form-control form-control-sm"
+                                               @bind-Value="Lead.CustomerName" />
+                                </td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Origen</th>
-                        <td>@Lead.Origin?.LeadOriginName</td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted">Teléfono</th>
+                                <td>
+                                    <InputNumber @bind-Value="Lead.PhoneNumber" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Correo</th>
+                                <td>
+                                    <InputText @bind-Value="Lead.Email" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Web Site</th>
+                                <td>@Lead.WebSite</td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Tipo de Solicitud</th>
-                        <td>@Lead.LeadRequest?.RequestName</td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted small">País</th>
+                                <td>
+                                    @Lead.Country
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.Country">
+                                    </InputSelect>
+                                </td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Vendedor</th>
-                        <td>@Lead.Seller?.SellerName</td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted small">Estado</th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.LeadStateId">
+                                    </InputSelect>
+                                </td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Número de Deal</th>
-                        <td>@Lead.DealNumber</td>
-                    </tr>
+                            <tr>
+                                <th class="text-muted small">Origen</th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.LeadOriginId">
+                                    </InputSelect>
+                                </td>
+                            </tr>
 
-                    <tr>
-                        <th class="text-muted">Prioridad</th>
-                        <td>
-                            @if (Lead.Prioritized > 0)
+                            <tr>
+                                <th class="text-muted small">Tipo</th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.LeadRequestId">
+                                    </InputSelect>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Vendedor</th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.SellerId">
+                                    </InputSelect>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Deal</th>
+                                <td>
+                                    
+                                    <InputNumber class="form-control form-control-sm"
+                                                 @bind-Value="Lead.DealNumber" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Prioridad</th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm"
+                                                 @bind-Value="Lead.Prioritized">
+                                        <option value="1">Alta</option>
+                                        <option value="2">Media</option>
+                                        <option value="3">Baja</option>
+                                    </InputSelect>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Nuevo</th>
+                                <td>
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="Lead.IsNew" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Contactado</th>
+                                <td>
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="Lead.ContactedBySeller" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Llamada</th>
+                                <td>
+                                    <InputCheckbox class="form-check-input"
+                                                   @bind-Value="Lead.isCalled" />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Creado por</th>
+                                <td class="text-muted">@Lead.CreatedBy</td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Creado</th>
+                                <td class="text-muted">@Lead.CreatedAt</td>
+                            </tr>
+
+                            <tr>
+                                <th class="text-muted small">Actualizado</th>
+                                <td class="text-muted">@Lead.UpdatedAt</td>
+                            </tr>
+
+                            @if (!string.IsNullOrWhiteSpace(Lead.Description))
                             {
-                                <span class="badge bg-warning text-dark">
-                                    Prioritario
-                                </span>
+                                <tr>
+                                    <th class="text-muted small align-top">Descripción</th>
+                                    <td>
+                                        <InputTextArea class="form-control form-control-sm"
+                                                       rows="3"
+                                                       @bind-Value="Lead.Description" />
+                                    </td>
+                                </tr>
                             }
-                            else
-                            {
-                                <span class="text-muted">Normal</span>
-                            }
-                        </td>
-                    </tr>
+                        </tbody>
+                    </table>
+                </EditForm>
 
-                    <tr>
-                        <th class="text-muted">Nuevo</th>
-                        <td>
-                            @if (Lead.IsNew)
-                            {
-                                <span class="badge bg-success">Sí</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">No</span>
-                            }
-                        </td>
-                    </tr>
+            </div>
+        }
+        else
+        {
+            <div class="card-body p-3">
+                <table class="table table-borderless table-sm mb-0 align-middle">
+                    <tbody>
+                        <tr><th class="text-muted">ID</th><td>@Lead.LeadId</td></tr>
+                        <tr><th class="text-muted">Contacto</th><td>@Lead.ContactName</td></tr>
+                        <tr><th class="text-muted">Empresa</th><td>@Lead.CustomerName</td></tr>
+                        <tr><th class="text-muted">Teléfono</th><td>@Lead.PhoneNumber</td></tr>
+                        <tr><th class="text-muted">Correo</th><td>@Lead.Email</td></tr>
+                        <tr><th class="text-muted">Sitio Web</th><td>@Lead.WebSite</td></tr>
 
-                    <tr>
-                        <th class="text-muted">Contactado</th>
-                        <td>
-                            @if (Lead.ContactedBySeller)
-                            {
-                                <span class="badge bg-success">Sí</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">No</span>
-                            }
-                        </td>
-                    </tr>
+                        <tr><th class="text-muted">País</th><td>@Lead.Country</td></tr>
 
-                    <tr>
-                        <th class="text-muted">Llamada realizada</th>
-                        <td>
-                            @if (Lead.isCalled)
-                            {
-                                <span class="badge bg-success">Sí</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">No</span>
-                            }
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th class="text-muted">Creado por</th>
-                        <td>@Lead.CreatedBy</td>
-                    </tr>
-
-                    <tr>
-                        <th class="text-muted">Fecha de creación</th>
-                        <td>@Lead.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                    </tr>
-
-                    <tr>
-                        <th class="text-muted">Última actualización</th>
-                        <td>@Lead.UpdatedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                    </tr>
-
-                    @if (!string.IsNullOrWhiteSpace(Lead.Description))
-                    {
                         <tr>
-                            <th class="text-muted align-top">Descripción</th>
-                            <td class="text-wrap">
-                                @Lead.Description
+                            <th class="text-muted">Estado</th>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    @Lead.LeadState?.Name
+                                </span>
                             </td>
                         </tr>
-                    }
 
-                </tbody>
-            </table>
+                        <tr><th class="text-muted">Origen</th><td>@Lead.Origin?.LeadOriginName</td></tr>
+                        <tr><th class="text-muted">Tipo</th><td>@Lead.LeadRequest?.RequestName</td></tr>
+                        <tr><th class="text-muted">Vendedor</th><td>@Lead.Seller?.SellerName</td></tr>
+                        <tr><th class="text-muted">Deal</th>
+                            <td>
+                                <a href="https://grupomecsa.bitrix24.es/crm/deal/details/@Lead.DealNumber/" target="_blank">
+                                    @Lead.DealNumber
+                                </a>
+                           
+                            </td>
+                            </tr>
+
+                        <tr>
+                            <th class="text-muted">Prioridad</th>
+                            <td>
+                                @if (Lead.Prioritized > 0)
+                                {
+                                    <span class="badge bg-warning text-dark">Prioritario</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Normal</span>
+                                }
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-muted">Nuevo</th>
+                            <td>
+                                <span class="badge @(Lead.IsNew ? "bg-success" : "bg-secondary")">
+                                    @(Lead.IsNew ? "Sí" : "No")
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-muted">Contactado</th>
+                            <td>
+                                <span class="badge @(Lead.ContactedBySeller ? "bg-success" : "bg-secondary")">
+                                    @(Lead.ContactedBySeller ? "Sí" : "No")
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th class="text-muted">Llamada</th>
+                            <td>
+                                <span class="badge @(Lead.isCalled ? "bg-success" : "bg-secondary")">
+                                    @(Lead.isCalled ? "Sí" : "No")
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr><th class="text-muted">Creado por</th><td>@Lead.CreatedBy</td></tr>
+                        <tr><th class="text-muted">Creado</th><td>@Lead.CreatedAt</td></tr>
+                        <tr><th class="text-muted">Actualizado</th><td>@Lead.UpdatedAt</td></tr>
+
+                        @if (!string.IsNullOrWhiteSpace(Lead.Description))
+                        {
+                            <tr>
+                                <th class="text-muted align-top">Descripción</th>
+                                <td>@Lead.Description</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        }
+
+
+
+
+    </div>
+
+
+
+<!-- ================= Actions ================= -->
+<div class="card mb-3 shadow-sm border-0 rounded-3">
+
+    <div class="card-header bg-light fw-semibold">
+        Acciones
+    </div>
+
+    <div class="card-body p-3">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+
+            @if (!Editing)
+            {
+                <Button class="btn btn-sm btn-primary px-3"
+                        @onclick="SendMessage">
+                    Notificar al Vendedor
+                </Button>
+
+                <Button class="btn btn-sm btn-outline-success px-3">
+                    Contactado
+                </Button>
+
+                <Button class="btn btn-sm btn-outline-secondary px-3">
+                    Llamado
+                </Button>
+            }
+
+            <Button class="btn btn-sm  ms-auto px-3"
+                    @onclick="() => Editing = !Editing">
+                @(Editing ? "Cancelar edición" : "Editar")
+            </Button>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- ================= NOTES ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header fw-bold">
+            Notas del Lead
+        </div>
+
+        <div class="card-body">
+
+            <!-- Formulario -->
+            <EditForm Model="newNote" OnValidSubmit="AddNote">
+                <div class="mb-3">
+                    <InputTextArea class="form-control"
+                                   rows="3"
+                                   placeholder="Agregar nota..."
+                                   @bind-Value="newNote.Notes" />
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary btn-sm"
+                        disabled="@string.IsNullOrWhiteSpace(newNote.Notes)">
+                    Guardar nota
+                </button>
+            </EditForm>
+
+            <hr />
+
+            <!-- Listado -->
+            @if (notes.Any())
+            {
+                @foreach (var n in notes.OrderByDescending(x => x.CreatedAt))
+                {
+                    <div class="border rounded p-2 mb-2">
+                        <div class="small text-muted mb-1">
+                            @n.CreatedBy · @n.CreatedAt:dd/MM/yyyy HH:mm
+                        </div>
+                        <div>@n.Notes</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-muted small">
+                    No hay notas registradas.
+                </div>
+            }
         </div>
     </div>
 }
 
-
 @code {
     [Parameter]
     public Lead Lead { get; set; } = default!;
+
+    private ProjectsDBContext db = default!;
+    private List<LeadNotes> notes = new();
+    private LeadNotes newNote = new();
+    private string? currentUser;
+    private bool Editing = false;
+
+    private string message = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+        await LoadUserAsync();
+
+        message = $@"
+📌 Nueva Solicitud Entrante en Recepción
+
+• Nombre: {Lead.ContactName}
+• Empresa: {Lead.CustomerName}
+• Correo: {Lead.Email}
+• Teléfono: {Lead.PhoneNumber}
+
+• Origen: {Lead?.Origin.LeadOriginName}
+• Solicitud: {Lead?.LeadRequest.RequestName}
+• Estado: {Lead.LeadState?.Name}
+
+• Negociación https://grupomecsa.bitrix24.es/crm/deal/details/{Lead.DealNumber}/
+
+• Vendedor asignado: {Lead.Seller.SellerName}
+
+🗓 Fecha de creación: {Lead.CreatedAt:dd/MM/yyyy HH:mm}
+👤 Creado por: {currentUser}
+
+Descripción
+{Lead.Description}
+
+
+-------
+(Este es un mensaje automático)
+";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadNotesAsync();
+    }
+
+    private async Task LoadNotesAsync()
+    {
+        if (Lead == null) return;
+
+        notes = await db.LeadNotes
+            .Where(n => n.LeadId == Lead.LeadId)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    private async Task LoadUserAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            currentUser = user.Identity.Name;
+        }
+    }
+
+    private async Task AddNote()
+    {
+        if (string.IsNullOrWhiteSpace(newNote.Notes)) return;
+
+        newNote.LeadId = Lead.LeadId;
+        newNote.CreatedBy = currentUser;
+        newNote.CreatedAt = DateTime.Now;
+
+        db.LeadNotes.Add(newNote);
+        await db.SaveChangesAsync();
+
+        notes.Insert(0, newNote);
+        newNote = new();
+    }
+
+    private async Task SendMessage()
+    {
+        await Bitrix24Client.SendMessageToUser(252, message);
+    }
 }

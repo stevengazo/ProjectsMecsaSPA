@@ -92,12 +92,14 @@
 
         states = await db.LeadsState
                          .OrderBy(e => e.Order)
+                         .Distinct()
                          .ToListAsync();
 
         foreach (var state in states)
         {
             LeadsByState[state] = Leads
                 .Where(l => !l.isDeleted && l.LeadStateId == state.LeadStateId)
+                .Distinct()
                 .OrderByDescending(l => l.CreatedAt)
                 .ToList();
         }
@@ -128,27 +130,38 @@
             list.Add(lead);
 
         return Task.CompletedTask;
+
+
     }
 
     private async Task OnLeadListRemoveAsync(SortableListEventArgs args)
     {
-        var originState = states.FirstOrDefault(e => e.Name == args.FromListName);
-        var targetState = states.FirstOrDefault(e => e.Name == args.ToListName);
+        try
+        {
+            var originState = states.FirstOrDefault(e => e.Name == args.FromListName);
+            var targetState = states.FirstOrDefault(e => e.Name == args.ToListName);
 
-        if (originState == null || targetState == null) return;
+            if (originState == null || targetState == null) return;
 
-        var lead = GetLead(originState, args.OldIndex);
-        if (lead == null) return;
+            var lead = GetLead(originState, args.OldIndex);
+            if (lead == null) return;
 
-        LeadsByState[originState].Remove(lead);
-        LeadsByState[targetState].Insert(0, lead);
+            LeadsByState[originState].Remove(lead);
+            LeadsByState[targetState].Insert(0, lead);
 
-        lead.LeadStateId = targetState.LeadStateId;
+            lead.LeadStateId = targetState.LeadStateId;
+            lead.LeadState = targetState;
 
-        using var db = DbContextFactory.CreateDbContext();
-        db.Leads.Update(lead);
-        await db.SaveChangesAsync();
+            using var db = DbContextFactory.CreateDbContext();
+            db.Leads.Update(lead);
+            await db.SaveChangesAsync();
 
-        StateHasChanged();
+        }
+        catch (Exception E)
+        {
+            
+            throw E;
+        }
+       
     }
 }

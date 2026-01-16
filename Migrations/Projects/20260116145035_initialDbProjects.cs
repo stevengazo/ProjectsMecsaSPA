@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class createdb : Migration
+    public partial class initialDbProjects : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -196,19 +196,22 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 {
                     LeadId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerName = table.Column<int>(type: "int", nullable: false),
-                    ContactName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ContactName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DealNumber = table.Column<int>(type: "int", nullable: false),
+                    PhoneNumber = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WebSite = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Prioritized = table.Column<int>(type: "int", nullable: false),
                     IsNew = table.Column<bool>(type: "bit", nullable: false),
                     ContactedBySeller = table.Column<bool>(type: "bit", nullable: false),
                     isCalled = table.Column<bool>(type: "bit", nullable: false),
                     isDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     SellerId = table.Column<int>(type: "int", nullable: false),
                     LeadStateId = table.Column<int>(type: "int", nullable: false),

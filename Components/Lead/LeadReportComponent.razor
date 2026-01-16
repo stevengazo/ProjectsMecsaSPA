@@ -1,0 +1,21 @@
+﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+
+<!-- Selector de rango de fechas -->
+<div class="flex-grow-1">
+</div>
+
+@code {
+
+    private DateTime? fechaInicio;
+    private DateTime? fechaFin;
+
+    private void RecibirRango((DateTime? Start, DateTime? End) rango)
+    {
+        fechaInicio = rango.Start;
+        fechaFin = rango.End;
+    }
+
+
+
+}

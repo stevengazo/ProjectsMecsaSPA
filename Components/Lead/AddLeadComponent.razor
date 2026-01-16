@@ -3,6 +3,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 
+
 <h3>Agregar Lead</h3>
 
 <EditForm Model="Lead" OnValidSubmit="SaveAsync">
@@ -12,7 +13,7 @@
     <!-- Cliente -->
     <div class="mb-3">
         <label class="form-label">Cliente</label>
-        <InputNumber class="form-control" @bind-Value="Lead.CustomerName" />
+        <InputText class="form-control" @bind-Value="Lead.CustomerName" />
     </div>
 
     <!-- Nombre de contacto -->
@@ -20,11 +21,29 @@
         <label class="form-label">Nombre del contacto</label>
         <InputText class="form-control" @bind-Value="Lead.ContactName" />
     </div>
+    <!-- Email -->
+    <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <InputText class="form-control" @bind-Value="Lead.Email" />
+    </div>
 
+    <!-- Phone -->
+    <div class="mb-3">
+        <label class="form-label">Teléfono </label>
+        <InputNumber class="form-control" @bind-Value="Lead.PhoneNumber" />
+    </div>
+
+    
     <!-- Descripción -->
     <div class="mb-3">
         <label class="form-label">Descripción</label>
         <InputTextArea class="form-control" @bind-Value="Lead.Description" />
+    </div>
+
+    <!-- Web site -->
+    <div class="mb-3">
+        <label class="form-label">Sitio Web</label>
+        <InputTextArea class="form-control" @bind-Value="Lead.WebSite" />
     </div>
 
     <!-- Número de negocio -->
@@ -126,7 +145,7 @@
     private Lead Lead = new();
     private List<LeadOrigin> origins = new();
     private List<LeadRequest> requests = new();
-  private List<Seller> sellers = new();
+    private List<Seller> sellers = new();
     private List<LeadState> states = new();
 
     private string? currentUser;
@@ -144,25 +163,25 @@
 
     private async Task LoadDataAsync()
     {
-      try
+        try
         {
             using var db = DbContextFactory.CreateDbContext();
 
             origins = await db.LeadOrigins.AsNoTracking().ToListAsync();
             requests = await db.LeadsRequest.AsNoTracking().ToListAsync();
             states = await db.LeadsState.AsNoTracking().ToListAsync();
-           sellers = await db.Seller.ToListAsync();
+            sellers = await db.Seller.ToListAsync();
         }
         catch (Exception s)
         {
-            
+
             throw s;
         }
     }
 
     private async Task LoadUserAsync()
     {
-      try
+        try
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = authState.User;
@@ -179,7 +198,7 @@
         }
         catch (Exception f)
         {
-            
+
             throw f;
         }
     }
@@ -193,7 +212,6 @@
             Lead.CreatedBy = currentUser ?? "";
             Lead.CreatedAt = DateTime.Now;
             Lead.LastUpdatedBy = currentUser ?? "";
-
 
             db.Leads.Add(Lead);
             await db.SaveChangesAsync();
