@@ -258,8 +258,8 @@
        style='border-collapse:collapse; border:1px solid #ccc;'>
 
 <tr style='background:#f2f2f2;'>
-<th>ID</th><th>Contacto</th><th>Teléfono</th><th>Cliente</th>
-<th>Email</th><th>Solicitud</th><th>Vendedor</th><th>Fecha</th>
+<th>ID</th><th>Contacto</th><th>Cliente</th>
+<th>Solicitud</th><th>Vendedor</th><th>Fecha</th>
 </tr>";
 
         foreach (var item in Leads)
@@ -268,9 +268,7 @@
 <tr>
 <td>{item.LeadId}</td>
 <td>{item.ContactName}</td>
-<td>{item.PhoneNumber}</td>
-<td>{item.CustomerName}</td>
-<td>{item.Email}</td>
+<td>{item.CompanyName}</td>
 <td>{item.LeadRequest?.RequestName}</td>
 <td>{item.Seller?.SellerName}</td>
 <td>{item.CreatedAt:dd/MM/yyyy HH:mm}</td>

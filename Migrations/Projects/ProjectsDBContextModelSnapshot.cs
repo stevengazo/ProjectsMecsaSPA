@@ -318,6 +318,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadId"));
 
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ContactName")
                         .HasColumnType("nvarchar(max)");
 
@@ -333,16 +336,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CustomerName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("DealNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsNew")
@@ -360,20 +357,14 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<int>("LeadStateId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Prioritized")
-                        .HasColumnType("int");
+                    b.Property<string>("Prioritized")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("WebSite")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("isCalled")
                         .HasColumnType("bit");
@@ -620,7 +611,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 1,
                             IsDeleted = false,
-                            Name = "Entrante",
+                            Name = "Nuevo",
                             Order = 0,
                             Priority = false
                         },
@@ -628,7 +619,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 2,
                             IsDeleted = false,
-                            Name = "Asignado a Vendedor",
+                            Name = "Asignado",
                             Order = 0,
                             Priority = false
                         },
@@ -636,7 +627,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 3,
                             IsDeleted = false,
-                            Name = "Revisión Vendedor",
+                            Name = "Contactado",
                             Order = 0,
                             Priority = false
                         },
@@ -644,7 +635,15 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 4,
                             IsDeleted = false,
-                            Name = "Contactado por Vendedor",
+                            Name = "Cerrado Ganado",
+                            Order = 0,
+                            Priority = false
+                        },
+                        new
+                        {
+                            LeadStateId = 5,
+                            IsDeleted = false,
+                            Name = "Cerrado Perdido",
                             Order = 0,
                             Priority = false
                         });

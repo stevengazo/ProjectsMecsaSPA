@@ -6,14 +6,11 @@ namespace ProjectsMecsaSPA.Model
     {
         [Key]
         public int LeadId { get; set; }
-        public string? CustomerName { get; set; }
+        public string? CompanyName { get; set; }
         public string? ContactName { get; set; }
         public string? Description { get; set; }
         public int DealNumber { get; set; }
-        public int PhoneNumber { get; set; }
-        public string? Email { get; set; }
-        public string? WebSite { get; set; }
-        public int Prioritized { get; set; } = 0;
+        public string? Prioritized { get; set; } 
         public bool IsNew { get; set; }
         public bool ContactedBySeller { get; set; }
         public bool isCalled { get; set; }

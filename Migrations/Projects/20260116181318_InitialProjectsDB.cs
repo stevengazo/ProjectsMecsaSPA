@@ -200,14 +200,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 {
                     LeadId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DealNumber = table.Column<int>(type: "int", nullable: false),
-                    PhoneNumber = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WebSite = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Prioritized = table.Column<int>(type: "int", nullable: false),
+                    Prioritized = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsNew = table.Column<bool>(type: "bit", nullable: false),
                     ContactedBySeller = table.Column<bool>(type: "bit", nullable: false),
                     isCalled = table.Column<bool>(type: "bit", nullable: false),
@@ -573,10 +570,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 columns: new[] { "LeadStateId", "IsDeleted", "Name", "Order", "Priority" },
                 values: new object[,]
                 {
-                    { 1, false, "Entrante", 0, false },
-                    { 2, false, "Asignado a Vendedor", 0, false },
-                    { 3, false, "Revisión Vendedor", 0, false },
-                    { 4, false, "Contactado por Vendedor", 0, false }
+                    { 1, false, "Nuevo", 0, false },
+                    { 2, false, "Asignado", 0, false },
+                    { 3, false, "Contactado", 0, false },
+                    { 4, false, "Cerrado Ganado", 0, false },
+                    { 5, false, "Cerrado Perdido", 0, false }
                 });
 
             migrationBuilder.InsertData(

@@ -13,7 +13,7 @@
     <!-- Cliente -->
     <div class="mb-3">
         <label class="form-label">Cliente</label>
-        <InputText class="form-control" @bind-Value="Lead.CustomerName" />
+        <InputText class="form-control" @bind-Value="Lead.CompanyName" />
     </div>
 
     <!-- Nombre de contacto -->
@@ -21,29 +21,11 @@
         <label class="form-label">Nombre del contacto</label>
         <InputText class="form-control" @bind-Value="Lead.ContactName" />
     </div>
-    <!-- Email -->
-    <div class="mb-3">
-        <label class="form-label">Correo</label>
-        <InputText class="form-control" @bind-Value="Lead.Email" />
-    </div>
-
-    <!-- Phone -->
-    <div class="mb-3">
-        <label class="form-label">Teléfono </label>
-        <InputNumber class="form-control" @bind-Value="Lead.PhoneNumber" />
-    </div>
-
     
     <!-- Descripción -->
     <div class="mb-3">
         <label class="form-label">Descripción</label>
         <InputTextArea class="form-control" @bind-Value="Lead.Description" />
-    </div>
-
-    <!-- Web site -->
-    <div class="mb-3">
-        <label class="form-label">Sitio Web</label>
-        <InputTextArea class="form-control" @bind-Value="Lead.WebSite" />
     </div>
 
     <!-- Número de negocio -->
@@ -56,10 +38,9 @@
     <div class="mb-3">
         <label class="form-label">Prioridad</label>
         <InputSelect class="form-control"  @bind-Value="Lead.Prioritized" >
-           <option value="1">Alta</option>
-            <option value="2">Media</option>
-            <option value="3">Baja</option>
-
+           <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
             </InputSelect>
     </div>
 
@@ -112,7 +93,14 @@
         <label class="form-label">País</label>
         <InputSelect class="form-select" @bind-Value="Lead.Country">
             <option value="">Seleccione...</option>
+        
+            <option value="Belice">Belice</option>
             <option value="Costa Rica">Costa Rica</option>
+            <option value="El Salvador">El Salvador</option>
+            <option value="Guatemala">Guatemala</option>
+            <option value="Honduras">Honduras</option>
+            <option value="México">México</option>
+            <option value="Nicaragua">Nicaragua</option>
             <option value="Panamá">Panamá</option>
         </InputSelect>
     </div>
@@ -167,10 +155,10 @@
         {
             using var db = DbContextFactory.CreateDbContext();
 
-            origins = await db.LeadOrigins.AsNoTracking().ToListAsync();
-            requests = await db.LeadsRequest.AsNoTracking().ToListAsync();
-            states = await db.LeadsState.AsNoTracking().ToListAsync();
-            sellers = await db.Seller.ToListAsync();
+            origins = await db.LeadOrigins.AsNoTracking().OrderBy(e=>e.LeadOriginName).ToListAsync();
+            requests = await db.LeadsRequest.AsNoTracking().OrderBy(e => e.RequestName).ToListAsync();
+            states = await db.LeadsState.AsNoTracking().OrderBy(e => e.Name).ToListAsync();
+            sellers = await db.Seller.OrderBy(e => e.SellerName).ToListAsync();
         }
         catch (Exception s)
         {

@@ -46,33 +46,28 @@ else
                                 <th class="text-muted small">Cliente</th>
                                 <td>
                                     <InputText class="form-control form-control-sm"
-                                               @bind-Value="Lead.CustomerName" />
+                                               @bind-Value="Lead.CompanyName" />
                                 </td>
                             </tr>
 
-                            <tr>
-                                <th class="text-muted">Teléfono</th>
-                                <td>
-                                    <InputNumber @bind-Value="Lead.PhoneNumber" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Correo</th>
-                                <td>
-                                    <InputText @bind-Value="Lead.Email" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Web Site</th>
-                                <td>@Lead.WebSite</td>
-                            </tr>
+
 
                             <tr>
                                 <th class="text-muted small">País</th>
                                 <td>
-                                    @Lead.Country
+
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.Country">
+
+                                        <option value=""></option>
+                                        <option value="Belice">Belice</option>
+                                        <option value="Costa Rica">Costa Rica</option>
+                                        <option value="El Salvador">El Salvador</option>
+                                        <option value="Guatemala">Guatemala</option>
+                                        <option value="Honduras">Honduras</option>
+                                        <option value="México">México</option>
+                                        <option value="Nicaragua">Nicaragua</option>
+                                        <option value="Panamá">Panamá</option>
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -82,6 +77,11 @@ else
                                 <td>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.LeadStateId">
+                                        @foreach (var i in States)
+                                        {
+                                            <option value="@i.Key">@i.Value</option>
+                                        }
+
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -91,6 +91,10 @@ else
                                 <td>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.LeadOriginId">
+                                        @foreach (var i in Origins)
+                                        {
+                                            <option value="@i.Key">@i.Value</option>
+                                        }
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -100,6 +104,10 @@ else
                                 <td>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.LeadRequestId">
+                                        @foreach (var i in RequestTypes)
+                                        {
+                                            <option value="@i.Key">@i.Value</option>
+                                        }
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -109,6 +117,10 @@ else
                                 <td>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.SellerId">
+                                        @foreach (var i in Sellers)
+                                        {
+                                            <option value="@i.Key">@i.Value</option>
+                                        }
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -116,7 +128,7 @@ else
                             <tr>
                                 <th class="text-muted small">Deal</th>
                                 <td>
-                                    
+
                                     <InputNumber class="form-control form-control-sm"
                                                  @bind-Value="Lead.DealNumber" />
                                 </td>
@@ -127,9 +139,9 @@ else
                                 <td>
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.Prioritized">
-                                        <option value="1">Alta</option>
-                                        <option value="2">Media</option>
-                                        <option value="3">Baja</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Baja">Baja</option>
                                     </InputSelect>
                                 </td>
                             </tr>
@@ -197,10 +209,7 @@ else
                     <tbody>
                         <tr><th class="text-muted">ID</th><td>@Lead.LeadId</td></tr>
                         <tr><th class="text-muted">Contacto</th><td>@Lead.ContactName</td></tr>
-                        <tr><th class="text-muted">Empresa</th><td>@Lead.CustomerName</td></tr>
-                        <tr><th class="text-muted">Teléfono</th><td>@Lead.PhoneNumber</td></tr>
-                        <tr><th class="text-muted">Correo</th><td>@Lead.Email</td></tr>
-                        <tr><th class="text-muted">Sitio Web</th><td>@Lead.WebSite</td></tr>
+                        <tr><th class="text-muted">Empresa</th><td>@Lead.CompanyName</td></tr>
 
                         <tr><th class="text-muted">País</th><td>@Lead.Country</td></tr>
 
@@ -216,26 +225,21 @@ else
                         <tr><th class="text-muted">Origen</th><td>@Lead.Origin?.LeadOriginName</td></tr>
                         <tr><th class="text-muted">Tipo</th><td>@Lead.LeadRequest?.RequestName</td></tr>
                         <tr><th class="text-muted">Vendedor</th><td>@Lead.Seller?.SellerName</td></tr>
-                        <tr><th class="text-muted">Deal</th>
+                        <tr>
+                            <th class="text-muted">Deal</th>
                             <td>
                                 <a href="https://grupomecsa.bitrix24.es/crm/deal/details/@Lead.DealNumber/" target="_blank">
                                     @Lead.DealNumber
                                 </a>
-                           
+
                             </td>
-                            </tr>
+                        </tr>
 
                         <tr>
                             <th class="text-muted">Prioridad</th>
                             <td>
-                                @if (Lead.Prioritized > 0)
-                                {
-                                    <span class="badge bg-warning text-dark">Prioritario</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Normal</span>
-                                }
+                                <span class="badge bg-warning text-dark"> @Lead.Prioritized</span>
+
                             </td>
                         </tr>
 
@@ -290,40 +294,48 @@ else
 
 
 
-<!-- ================= Actions ================= -->
-<div class="card mb-3 shadow-sm border-0 rounded-3">
+    <!-- ================= Actions ================= -->
+    <div class="card mb-3 shadow-sm border-0 rounded-3">
 
-    <div class="card-header bg-light fw-semibold">
-        Acciones
-    </div>
+        <div class="card-header bg-light fw-semibold">
+            Acciones
+        </div>
 
-    <div class="card-body p-3">
-        <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="card-body p-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
 
-            @if (!Editing)
-            {
-                <Button class="btn btn-sm btn-primary px-3"
-                        @onclick="SendMessage">
-                    Notificar al Vendedor
+                @if (!Editing)
+                {
+                    <Button class="btn btn-sm btn-primary px-3"
+                            @onclick="SendMessage">
+                        Notificar al Vendedor
+                    </Button>
+
+                    <Button class="btn btn-sm btn-outline-success px-3">
+                        Contactado
+                    </Button>
+
+                    <Button class="btn btn-sm btn-outline-secondary px-3">
+                        Llamado
+                    </Button>
+                }
+                else
+                {
+                    <Button class="btn btn-sm ms-auto px-3 btn-success" @onclick="handleUpdate">
+                        Guardar Cambios
+                    </Button>
+                }
+
+                <Button class="@($"btn btn-sm ms-auto px-3 {deletebutton}")"
+                        @onclick="HandleEditing">
+                    @(Editing ? "Cancelar edición" : "Editar")
                 </Button>
 
-                <Button class="btn btn-sm btn-outline-success px-3">
-                    Contactado
-                </Button>
 
-                <Button class="btn btn-sm btn-outline-secondary px-3">
-                    Llamado
-                </Button>
-            }
 
-            <Button class="btn btn-sm  ms-auto px-3"
-                    @onclick="() => Editing = !Editing">
-                @(Editing ? "Cancelar edición" : "Editar")
-            </Button>
-
+            </div>
         </div>
     </div>
-</div>
 
 
 
@@ -387,6 +399,14 @@ else
     private string? currentUser;
     private bool Editing = false;
 
+    private Dictionary<int, string> Origins = new();
+    private Dictionary<int, string> RequestTypes = new();
+    private Dictionary<int, string> Sellers = new();
+
+    private Dictionary<int, string> States = new();
+
+    private string deletebutton = "btn-success";
+
     private string message = "";
 
 
@@ -399,9 +419,7 @@ else
 📌 Nueva Solicitud Entrante en Recepción
 
 • Nombre: {Lead.ContactName}
-• Empresa: {Lead.CustomerName}
-• Correo: {Lead.Email}
-• Teléfono: {Lead.PhoneNumber}
+• Empresa: {Lead.CompanyName}
 
 • Origen: {Lead?.Origin.LeadOriginName}
 • Solicitud: {Lead?.LeadRequest.RequestName}
@@ -421,11 +439,69 @@ Descripción
 -------
 (Este es un mensaje automático)
 ";
+
+        await LoadData();
+    }
+
+    private async Task handleUpdate()
+    {
+        try
+        {
+            using var context = DbContextFactory.CreateDbContext();
+
+            context.Leads.Attach(Lead);
+            context.Entry(Lead).State = EntityState.Modified;
+
+            Lead.UpdatedAt = DateTime.Now;
+            Lead.LastUpdatedBy = currentUser;
+
+            await context.SaveChangesAsync();
+
+            Editing = false;
+            deletebutton = "btn-success";
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al actualizar Lead: {ex.Message}");
+            // Aquí puedes integrar Toast / Snackbar si usas alguno
+            throw;
+        }
+    }
+
+    protected async Task HandleEditing()
+    {
+        Editing = !Editing;
+        if (Editing)
+        {
+            deletebutton = "btn-danger";
+        }
+        else
+        {
+            deletebutton = "btn-success";
+        }
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadNotesAsync();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            Origins = await db.LeadOrigins.ToDictionaryAsync(e => e.LeadOriginId, e => e.LeadOriginName);
+            RequestTypes = await db.LeadsRequest.ToDictionaryAsync(e => e.LeadRequestId, e => e.RequestName);
+            Sellers = await db.Seller.ToDictionaryAsync(e => e.SellerId, e => e.SellerName);
+            States = await db.LeadsState.ToDictionaryAsync(e => e.LeadStateId, e => e.Name);
+        }
+        catch (Exception e)
+        {
+
+            throw e;
+        }
     }
 
     private async Task LoadNotesAsync()

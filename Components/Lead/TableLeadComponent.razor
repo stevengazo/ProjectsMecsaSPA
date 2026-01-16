@@ -3,7 +3,7 @@
 <div class="table-responsive">
     <table class="table table-striped table-hover table-bordered align-middle mb-0">
 
-        <thead class="table-info">
+        <thead class="table-light table-hover">
             <tr>
                 <th>Contacto</th>
                 <th>Cliente</th>
@@ -30,7 +30,7 @@
                         </td>
 
                         <td>
-                            @l.CustomerName
+                            @l.CompanyName
                         </td>
 
                         <td>
@@ -66,8 +66,8 @@
                         </td>
 
                         <td class="text-center">
-                            <span class="badge @(l.Prioritized == 1 ? "bg-danger" : "bg-secondary")">
-                                @(l.Prioritized == 1 ? "Alta" : "Normal")
+                            <span class="badge">
+                                @l.Prioritized
                             </span>
                         </td>
 

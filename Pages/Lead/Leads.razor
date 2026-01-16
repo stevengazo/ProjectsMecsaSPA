@@ -2,42 +2,52 @@
 
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 
-<div class="d-flex justify-content-between align-items-center">
-    <h3>Prospectos Recepción</h3>
+<AuthorizeView Roles="administrador,ingeniero">
+    <Authorized>
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Prospectos Recepción</h3>
 
-    <button class="btn btn-primary" @onclick="ShowLeadComponent">
-        Agregar Lead
-    </button>
-</div>
+            <button class="btn btn-primary" @onclick="ShowLeadComponent">
+                Agregar Lead
+            </button>
+        </div>
 
-<hr />
+        <hr />
 
-<Tabs>
-    <Tab Title="Tabla" Active="true">
-        <Content>
-            <TableLeadComponent Leads="leads" OnSelect="HandleLeadSelected" />
-        </Content>
-    </Tab>
+        <Tabs>
+            <Tab Title="Tabla" Active="true">
+                <Content>
+                    <TableLeadComponent Leads="leads" OnSelect="HandleLeadSelected" />
+                </Content>
+            </Tab>
 
-    <Tab Title="Etapas">
-        <Content>
-            <LeadKanban Leads="leads"
-                        OnSelect="HandleLeadSelected" />
-        </Content>
-    </Tab>
-    <Tab Title="Reporte">
-        <Content>
-            <LeadReportComponent OnSelect="HandleLeadSelected" />
-        </Content>
-    </Tab>
-    <Tab Title="Graficas">
-        <Content>
-      
-        </Content>
-    </Tab>
-</Tabs>
+            <Tab Title="Etapas">
+                <Content>
+                    <LeadKanban Leads="leads"
+                                OnSelect="HandleLeadSelected" />
+                </Content>
+            </Tab>
+            <Tab Title="Reporte">
+                <Content>
+                    <LeadReportComponent OnSelect="HandleLeadSelected" />
+                </Content>
+            </Tab>
+            <Tab Title="Graficas">
+                <Content>
 
-<Offcanvas @ref="offcanvas" />
+                </Content>
+            </Tab>
+        </Tabs>
+
+        <Offcanvas @ref="offcanvas" />
+    </Authorized>
+    <NotAuthorized>
+
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
 
 @if (!string.IsNullOrWhiteSpace(message))
 {
@@ -63,10 +73,12 @@
         using var db = DbContextFactory.CreateDbContext();
 
         leads = await db.Leads
+        //    .AsNoTracking()
             .Include(e => e.Origin)
             .Include(e => e.LeadRequest)
-                        .Include(e => e.Seller)
+            .Include(e => e.Seller)
             .Include(e => e.LeadState)
+            .OrderByDescending(l=>l.LeadId)
             .ToListAsync();
     }
 

@@ -258,8 +258,6 @@ namespace ProjectsMecsaSPA.Data
            LeadOriginName = "Evento / Feria"
        }
    );
-
-
             modelBuilder.Entity<LeadRequest>().HasData(
                 new LeadRequest()
                 {
@@ -320,29 +318,34 @@ namespace ProjectsMecsaSPA.Data
                   {
                       IsDeleted = false,
                       LeadStateId = 1,
-                      Name = "Entrante"
+                      Name = "Nuevo"
                   },
                   new LeadState
                   {
                       IsDeleted = false,
                       LeadStateId = 2,
-                      Name = "Asignado a Vendedor"
+                      Name = "Asignado"
                   },
                   new LeadState
                   {
                       IsDeleted = false,
                       LeadStateId = 3,
-                      Name = "Revisión Vendedor"
+                      Name = "Contactado"
                   },
                     new LeadState
                     {
                         IsDeleted = false,
                         LeadStateId =4,
-                        Name = "Contactado por Vendedor"
+                        Name = "Cerrado Ganado"
+
+                    },
+                    new LeadState
+                    {
+                        IsDeleted = false,
+                        LeadStateId = 5,
+                        Name = "Cerrado Perdido"
                     }
               );
-
-
             modelBuilder.Entity<State>().HasData(states);
         }
     }
