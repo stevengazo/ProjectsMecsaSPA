@@ -17,10 +17,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.32")
+                .HasAnnotation("ProductVersion", "8.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>
                 {
@@ -28,10 +28,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillId"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,3)");
+                        .HasColumnType("decimal(15, 3)");
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -95,7 +95,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillFileId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BillFileId"));
 
                     b.Property<string>("B24FileId")
                         .HasColumnType("nvarchar(max)");
@@ -131,7 +131,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentaryID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CommentaryID"));
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -160,7 +160,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"));
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -184,7 +184,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerId"));
 
                     b.Property<long>("DNI")
                         .HasColumnType("bigint");
@@ -219,7 +219,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeviceId"));
 
                     b.Property<string>("DeviceName")
                         .IsRequired()
@@ -244,7 +244,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
@@ -276,7 +276,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FileId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FileId"));
 
                     b.Property<byte[]>("Content")
                         .IsRequired()
@@ -316,7 +316,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadId"));
 
                     b.Property<string>("ContactName")
                         .HasColumnType("nvarchar(max)");
@@ -400,7 +400,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadNoteId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadNoteId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -432,7 +432,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadOriginId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadOriginId"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -514,7 +514,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadRequestId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadRequestId"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -532,7 +532,61 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadRequestId = 1,
                             IsDeleted = false,
-                            RequestName = "pararrayos"
+                            RequestName = "Pararrayos"
+                        },
+                        new
+                        {
+                            LeadRequestId = 2,
+                            IsDeleted = false,
+                            RequestName = "Mantenimiento"
+                        },
+                        new
+                        {
+                            LeadRequestId = 3,
+                            IsDeleted = false,
+                            RequestName = "Supresores"
+                        },
+                        new
+                        {
+                            LeadRequestId = 4,
+                            IsDeleted = false,
+                            RequestName = "Contadores de Eventos"
+                        },
+                        new
+                        {
+                            LeadRequestId = 5,
+                            IsDeleted = false,
+                            RequestName = "Torres"
+                        },
+                        new
+                        {
+                            LeadRequestId = 6,
+                            IsDeleted = false,
+                            RequestName = "Suministros Varios"
+                        },
+                        new
+                        {
+                            LeadRequestId = 7,
+                            IsDeleted = false,
+                            RequestName = "Puesta a Tierra"
+                        },
+                        new
+                        {
+                            LeadRequestId = 8,
+                            IsDeleted = false,
+                            RequestName = "Punta Franklin"
+                        },
+                        new
+                        {
+                            LeadRequestId = 9,
+                            IsDeleted = false,
+                            RequestName = "Detectores"
+                        },
+                        new
+                        {
+                            LeadRequestId = 10,
+                            IsDeleted = false,
+                            RequestName = "Mástil"
                         });
                 });
 
@@ -542,7 +596,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadStateId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadStateId"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -566,7 +620,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 1,
                             IsDeleted = false,
-                            Name = "Atendido",
+                            Name = "Entrante",
                             Order = 0,
                             Priority = false
                         },
@@ -574,7 +628,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 2,
                             IsDeleted = false,
-                            Name = "Nuevo",
+                            Name = "Asignado a Vendedor",
                             Order = 0,
                             Priority = false
                         },
@@ -582,7 +636,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 3,
                             IsDeleted = false,
-                            Name = "Contactado",
+                            Name = "Revisión Vendedor",
                             Order = 0,
                             Priority = false
                         },
@@ -590,55 +644,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadStateId = 4,
                             IsDeleted = false,
-                            Name = "En Seguimiento",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 5,
-                            IsDeleted = false,
-                            Name = "Cotización Enviada",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 6,
-                            IsDeleted = false,
-                            Name = "Negociación",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 7,
-                            IsDeleted = false,
-                            Name = "Ganado",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 8,
-                            IsDeleted = false,
-                            Name = "Perdido",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 9,
-                            IsDeleted = false,
-                            Name = "No Calificado",
-                            Order = 0,
-                            Priority = false
-                        },
-                        new
-                        {
-                            LeadStateId = 10,
-                            IsDeleted = false,
-                            Name = "Pendiente de Respuesta",
+                            Name = "Contactado por Vendedor",
                             Order = 0,
                             Priority = false
                         });
@@ -650,10 +656,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OfferId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OfferId"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,3)");
+                        .HasColumnType("decimal(15, 3)");
 
                     b.Property<string>("Author")
                         .IsRequired()
@@ -730,10 +736,10 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,3)");
+                        .HasColumnType("decimal(15, 3)");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
@@ -810,7 +816,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .HasColumnType("int");
 
                     b.Property<decimal>("TypeOfChange")
-                        .HasColumnType("decimal(15,3)");
+                        .HasColumnType("decimal(15, 3)");
 
                     b.Property<string>("Ubication")
                         .IsRequired()
@@ -838,7 +844,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchDevId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchDevId"));
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
@@ -858,13 +864,36 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.ToTable("Schedule_Device");
                 });
 
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchEmpl", b =>
+                {
+                    b.Property<int>("SchEmplId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchEmplId"));
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ScheduleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SchEmplId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.ToTable("Schedule_Employee");
+                });
+
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
                 {
                     b.Property<int>("ScheduleId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ScheduleId"));
 
                     b.Property<string>("Car")
                         .IsRequired()
@@ -914,36 +943,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.ToTable("Schedules");
                 });
 
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.SchEmpl", b =>
-                {
-                    b.Property<int>("SchEmplId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SchEmplId"), 1L, 1);
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ScheduleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SchEmplId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ScheduleId");
-
-                    b.ToTable("Schedule_Employee");
-                });
-
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Seller", b =>
                 {
                     b.Property<int>("SellerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SellerId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SellerId"));
 
                     b.Property<int>("Bitrix24Id")
                         .HasColumnType("int");
@@ -989,7 +995,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1063,7 +1069,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TypeId"));
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -1303,17 +1309,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Schedule");
                 });
 
-            modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
-                {
-                    b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
-                        .WithMany("Schedules")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("ProjectsMecsaSPA.Model.SchEmpl", b =>
                 {
                     b.HasOne("ProjectsMecsaSPA.Model.Employee", "Employee")
@@ -1331,6 +1326,17 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Employee");
 
                     b.Navigation("Schedule");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.Schedule", b =>
+                {
+                    b.HasOne("ProjectsMecsaSPA.Model.Project", "Project")
+                        .WithMany("Schedules")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Bill", b =>

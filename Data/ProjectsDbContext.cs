@@ -331,13 +331,13 @@ namespace ProjectsMecsaSPA.Data
                   new LeadState
                   {
                       IsDeleted = false,
-                      LeadStateId = 1,
+                      LeadStateId = 3,
                       Name = "Revisión Vendedor"
                   },
                     new LeadState
                     {
                         IsDeleted = false,
-                        LeadStateId = 1,
+                        LeadStateId =4,
                         Name = "Contactado por Vendedor"
                     }
               );

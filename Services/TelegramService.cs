@@ -276,7 +276,8 @@ public class TelegramService : BackgroundService
 
             if (project != null)
             {
-                await _botClient.SendTextMessageAsync(
+                await _botClient
+                    .SendMessage(
                     chatId: chatId,
                     text: @$"
 Información del Proyecto {projectNumber}-{project.TaskNumber}
@@ -317,7 +318,7 @@ Si tienes más dudas, no dudes en comunicarte con el vendedor: {project.Seller?.
 
             if (offer != null)
             {
-                await _botClient.SendTextMessageAsync(
+                await _botClient.SendMessage(
                     chatId: chatId,
                     text: @$"
 Información del Oferta {offer.OfferId}

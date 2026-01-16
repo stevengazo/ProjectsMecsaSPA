@@ -3,10 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
-    public partial class initialDbProjects : Migration
+    /// <inheritdoc />
+    public partial class InitialProjectsDB : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -550,23 +554,29 @@ namespace ProjectsMecsaSPA.Migrations.Projects
             migrationBuilder.InsertData(
                 table: "LeadsRequest",
                 columns: new[] { "LeadRequestId", "IsDeleted", "RequestName" },
-                values: new object[] { 1, false, "pararrayos" });
+                values: new object[,]
+                {
+                    { 1, false, "Pararrayos" },
+                    { 2, false, "Mantenimiento" },
+                    { 3, false, "Supresores" },
+                    { 4, false, "Contadores de Eventos" },
+                    { 5, false, "Torres" },
+                    { 6, false, "Suministros Varios" },
+                    { 7, false, "Puesta a Tierra" },
+                    { 8, false, "Punta Franklin" },
+                    { 9, false, "Detectores" },
+                    { 10, false, "Mástil" }
+                });
 
             migrationBuilder.InsertData(
                 table: "LeadsState",
                 columns: new[] { "LeadStateId", "IsDeleted", "Name", "Order", "Priority" },
                 values: new object[,]
                 {
-                    { 1, false, "Atendido", 0, false },
-                    { 2, false, "Nuevo", 0, false },
-                    { 3, false, "Contactado", 0, false },
-                    { 4, false, "En Seguimiento", 0, false },
-                    { 5, false, "Cotización Enviada", 0, false },
-                    { 6, false, "Negociación", 0, false },
-                    { 7, false, "Ganado", 0, false },
-                    { 8, false, "Perdido", 0, false },
-                    { 9, false, "No Calificado", 0, false },
-                    { 10, false, "Pendiente de Respuesta", 0, false }
+                    { 1, false, "Entrante", 0, false },
+                    { 2, false, "Asignado a Vendedor", 0, false },
+                    { 3, false, "Revisión Vendedor", 0, false },
+                    { 4, false, "Contactado por Vendedor", 0, false }
                 });
 
             migrationBuilder.InsertData(
@@ -603,13 +613,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     { 8, false, "Instalación SPAT" },
                     { 9, false, "Instalación Supresores" },
                     { 10, false, "Certificación SPAT" },
-                    { 11, false, "Eléctricos" }
+                    { 11, false, "Eléctricos" },
+                    { 12, false, "Otros" }
                 });
-
-            migrationBuilder.InsertData(
-                table: "Types",
-                columns: new[] { "TypeId", "IsDeleted", "Name" },
-                values: new object[] { 12, false, "Otros" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bill_ProjectId",
@@ -707,6 +713,7 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 column: "ProjectId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
