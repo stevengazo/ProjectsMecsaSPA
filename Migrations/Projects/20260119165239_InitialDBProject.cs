@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     /// <inheritdoc />
-    public partial class InitialProjectsDB : Migration
+    public partial class InitialDBProject : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -74,6 +74,19 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 });
 
             migrationBuilder.CreateTable(
+                name: "LeadInput",
+                columns: table => new
+                {
+                    LeadInputId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeadInput", x => x.LeadInputId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LeadOrigins",
                 columns: table => new
                 {
@@ -88,13 +101,27 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 });
 
             migrationBuilder.CreateTable(
+                name: "LeadSectors",
+                columns: table => new
+                {
+                    LeadSectorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeadSectors", x => x.LeadSectorId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LeadsRequest",
                 columns: table => new
                 {
                     LeadRequestId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RequestName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    LeadSectorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,8 +233,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     DealNumber = table.Column<int>(type: "int", nullable: false),
                     Prioritized = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsNew = table.Column<bool>(type: "bit", nullable: false),
-                    ContactedBySeller = table.Column<bool>(type: "bit", nullable: false),
-                    isCalled = table.Column<bool>(type: "bit", nullable: false),
                     isDeleted = table.Column<bool>(type: "bit", nullable: false),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -217,16 +242,30 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     SellerId = table.Column<int>(type: "int", nullable: false),
                     LeadStateId = table.Column<int>(type: "int", nullable: false),
                     LeadRequestId = table.Column<int>(type: "int", nullable: false),
-                    LeadOriginId = table.Column<int>(type: "int", nullable: false)
+                    LeadOriginId = table.Column<int>(type: "int", nullable: false),
+                    LeadInputId = table.Column<int>(type: "int", nullable: false),
+                    LeadSectorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Leads", x => x.LeadId);
                     table.ForeignKey(
+                        name: "FK_Leads_LeadInput_LeadInputId",
+                        column: x => x.LeadInputId,
+                        principalTable: "LeadInput",
+                        principalColumn: "LeadInputId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Leads_LeadOrigins_LeadOriginId",
                         column: x => x.LeadOriginId,
                         principalTable: "LeadOrigins",
                         principalColumn: "LeadOriginId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Leads_LeadSectors_LeadSectorId",
+                        column: x => x.LeadSectorId,
+                        principalTable: "LeadSectors",
+                        principalColumn: "LeadSectorId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Leads_LeadsRequest_LeadRequestId",
@@ -532,6 +571,17 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 values: new object[] { 1, 1L, "Default", "Publico" });
 
             migrationBuilder.InsertData(
+                table: "LeadInput",
+                columns: new[] { "LeadInputId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "WhatsApp" },
+                    { 2, "Llamada" },
+                    { 3, "Correo" },
+                    { 4, "Pagina Web" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "LeadOrigins",
                 columns: new[] { "LeadOriginId", "IsDeleted", "LeadOriginName" },
                 values: new object[,]
@@ -549,20 +599,31 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 });
 
             migrationBuilder.InsertData(
-                table: "LeadsRequest",
-                columns: new[] { "LeadRequestId", "IsDeleted", "RequestName" },
+                table: "LeadSectors",
+                columns: new[] { "LeadSectorId", "Name" },
                 values: new object[,]
                 {
-                    { 1, false, "Pararrayos" },
-                    { 2, false, "Mantenimiento" },
-                    { 3, false, "Supresores" },
-                    { 4, false, "Contadores de Eventos" },
-                    { 5, false, "Torres" },
-                    { 6, false, "Suministros Varios" },
-                    { 7, false, "Puesta a Tierra" },
-                    { 8, false, "Punta Franklin" },
-                    { 9, false, "Detectores" },
-                    { 10, false, "Mástil" }
+                    { 1, "Eléctrico" },
+                    { 2, "Asfalto" },
+                    { 3, "Sellador" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "LeadsRequest",
+                columns: new[] { "LeadRequestId", "IsDeleted", "LeadSectorId", "RequestName" },
+                values: new object[,]
+                {
+                    { 1, false, 1, "Pararrayos" },
+                    { 2, false, 1, "Mantenimiento" },
+                    { 3, false, 1, "Supresores" },
+                    { 4, false, 1, "Contadores de Eventos" },
+                    { 5, false, 1, "Torres" },
+                    { 6, false, 1, "Suministros Varios" },
+                    { 7, false, 1, "Puesta a Tierra" },
+                    { 8, false, 1, "Punta Franklin" },
+                    { 9, false, 1, "Detectores" },
+                    { 10, false, 1, "Mástil" },
+                    { 11, false, 2, "Asfalto" }
                 });
 
             migrationBuilder.InsertData(
@@ -641,6 +702,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 column: "LeadId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Leads_LeadInputId",
+                table: "Leads",
+                column: "LeadInputId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Leads_LeadOriginId",
                 table: "Leads",
                 column: "LeadOriginId");
@@ -649,6 +715,11 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "IX_Leads_LeadRequestId",
                 table: "Leads",
                 column: "LeadRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Leads_LeadSectorId",
+                table: "Leads",
+                column: "LeadSectorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Leads_LeadStateId",
@@ -751,7 +822,13 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                 name: "Schedules");
 
             migrationBuilder.DropTable(
+                name: "LeadInput");
+
+            migrationBuilder.DropTable(
                 name: "LeadOrigins");
+
+            migrationBuilder.DropTable(
+                name: "LeadSectors");
 
             migrationBuilder.DropTable(
                 name: "LeadsRequest");

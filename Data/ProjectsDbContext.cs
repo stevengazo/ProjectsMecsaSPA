@@ -28,6 +28,8 @@ namespace ProjectsMecsaSPA.Data
         public DbSet<LeadRequest> LeadsRequest { get; set; }
         public DbSet<LeadState> LeadsState { get; set; }
         public DbSet<LeadOrigin> LeadOrigins { get; set; }
+        public DbSet<LeadInput> LeadInput { get; set; }
+        public DbSet<LeadSector> LeadSectors { get; set; }
         public DbSet<LeadNotes> LeadNotes { get; set; }
 
         public ProjectsDBContext(DbContextOptions contextOptions) : base(contextOptions)
@@ -196,6 +198,53 @@ namespace ProjectsMecsaSPA.Data
                 }
             };
 
+
+            List<LeadSector> leadSectors = new List<LeadSector>()
+            {
+                new LeadSector
+                {
+
+                    LeadSectorId = 1,
+                    Name = "Eléctrico"
+                },
+                new LeadSector
+                {
+
+                    LeadSectorId = 2,
+                    Name = "Asfalto"
+                },
+                new LeadSector
+                {
+
+                    LeadSectorId = 3,
+                    Name = "Sellador"
+                }
+            };
+            modelBuilder.Entity<LeadSector>().HasData(leadSectors);
+
+            modelBuilder.Entity<LeadInput>().HasData(
+                new LeadInput
+                {
+                    LeadInputId = 1,
+                    Name = "WhatsApp"
+                },
+                 new LeadInput
+                 {
+                     LeadInputId = 2,
+                     Name = "Llamada"
+                 },
+                  new LeadInput
+                  {
+                      LeadInputId = 3,
+                      Name = "Correo"
+                  },
+                   new LeadInput
+                   {
+                       LeadInputId = 4,
+                       Name = "Pagina Web"
+                   }
+                );
+
             modelBuilder.Entity<LeadOrigin>().HasData(
        new LeadOrigin
        {
@@ -263,55 +312,73 @@ namespace ProjectsMecsaSPA.Data
                 {
                     IsDeleted = false,
                     LeadRequestId = 1,
-                    RequestName = "Pararrayos"
+                    RequestName = "Pararrayos",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 2,
-                    RequestName = "Mantenimiento"
+                    RequestName = "Mantenimiento",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 3,
-                    RequestName = "Supresores"
+                    RequestName = "Supresores",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 4,
                     RequestName = "Contadores de Eventos"
+                    ,
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 5,
-                    RequestName = "Torres"
+                    RequestName = "Torres",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 },
                 new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 6,
-                    RequestName = "Suministros Varios"
+                    RequestName = "Suministros Varios",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 7,
-                    RequestName = "Puesta a Tierra"
+                    RequestName = "Puesta a Tierra",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 8,
-                    RequestName = "Punta Franklin"
+                    RequestName = "Punta Franklin",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 }, new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 9,
-                    RequestName = "Detectores"
+                    RequestName = "Detectores",
+                    LeadSectorId = leadSectors[0].LeadSectorId
                 },
                 new LeadRequest()
                 {
                     IsDeleted = false,
                     LeadRequestId = 10,
-                    RequestName = "Mástil"
-                }
+                    RequestName = "Mástil",
+                    LeadSectorId = leadSectors[0].LeadSectorId
+                },
+                          new LeadRequest()
+                          {
+                              IsDeleted = false,
+                              LeadRequestId = 11,
+                              RequestName = "Asfalto",
+                              LeadSectorId = leadSectors[1].LeadSectorId
+                          }
                 );
             modelBuilder.Entity<LeadState>().HasData(
                   new LeadState
@@ -335,7 +402,7 @@ namespace ProjectsMecsaSPA.Data
                     new LeadState
                     {
                         IsDeleted = false,
-                        LeadStateId =4,
+                        LeadStateId = 4,
                         Name = "Cerrado Ganado"
 
                     },

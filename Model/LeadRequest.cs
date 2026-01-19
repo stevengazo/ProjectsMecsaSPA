@@ -9,6 +9,8 @@ namespace ProjectsMecsaSPA.Model
         public string RequestName { get; set; }
         public bool IsDeleted { get; set; }
 
-        public ICollection<Lead> Leads { get; set; }
+        public int LeadSectorId { get; set; }
+
+        public ICollection<Lead>? Leads { get; set; }
     }
 }

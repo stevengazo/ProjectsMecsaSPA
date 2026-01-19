@@ -12,8 +12,8 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20260116181318_InitialProjectsDB")]
-    partial class InitialProjectsDB
+    [Migration("20260119165239_InitialDBProject")]
+    partial class InitialDBProject
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -327,9 +327,6 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<string>("ContactName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ContactedBySeller")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
@@ -351,10 +348,16 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("LeadInputId")
+                        .HasColumnType("int");
+
                     b.Property<int>("LeadOriginId")
                         .HasColumnType("int");
 
                     b.Property<int>("LeadRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeadSectorId")
                         .HasColumnType("int");
 
                     b.Property<int>("LeadStateId")
@@ -369,23 +372,63 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("isCalled")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("isDeleted")
                         .HasColumnType("bit");
 
                     b.HasKey("LeadId");
 
+                    b.HasIndex("LeadInputId");
+
                     b.HasIndex("LeadOriginId");
 
                     b.HasIndex("LeadRequestId");
+
+                    b.HasIndex("LeadSectorId");
 
                     b.HasIndex("LeadStateId");
 
                     b.HasIndex("SellerId");
 
                     b.ToTable("Leads");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadInput", b =>
+                {
+                    b.Property<int>("LeadInputId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadInputId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LeadInputId");
+
+                    b.ToTable("LeadInput");
+
+                    b.HasData(
+                        new
+                        {
+                            LeadInputId = 1,
+                            Name = "WhatsApp"
+                        },
+                        new
+                        {
+                            LeadInputId = 2,
+                            Name = "Llamada"
+                        },
+                        new
+                        {
+                            LeadInputId = 3,
+                            Name = "Correo"
+                        },
+                        new
+                        {
+                            LeadInputId = 4,
+                            Name = "Pagina Web"
+                        });
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadNotes", b =>
@@ -513,6 +556,9 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("LeadSectorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RequestName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -526,61 +572,112 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         {
                             LeadRequestId = 1,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Pararrayos"
                         },
                         new
                         {
                             LeadRequestId = 2,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Mantenimiento"
                         },
                         new
                         {
                             LeadRequestId = 3,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Supresores"
                         },
                         new
                         {
                             LeadRequestId = 4,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Contadores de Eventos"
                         },
                         new
                         {
                             LeadRequestId = 5,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Torres"
                         },
                         new
                         {
                             LeadRequestId = 6,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Suministros Varios"
                         },
                         new
                         {
                             LeadRequestId = 7,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Puesta a Tierra"
                         },
                         new
                         {
                             LeadRequestId = 8,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Punta Franklin"
                         },
                         new
                         {
                             LeadRequestId = 9,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Detectores"
                         },
                         new
                         {
                             LeadRequestId = 10,
                             IsDeleted = false,
+                            LeadSectorId = 1,
                             RequestName = "Mástil"
+                        },
+                        new
+                        {
+                            LeadRequestId = 11,
+                            IsDeleted = false,
+                            LeadSectorId = 2,
+                            RequestName = "Asfalto"
+                        });
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadSector", b =>
+                {
+                    b.Property<int>("LeadSectorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LeadSectorId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("LeadSectorId");
+
+                    b.ToTable("LeadSectors");
+
+                    b.HasData(
+                        new
+                        {
+                            LeadSectorId = 1,
+                            Name = "Eléctrico"
+                        },
+                        new
+                        {
+                            LeadSectorId = 2,
+                            Name = "Asfalto"
+                        },
+                        new
+                        {
+                            LeadSectorId = 3,
+                            Name = "Sellador"
                         });
                 });
 
@@ -1205,6 +1302,12 @@ namespace ProjectsMecsaSPA.Migrations.Projects
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.Lead", b =>
                 {
+                    b.HasOne("ProjectsMecsaSPA.Model.LeadInput", "Input")
+                        .WithMany("Leads")
+                        .HasForeignKey("LeadInputId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ProjectsMecsaSPA.Model.LeadOrigin", "Origin")
                         .WithMany("Leads")
                         .HasForeignKey("LeadOriginId")
@@ -1214,6 +1317,12 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.HasOne("ProjectsMecsaSPA.Model.LeadRequest", "LeadRequest")
                         .WithMany("Leads")
                         .HasForeignKey("LeadRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjectsMecsaSPA.Model.LeadSector", "Sector")
+                        .WithMany("Leads")
+                        .HasForeignKey("LeadSectorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1229,11 +1338,15 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Input");
+
                     b.Navigation("LeadRequest");
 
                     b.Navigation("LeadState");
 
                     b.Navigation("Origin");
+
+                    b.Navigation("Sector");
 
                     b.Navigation("Seller");
                 });
@@ -1371,12 +1484,22 @@ namespace ProjectsMecsaSPA.Migrations.Projects
                     b.Navigation("Notes");
                 });
 
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadInput", b =>
+                {
+                    b.Navigation("Leads");
+                });
+
             modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadOrigin", b =>
                 {
                     b.Navigation("Leads");
                 });
 
             modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadRequest", b =>
+                {
+                    b.Navigation("Leads");
+                });
+
+            modelBuilder.Entity("ProjectsMecsaSPA.Model.LeadSector", b =>
                 {
                     b.Navigation("Leads");
                 });
