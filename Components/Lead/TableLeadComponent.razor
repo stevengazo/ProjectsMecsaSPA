@@ -66,9 +66,19 @@
                         </td>
 
                         <td class="text-center">
-                            <span class="badge">
-                                @l.Prioritized
-                            </span>
+
+                            @if (l.Prioritized == "Alta")
+                            {
+                                <span class="badge bg-danger">
+                                    @l.Prioritized
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">
+                                    @l.Prioritized
+                                </span>
+                            }
                         </td>
 
                     </tr>

@@ -7,7 +7,6 @@
     @foreach (var state in LeadsByState)
     {
         <div style="min-width:300px; max-width:300px;">
-
             <!-- Header -->
             <div class="text-center fw-bold py-2 bg-light">
                 @state.Key.Name
@@ -15,7 +14,7 @@
 
             <!-- Body -->
             <div class="p-2">
-
+           
                 <SortableList class="h-100"
                               TItem="Lead"
                               Name="@state.Key.Name"
@@ -58,6 +57,19 @@
                                     @lead.LeadRequest.RequestName
                                 </span>
 
+                                @if(lead.Prioritized == "Alta")
+                                {
+                                    <span class="badge bg-danger">
+                                        @lead.Prioritized
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">
+                                        @lead.Prioritized
+                                    </span>
+                                }
+
                                 @if (lead.Seller != null)
                                 {
                                     <span class="badge bg-success">
@@ -71,6 +83,8 @@
                 </SortableList>
             </div>
         </div>
+
+
     }
 
 </div>
@@ -106,14 +120,12 @@
 
         states = await db.LeadsState
                          .OrderBy(e => e.Order)
-                         .Distinct()
                          .ToListAsync();
 
         foreach (var state in states)
         {
             LeadsByState[state] = Leads
                 .Where(l => !l.isDeleted && l.LeadStateId == state.LeadStateId)
-                .Distinct()
                 .OrderByDescending(l => l.CreatedAt)
                 .ToList();
         }

@@ -15,13 +15,13 @@
         <hr />
 
         <Tabs>
-            <Tab Title="Tabla" Active="true">
+            <Tab Title="Tabla" >
                 <Content>
                     <TableLeadComponent Leads="leads" OnSelect="HandleLeadSelected" />
                 </Content>
             </Tab>
 
-            <Tab Title="Etapas">
+            <Tab Title="Etapas" Active="true">
                 <Content>
                     <LeadKanban Leads="leads"
                                 OnSelect="HandleLeadSelected" />
