@@ -25,37 +25,50 @@
                               OnRemove="args => OnLeadListRemoveAsync(args)">
 
                     <ItemTemplate>
-                        <div class="mb-2 p-2"
-                             style="cursor:pointer"
+                        <div class="mb-2 p-3"
+                             style="cursor: pointer;"
                              @onclick="() => OnSelect.InvokeAsync(lead)">
 
-                            <div class="fw-semibold">
-                                @lead.ContactName
+                            <!-- Encabezado -->
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <div class="fw-semibold">
+                                    @lead.ContactName
+                                </div>
+
+                                <small class="text-muted">
+                                    @lead.CreatedAt.ToString("dd/MM/yyyy")
+                                </small>
                             </div>
 
-                            <div class="text-muted small">
-                                @lead.CreatedAt.ToString("dd/MM/yyyy")
-                            </div>
-
+                            <!-- Descripción -->
                             @if (!string.IsNullOrWhiteSpace(lead.Description))
                             {
-                                <p class="small mb-1">
+                                <p class="text-muted small mb-2">
                                     @lead.Description
                                 </p>
                             }
 
-                            @if (lead.Seller != null)
-                            {
-                                <span class="badge bg-secondary mt-1">
-                                    @lead.Seller.SellerName
+                            <!-- Badges -->
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-secondary">
+                                    @lead.Sector.Name
                                 </span>
-                            }
+
+                                <span class="badge bg-primary">
+                                    @lead.LeadRequest.RequestName
+                                </span>
+
+                                @if (lead.Seller != null)
+                                {
+                                    <span class="badge bg-success">
+                                        @lead.Seller.SellerName
+                                    </span>
+                                }
+                            </div>
 
                         </div>
                     </ItemTemplate>
-
                 </SortableList>
-
             </div>
         </div>
     }
@@ -65,7 +78,6 @@
 @code {
 
     private List<LeadState> states = new();
-
     private Dictionary<LeadState, List<Lead>> LeadsByState { get; set; } = new();
 
     [Parameter]
@@ -84,9 +96,11 @@
         await LoadAsync();
     }
 
+
     private async Task LoadAsync()
     {
         LeadsByState.Clear();
+        states.Clear();
 
         using var db = DbContextFactory.CreateDbContext();
 
@@ -131,7 +145,6 @@
 
         return Task.CompletedTask;
 
-
     }
 
     private async Task OnLeadListRemoveAsync(SortableListEventArgs args)
@@ -161,6 +174,11 @@
         {
             
             throw E;
+        }
+        finally
+        {
+            await LoadAsync();
+            StateHasChanged();
         }
        
     }

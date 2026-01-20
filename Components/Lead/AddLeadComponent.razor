@@ -131,7 +131,7 @@
     <div class="mb-3">
         <label class="form-label">Estado</label>
         <InputSelect class="form-select" @bind-Value="Lead.LeadStateId" disabled>
-            @foreach (var s in states.Where(x => x.LeadStateId == Lead.LeadStateId))
+            @foreach (var s in states)
             {
                 <option value="@s.LeadStateId">@s.Name</option>
             }
@@ -164,18 +164,20 @@
 
         Lead.CreatedAt = DateTime.UtcNow;
         Lead.UpdatedAt = DateTime.UtcNow;
+        Lead.CompanyName = "";
+        Lead.ContactName = "";
+        Lead.Description = "";
         Lead.IsNew = true;
         Lead.isDeleted = false;
-        Lead.LeadStateId = 2; // Nuevo
+      //  Lead.LeadStateId = 2; // Nuevo
     }
 
     private async Task LoadDataAsync()
     {
         using var db = DbContextFactory.CreateDbContext();
-
         origins = await db.LeadOrigins.AsNoTracking().OrderBy(x => x.LeadOriginName).ToListAsync();
         requests = await db.LeadsRequest.AsNoTracking().OrderBy(x => x.RequestName).ToListAsync();
-        states = await db.LeadsState.AsNoTracking().OrderBy(x => x.LeadStateId).ToListAsync();
+        states = await db.LeadsState.AsNoTracking().OrderBy(x => x.Order).ToListAsync();
         sellers = await db.Seller.AsNoTracking().OrderBy(x => x.SellerName).ToListAsync();
         sectors = await db.LeadSectors.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
         inputs = await db.LeadInput.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
