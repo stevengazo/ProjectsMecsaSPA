@@ -9,6 +9,7 @@
                 <th>Cliente</th>
                 <th>Vendedor</th>
                 <th>Origen</th>
+                <th>Sector</th>
                 <th>Solicitud</th>
                 <th>Estado</th>
                 <th>Deal</th>
@@ -42,6 +43,10 @@
                         </td>
 
                         <td>
+                            @l.Sector?.Name
+                        </td>
+
+                        <td>
                             @l.LeadRequest?.RequestName
                         </td>
 
@@ -56,7 +61,7 @@
                         </td>
 
                         <td class="text-nowrap">
-                            @l.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                            @l.CreatedAt.ToString("HH:mm dd/MM/yyyy")
                         </td>
 
                         <td class="text-center">

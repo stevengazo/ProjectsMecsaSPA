@@ -325,9 +325,6 @@ else
         </div>
     </div>
 
-
-
-
     <!-- ================= NOTES ================= -->
     <div class="card shadow-sm">
         <div class="card-header fw-bold">
@@ -345,11 +342,19 @@ else
                                    @bind-Value="newNote.Notes" />
                 </div>
 
+                
+
                 <button type="submit"
                         class="btn btn-primary btn-sm"
-                        disabled="@string.IsNullOrWhiteSpace(newNote.Notes)">
+                       >
                     Guardar nota
                 </button>
+                @if (addingNote)
+                {
+                    <Spinner Size="SpinnerSize.Small" Class="ms-2" />
+                }
+
+            
             </EditForm>
 
             <hr />
@@ -360,16 +365,16 @@ else
                 @foreach (var n in notes.OrderByDescending(x => x.CreatedAt))
                 {
                     <div class="border rounded p-2 mb-2">
-                        <div class="small text-muted mb-1">
-                            @n.CreatedBy · @n.CreatedAt:dd/MM/yyyy HH:mm
+                        <div class=" flex flex-row justify-content-between small text-muted mb-1">
+                            @n.CreatedBy · @n.CreatedAt.ToString("hh:mm dd-MM-yy")
                         </div>
-                        <div>@n.Notes</div>
+                        <div class="text-muted small italic">@n.Notes</div>
                     </div>
                 }
             }
             else
             {
-                <div class="text-muted small">
+                <div class="text-muted">
                     No hay notas registradas.
                 </div>
             }
@@ -394,6 +399,8 @@ else
     private List<LeadSector> sectors = new();
     private List<LeadInput> Inputs = new();
     private List<LeadState> States = new();
+
+    private bool addingNote = false;    
 
     private string deletebutton = "btn-success";
 
@@ -511,17 +518,30 @@ else
 
     private async Task AddNote()
     {
-        if (string.IsNullOrWhiteSpace(newNote.Notes)) return;
+        try
+        {
+            addingNote = true;
+            if (string.IsNullOrWhiteSpace(newNote.Notes)) return;
 
-        newNote.LeadId = Lead.LeadId;
-        newNote.CreatedBy = currentUser;
-        newNote.CreatedAt = DateTime.Now;
+            newNote.LeadId = Lead.LeadId;
+            newNote.CreatedBy = currentUser;
+            newNote.CreatedAt = DateTime.Now;
 
-        db.LeadNotes.Add(newNote);
-        await db.SaveChangesAsync();
+            db.LeadNotes.Add(newNote);
+            await db.SaveChangesAsync();
 
-        notes.Insert(0, newNote);
-        newNote = new();
+            notes.Add(newNote);
+            notes.OrderDescending();
+            newNote = new();
+        }
+        catch (Exception f)
+        {
+            Console.WriteLine(f.Message);
+            
+        }
+        finally{
+            addingNote = false;
+        }
     }
 
     private async Task SendMessage()
