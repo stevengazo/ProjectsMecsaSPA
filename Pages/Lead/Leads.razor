@@ -4,15 +4,27 @@
 
 <AuthorizeView Roles="administrador,ingeniero">
     <Authorized>
-        <div class="d-flex justify-content-between align-items-center">
-            <h3>Prospectos Recepción</h3>
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+            <h3 class="mb-0">Prospectos Recepción</h3>
 
-            <button class="btn btn-primary" @onclick="ShowLeadComponent">
+            <div class="flex-grow-1" style="max-width: 320px;">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Buscar lead..."
+                       @bind-value="SearchValue"
+                       @bind-value:event="oninput" />
+            </div>
+
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>
                 Agregar Lead
             </button>
         </div>
 
+
         <hr />
+
+
 
         <Tabs>
             <Tab Title="Tabla" >
@@ -71,7 +83,20 @@
     private Offcanvas offcanvas = default!;
     private string? message;
 
+    private string _searchValue = string.Empty;
+    private string SearchValue
+    {
+        get => _searchValue;
+        set
+        {
+            _searchValue = value;
+            ApplyFilter();
+        }
+    }
 
+
+
+    private List<Lead> allLeads = new();
     private List<LeadSector> sectors = new();
     private List<Lead> leads = new();
 
@@ -87,7 +112,7 @@
         using var db = DbContextFactory.CreateDbContext();
 
         sectors = await db.LeadSectors.Distinct().ToListAsync();
-        leads = await db.Leads
+        allLeads = await db.Leads
             .AsNoTracking()
             .Include(e => e.Origin)
             .Include(e => e.LeadRequest)
@@ -98,6 +123,39 @@
             .OrderByDescending(l=>l.LeadId)
             .ToListAsync();
 
+
+
+        ApplyFilter();
+
+    }
+
+    private void ApplyFilter()
+    {
+        if (string.IsNullOrWhiteSpace(SearchValue))
+        {
+            leads = allLeads;
+        }
+        else
+        {
+            var search = SearchValue.Trim().ToLower();
+
+            leads = allLeads.Where(l =>
+                l.CompanyName!.ToLower().Contains(search) ||
+                l.ContactName!.ToLower().Contains(search) ||
+                l.Country!.ToLower().Contains(search) ||
+                l.Seller.SellerName!.Contains(search) ||
+                l.LeadRequest.RequestName!.ToLower().Contains(search) ||
+                l.Sector!.Name!.ToLower().Contains(search)
+            ).ToList();
+        }
+
+        BuildByCategory();
+    }
+
+
+    private void BuildByCategory()
+    {
+        ByCategory.Clear();
 
         foreach (var sector in sectors)
         {
@@ -110,7 +168,6 @@
                 ByCategory[sector.Name] = sectorLeads;
             }
         }
-
     }
 
     private async Task ShowLeadComponent()
