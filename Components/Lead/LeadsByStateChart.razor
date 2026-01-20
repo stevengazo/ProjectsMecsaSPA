@@ -1,0 +1,86 @@
+﻿
+<BarChart @ref="barChart"  />
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+
+    [Parameter]
+    public List<LeadChartModel> LeadsData { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        if (LeadsData == null || !LeadsData.Any())
+            return;
+
+        BuildChart();
+    }
+
+    private void BuildChart()
+    {
+        var grouped = LeadsData
+            .Where(l => !string.IsNullOrWhiteSpace(l.State))
+            .GroupBy(l => l.State)
+            .OrderByDescending(g => g.Count())
+            .Select(g => new { State = g.Key, Count = g.Count() })
+            .ToList();
+
+        var labels = grouped.Select(g => g.State).ToList();
+        var values = grouped.Select(g => (double?)g.Count).ToList();
+
+        var color = ColorUtility.CategoricalTwelveColors[3];
+
+        chartData = new ChartData
+        {
+            Labels = labels,
+            Datasets = new List<IChartDataset>
+            {
+                new BarChartDataset
+                {
+                    Label = "Cantidad de Leads",
+                    Data = values,
+                    BackgroundColor = Enumerable.Repeat(color, values.Count).ToList(),
+                    BorderColor = Enumerable.Repeat(color, values.Count).ToList(),
+                    BorderWidth = Enumerable.Repeat(0d, values.Count).ToList()
+                }
+            }
+        };
+
+        barChartOptions = BuildOptions("Estado");
+    }
+
+    private BarChartOptions BuildOptions(string yTitle)
+    {
+        var options = new BarChartOptions
+        {
+            Responsive = true,
+            MaintainAspectRatio = false,
+            IndexAxis = "y",
+            Interaction = new Interaction { Mode = InteractionMode.Y }
+        };
+
+        options.Scales.X!.Title = new ChartAxesTitle
+        {
+            Text = "Cantidad de Leads",
+            Display = true
+        };
+
+        options.Scales.Y!.Title = new ChartAxesTitle
+        {
+            Text = yTitle,
+            Display = true
+        };
+
+        options.Plugins.Legend.Display = false;
+        return options;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await barChart.InitializeAsync(chartData, barChartOptions);
+        }
+    }
+}

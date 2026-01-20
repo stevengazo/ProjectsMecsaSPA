@@ -1,0 +1,95 @@
+﻿
+<BarChart @ref="barChart"  />
+
+@code {
+    private BarChart barChart = default!;
+    private BarChartOptions barChartOptions = default!;
+    private ChartData chartData = default!;
+
+    [Parameter]
+    public List<LeadChartModel> LeadsData { get; set; } 
+
+    
+    protected override void OnParametersSet()
+    {
+        BuildChart();
+    }
+
+    private void BuildChart()
+    {
+        // Agrupar leads por vendedor
+        var groupedBySeller = LeadsData
+            .Where(l => !string.IsNullOrWhiteSpace(l.Seller))
+            .GroupBy(l => l.Seller)
+            .OrderByDescending(g => g.Count())
+            .Select(g => new
+            {
+                Seller = g.Key,
+                Count = g.Count()
+            })
+            .ToList();
+
+        var labels = groupedBySeller
+            .Select(g => g.Seller)
+            .ToList();
+
+        var values = groupedBySeller
+            .Select(g => (double?)g.Count)
+            .ToList();
+
+        var color = ColorUtility.CategoricalTwelveColors[0];
+
+        var datasets = new List<IChartDataset>
+        {
+            new BarChartDataset
+            {
+                Label = "Cantidad de Leads",
+                Data = values,
+                BackgroundColor = Enumerable.Repeat(color, values.Count).ToList(),
+                BorderColor = Enumerable.Repeat(color, values.Count).ToList(),
+                BorderWidth = Enumerable.Repeat(0d, values.Count).ToList()
+            }
+        };
+
+        chartData = new ChartData
+        {
+            Labels = labels,
+            Datasets = datasets
+        };
+
+        barChartOptions = new BarChartOptions
+        {
+            Responsive = true,
+            MaintainAspectRatio = false,
+            IndexAxis = "y",
+            Interaction = new Interaction
+            {
+                Mode = InteractionMode.Y
+            }
+        };
+
+        barChartOptions.Scales.X!.Title = new ChartAxesTitle
+        {
+            Text = "Cantidad de Leads",
+            Display = true
+        };
+
+        barChartOptions.Scales.Y!.Title = new ChartAxesTitle
+        {
+            Text = "Vendedor",
+            Display = true
+        };
+
+        barChartOptions.Plugins.Legend.Display = false;
+    
+    
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await barChart.InitializeAsync(chartData, barChartOptions);
+        }
+    }
+}

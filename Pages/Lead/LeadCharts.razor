@@ -1,0 +1,91 @@
+﻿@page "/lead/charts"
+
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
+
+<div class="container-fluid">
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Leads por Vendedor</h5>
+                    <div class="flex-grow-1" style="min-height: 280px;">
+                        <LeadsBySellerChart LeadsData="Data" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Leads por Fecha</h5>
+                    <div class="flex-grow-1" style="min-height: 350px;">
+                        <LeadsByDateChart LeadsData="Data" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Leads por Sector</h5>
+                    <div class="flex-grow-1" style="min-height: 280px;">
+                        <LeadsBySectorChart LeadsData="Data" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-3">Leads por Estado</h5>
+                    <div class="flex-grow-1" style="min-height: 280px;">
+                        <LeadsByStateChart LeadsData="Data" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+
+    private ProjectsDBContext dBContext = default!;
+
+    private List<LeadChartModel> Data = new();
+
+   protected override async Task OnInitializedAsync()
+    {
+        await LoadLeads();
+    }   
+
+    private async Task LoadLeads()
+    {
+        using var context = DbContextFactory.CreateDbContext();
+
+        Data = await context.Leads
+            .Select(l => new LeadChartModel
+            {
+                LeadId = l.LeadId,
+                CompanyName = l.CompanyName,
+                CreationDate = l.CreatedAt,
+                Seller = l.Seller != null ? l.Seller.SellerName : null,
+                Sector = l.Sector != null ? l.Sector.Name : null,
+                Origin = l.Origin != null ? l.Origin.LeadOriginName : null,
+                State = l.LeadState != null ? l.LeadState.Name : null,
+                Request = l.LeadRequest != null ? l.LeadRequest.RequestName : null
+            })
+            .ToListAsync();
+
+       
+    }
+
+
+
+  
+}

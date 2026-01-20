@@ -1,0 +1,106 @@
+﻿
+<div class="container-fluid">
+    <LineChart @ref="lineChart" />
+</div>
+
+
+@code {
+    private LineChart lineChart = default!;
+    private LineChartOptions lineChartOptions = default!;
+    private ChartData chartData = default!;
+
+    [Parameter]
+    public List<LeadChartModel> LeadsData { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        if (LeadsData == null || !LeadsData.Any())
+            return;
+
+        BuildChart();
+    }
+
+    private void BuildChart()
+    {
+        var colors = ColorUtility.CategoricalTwelveColors;
+
+        // Agrupar por Año + Mes
+        var groupedByDate = LeadsData
+            .Where(l => l.CreationDate != null)
+            .GroupBy(l => new
+            {
+                Year = l.CreationDate.Year,
+                Month = l.CreationDate.Month
+            })
+            .OrderBy(g => g.Key.Year)
+            .ThenBy(g => g.Key.Month)
+            .Select(g => new
+            {
+                Label = $"{g.Key.Month:00}/{g.Key.Year}",
+                Count = g.Count()
+            })
+            .ToList();
+
+        var labels = groupedByDate
+            .Select(g => g.Label)
+            .ToList();
+
+        var values = groupedByDate
+            .Select(g => (double?)g.Count)
+            .ToList();
+
+        var datasets = new List<IChartDataset>
+        {
+            new LineChartDataset
+            {
+                Label = "Leads creados",
+                Data = values,
+                BackgroundColor = colors[0],
+                BorderColor = colors[0],
+               
+                BorderWidth = 2,
+                HoverBorderWidth = 4,
+                Fill = false,
+                Tension = 0.3
+            }
+        };
+
+        chartData = new ChartData
+        {
+            Labels = labels,
+            Datasets = datasets
+        };
+
+        lineChartOptions = new LineChartOptions
+        {
+            Responsive = true,
+            MaintainAspectRatio = false,
+            Interaction = new Interaction
+            {
+                Mode = InteractionMode.Index
+            }
+        };
+
+        lineChartOptions.Scales.X!.Title = new ChartAxesTitle
+        {
+            Text = "Fecha",
+            Display = true
+        };
+
+        lineChartOptions.Scales.Y!.Title = new ChartAxesTitle
+        {
+            Text = "Cantidad de Leads",
+            Display = true
+        };
+
+        lineChartOptions.Plugins.Legend.Display = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await lineChart.InitializeAsync(chartData, lineChartOptions);
+        }
+    }
+}
