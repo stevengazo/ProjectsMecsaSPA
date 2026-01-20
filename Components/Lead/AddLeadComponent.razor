@@ -1,12 +1,11 @@
-﻿@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
-@using Microsoft.AspNetCore.Components.Authorization
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
-
-
 
 <h3>Agregar Lead</h3>
 
-<EditForm Model="Lead" OnValidSubmit="SaveAsync">
+<EditForm Model="@Lead" OnValidSubmit="SaveAsync">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -21,7 +20,7 @@
         <label class="form-label">Nombre del contacto</label>
         <InputText class="form-control" @bind-Value="Lead.ContactName" />
     </div>
-    
+
     <!-- Descripción -->
     <div class="mb-3">
         <label class="form-label">Descripción</label>
@@ -37,21 +36,46 @@
     <!-- Prioridad -->
     <div class="mb-3">
         <label class="form-label">Prioridad</label>
-        <InputSelect class="form-control"  @bind-Value="Lead.Prioritized" >
-           <option value="Alta">Alta</option>
+        <InputSelect class="form-select" @bind-Value="Lead.Prioritized">
+            <option value="">Seleccione...</option>
+            <option value="Alta">Alta</option>
             <option value="Media">Media</option>
             <option value="Baja">Baja</option>
-            </InputSelect>
+        </InputSelect>
     </div>
 
     <!-- Origen -->
     <div class="mb-3">
         <label class="form-label">Origen</label>
         <InputSelect class="form-select" @bind-Value="Lead.LeadOriginId">
-            <option value="">Seleccione...</option>
+            <option value="0">Seleccione...</option>
             @foreach (var o in origins)
             {
                 <option value="@o.LeadOriginId">@o.LeadOriginName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Entrada -->
+    <div class="mb-3">
+        <label class="form-label">Entrada</label>
+        <InputSelect class="form-select" @bind-Value="Lead.LeadInputId">
+            <option value="0">Seleccione...</option>
+            @foreach (var i in inputs)
+            {
+                <option value="@i.LeadInputId">@i.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Sector -->
+    <div class="mb-3">
+        <label class="form-label">Sector</label>
+        <InputSelect class="form-select" @bind-Value="Lead.LeadSectorId">
+            <option value="0">Seleccione...</option>
+            @foreach (var s in sectors)
+            {
+                <option value="@s.LeadSectorId">@s.Name</option>
             }
         </InputSelect>
     </div>
@@ -60,7 +84,7 @@
     <div class="mb-3">
         <label class="form-label">Tipo de solicitud</label>
         <InputSelect class="form-select" @bind-Value="Lead.LeadRequestId">
-            <option value="">Seleccione...</option>
+            <option value="0">Seleccione...</option>
             @foreach (var r in requests)
             {
                 <option value="@r.LeadRequestId">@r.RequestName</option>
@@ -68,32 +92,30 @@
         </InputSelect>
     </div>
 
-    <!-- Tipo de solicitud -->
+    <!-- Vendedor -->
     @if (sellers.Any())
     {
         <div class="mb-3">
             <label class="form-label">Vendedor</label>
             <InputSelect class="form-select" @bind-Value="Lead.SellerId">
-                <option value="">Seleccione...</option>
-                @foreach (var r in sellers)
+                <option value="0">Seleccione...</option>
+                @foreach (var s in sellers)
                 {
-                    <option value="@r.SellerId">@r.SellerName</option>
+                    <option value="@s.SellerId">@s.SellerName</option>
                 }
             </InputSelect>
         </div>
     }
     else
     {
-        <label>no hay vendedores disponibles</label>
+        <div class="text-muted mb-3">No hay vendedores disponibles</div>
     }
-
 
     <!-- País -->
     <div class="mb-3">
         <label class="form-label">País</label>
         <InputSelect class="form-select" @bind-Value="Lead.Country">
             <option value="">Seleccione...</option>
-        
             <option value="Belice">Belice</option>
             <option value="Costa Rica">Costa Rica</option>
             <option value="El Salvador">El Salvador</option>
@@ -105,41 +127,39 @@
         </InputSelect>
     </div>
 
-    <!-- Estado -->
+    <!-- Estado fijo: Nuevo -->
     <div class="mb-3">
         <label class="form-label">Estado</label>
-        <InputSelect class="form-select" @bind-Value="Lead.LeadStateId">
-            @foreach (var s in states)
+        <InputSelect class="form-select" @bind-Value="Lead.LeadStateId" disabled>
+            @foreach (var s in states.Where(x => x.LeadStateId == Lead.LeadStateId))
             {
                 <option value="@s.LeadStateId">@s.Name</option>
             }
         </InputSelect>
     </div>
 
-    <!-- Flags -->
-  
-
-
     <button type="submit" class="btn btn-success">
         Agregar
     </button>
 </EditForm>
 
-
 @code {
-    [Parameter]
-    public EventCallback OnAdded { get; set; }
+    [Parameter] public EventCallback OnAdded { get; set; }
 
     private Lead Lead = new();
+
     private List<LeadOrigin> origins = new();
     private List<LeadRequest> requests = new();
     private List<Seller> sellers = new();
     private List<LeadState> states = new();
+    private List<LeadSector> sectors = new();
+    private List<LeadInput> inputs = new();
 
     private string? currentUser;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadUserAsync();
         await LoadDataAsync();
 
         Lead.CreatedAt = DateTime.UtcNow;
@@ -151,67 +171,41 @@
 
     private async Task LoadDataAsync()
     {
-        try
-        {
-            using var db = DbContextFactory.CreateDbContext();
+        using var db = DbContextFactory.CreateDbContext();
 
-            origins = await db.LeadOrigins.AsNoTracking().OrderBy(e=>e.LeadOriginName).ToListAsync();
-            requests = await db.LeadsRequest.AsNoTracking().OrderBy(e => e.RequestName).ToListAsync();
-            states = await db.LeadsState.AsNoTracking().OrderBy(e => e.Name).ToListAsync();
-            sellers = await db.Seller.OrderBy(e => e.SellerName).ToListAsync();
-        }
-        catch (Exception s)
-        {
-
-            throw s;
-        }
+        origins = await db.LeadOrigins.AsNoTracking().OrderBy(x => x.LeadOriginName).ToListAsync();
+        requests = await db.LeadsRequest.AsNoTracking().OrderBy(x => x.RequestName).ToListAsync();
+        states = await db.LeadsState.AsNoTracking().OrderBy(x => x.LeadStateId).ToListAsync();
+        sellers = await db.Seller.AsNoTracking().OrderBy(x => x.SellerName).ToListAsync();
+        sectors = await db.LeadSectors.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
+        inputs = await db.LeadInput.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
     }
 
     private async Task LoadUserAsync()
     {
-        try
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
         {
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-
-            if (user.Identity is not null && user.Identity.IsAuthenticated)
-            {
-                // Usa Name por defecto (Identity)
-                currentUser = user.Identity.Name;
-
-                // Alternativa si usas Claims personalizados:
-                // currentUser = user.FindFirst("email")?.Value;
-                // currentUser = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
-        }
-        catch (Exception f)
-        {
-
-            throw f;
+            currentUser = user.Identity.Name;
         }
     }
 
     private async Task SaveAsync()
     {
-        try
+        using var db = DbContextFactory.CreateDbContext();
+
+        Lead.CreatedBy = currentUser ?? "system";
+        Lead.LastUpdatedBy = currentUser ?? "system";
+        Lead.UpdatedAt = DateTime.UtcNow;
+
+        db.Leads.Add(Lead);
+        await db.SaveChangesAsync();
+
+        if (OnAdded.HasDelegate)
         {
-            using var db = DbContextFactory.CreateDbContext();
-
-            Lead.CreatedBy = currentUser ?? "";
-            Lead.CreatedAt = DateTime.Now;
-            Lead.LastUpdatedBy = currentUser ?? "";
-
-            db.Leads.Add(Lead);
-            await db.SaveChangesAsync();
-
-            if (OnAdded.HasDelegate)
-            {
-                await OnAdded.InvokeAsync();
-            }
-        }
-        catch (Exception e)
-        {
-            
+            await OnAdded.InvokeAsync();
         }
     }
 }

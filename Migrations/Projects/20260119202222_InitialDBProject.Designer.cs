@@ -12,7 +12,7 @@ using ProjectsMecsaSPA.Data;
 namespace ProjectsMecsaSPA.Migrations.Projects
 {
     [DbContext(typeof(ProjectsDBContext))]
-    [Migration("20260119165239_InitialDBProject")]
+    [Migration("20260119202222_InitialDBProject")]
     partial class InitialDBProject
     {
         /// <inheritdoc />

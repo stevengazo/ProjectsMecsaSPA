@@ -32,9 +32,19 @@
                     <LeadReportComponent OnSelect="HandleLeadSelected" />
                 </Content>
             </Tab>
-            <Tab Title="Graficas">
+            <Tab Title="Sector">
                 <Content>
+                    <Tabs>
+                        @foreach (var item in ByCategory)
+                        {
+                            <Tab Title="@item.Key">
+                                <Content>
+                                    <TableLeadComponent Leads="@item.Value" OnSelect="HandleLeadSelected" />
+                                </Content>
+                            </Tab>
+                        }
 
+                    </Tabs>
                 </Content>
             </Tab>
         </Tabs>
@@ -61,7 +71,11 @@
     private Offcanvas offcanvas = default!;
     private string? message;
 
+
+    private List<LeadSector> sectors = new();
     private List<Lead> leads = new();
+
+    private Dictionary<string, List<Lead>> ByCategory = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -72,14 +86,31 @@
     {
         using var db = DbContextFactory.CreateDbContext();
 
+        sectors = await db.LeadSectors.Distinct().ToListAsync();
         leads = await db.Leads
-        //    .AsNoTracking()
+            .AsNoTracking()
             .Include(e => e.Origin)
             .Include(e => e.LeadRequest)
             .Include(e => e.Seller)
+            .Include(e => e.Sector)
+            .Include(e => e.Input)
             .Include(e => e.LeadState)
             .OrderByDescending(l=>l.LeadId)
             .ToListAsync();
+
+
+        foreach (var sector in sectors)
+        {
+            var sectorLeads = leads
+                .Where(l => l.LeadSectorId == sector.LeadSectorId)
+                .ToList();
+
+            if (sectorLeads.Any())
+            {
+                ByCategory[sector.Name] = sectorLeads;
+            }
+        }
+
     }
 
     private async Task ShowLeadComponent()

@@ -1,35 +1,46 @@
 ﻿@page "/user/{id}"
-@using Microsoft.AspNetCore.Identity
-@inject ApplicationDbContext dbContext;
-@inject ProjectsDBContext db
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext dbContext
 
 <AuthorizeView Roles="administrador">
     <Authorized>
         <h3>Detalles del Usuario</h3>
-        <UserDetailsComponent user="user" />
-        @if (user != null)
+
+        @if (isLoading)
         {
+            <p>Cargando usuario...</p>
+        }
+        else if (user == null)
+        {
+            <p class="text-danger">Usuario no encontrado</p>
+        }
+        else
+        {
+            <UserDetailsComponent user="user" />
             <RolListComponent id="@user.Id" />
         }
-
     </Authorized>
+
     <NotAuthorized>
         <ErrorViewComponent />
     </NotAuthorized>
 </AuthorizeView>
 
-
-
-
 @code {
     [Parameter]
-    public string id { get; set; }
+    public string id { get; set; } = string.Empty;
 
-    UserIdentityEx user = new();
+    private UserIdentityEx? user;
+    private bool isLoading = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        user = dbContext.Users.FirstOrDefault(e => e.Id == id);
-        await base.OnInitializedAsync();
+        isLoading = true;
+
+        user = await dbContext.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        isLoading = false;
     }
 }

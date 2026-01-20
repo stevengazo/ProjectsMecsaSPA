@@ -5,6 +5,9 @@
 @inject IDbContextFactory<ProjectsDBContext> DbContextFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
+
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
 @if (Lead == null)
 {
     <div class="alert alert-secondary small text-center">
@@ -33,7 +36,7 @@ else
                                 <th class="text-muted small">ID</th>
                                 <td class="fw-semibold">@Lead.LeadId</td>
                             </tr>
-
+                            <!-- contact name -->
                             <tr>
                                 <th class="text-muted small">Contacto</th>
                                 <td>
@@ -41,7 +44,7 @@ else
                                                @bind-Value="Lead.ContactName" />
                                 </td>
                             </tr>
-
+                            <!-- Company name -->
                             <tr>
                                 <th class="text-muted small">Cliente</th>
                                 <td>
@@ -49,16 +52,12 @@ else
                                                @bind-Value="Lead.CompanyName" />
                                 </td>
                             </tr>
-
-
-
+                            <!-- Country -->
                             <tr>
                                 <th class="text-muted small">País</th>
                                 <td>
-
                                     <InputSelect class="form-select form-select-sm"
                                                  @bind-Value="Lead.Country">
-
                                         <option value=""></option>
                                         <option value="Belice">Belice</option>
                                         <option value="Costa Rica">Costa Rica</option>
@@ -71,7 +70,7 @@ else
                                     </InputSelect>
                                 </td>
                             </tr>
-
+                            <!-- State -->
                             <tr>
                                 <th class="text-muted small">Estado</th>
                                 <td>
@@ -79,26 +78,13 @@ else
                                                  @bind-Value="Lead.LeadStateId">
                                         @foreach (var i in States)
                                         {
-                                            <option value="@i.Key">@i.Value</option>
+                                            <option value="@i.LeadStateId">@i.Name</option>
                                         }
 
                                     </InputSelect>
                                 </td>
                             </tr>
-
-                            <tr>
-                                <th class="text-muted small">Origen</th>
-                                <td>
-                                    <InputSelect class="form-select form-select-sm"
-                                                 @bind-Value="Lead.LeadOriginId">
-                                        @foreach (var i in Origins)
-                                        {
-                                            <option value="@i.Key">@i.Value</option>
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-
+                            <!-- Request -->
                             <tr>
                                 <th class="text-muted small">Tipo</th>
                                 <td>
@@ -106,12 +92,55 @@ else
                                                  @bind-Value="Lead.LeadRequestId">
                                         @foreach (var i in RequestTypes)
                                         {
-                                            <option value="@i.Key">@i.Value</option>
+                                            <option value="@i.LeadRequestId">@i.RequestName</option>
                                         }
                                     </InputSelect>
                                 </td>
                             </tr>
+                            <!-- Entrada -->
+                            <tr>
+                                <th>
+                                    <label class="form-label">Entrada</label>
+                                </th>
+                                <td>
 
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="Lead.LeadInputId">
+                                        @foreach (var o in Inputs)
+                                        {
+                                            <option value="@o.LeadInputId">@o.Name</option>
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <!-- Sector -->
+                            <tr>
+                                <th>
+                                    <label class="form-label">Sector</label>
+                                </th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="Lead.LeadSectorId">
+                                        @foreach (var o in sectors)
+                                        {
+                                            <option value="@o.LeadSectorId">@o.Name</option>
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <!-- Origin -->
+                            <tr>
+                                <th>
+                                    <label class="form-label">Origen</label>
+                                </th>
+                                <td>
+                                    <InputSelect class="form-select form-select-sm" @bind-Value="Lead.LeadOriginId">
+                                        @foreach (var o in Origins)
+                                        {
+                                            <option value="@o.LeadOriginId">@o.LeadOriginName</option>
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <!-- Vendedor -->
                             <tr>
                                 <th class="text-muted small">Vendedor</th>
                                 <td>
@@ -119,12 +148,12 @@ else
                                                  @bind-Value="Lead.SellerId">
                                         @foreach (var i in Sellers)
                                         {
-                                            <option value="@i.Key">@i.Value</option>
+                                            <option value="@i.SellerId">@i.SellerName</option>
                                         }
                                     </InputSelect>
                                 </td>
                             </tr>
-
+                            <!-- Task Bitrix -->
                             <tr>
                                 <th class="text-muted small">Deal</th>
                                 <td>
@@ -133,7 +162,7 @@ else
                                                  @bind-Value="Lead.DealNumber" />
                                 </td>
                             </tr>
-
+                            <!-- Priority -->
                             <tr>
                                 <th class="text-muted small">Prioridad</th>
                                 <td>
@@ -145,7 +174,7 @@ else
                                     </InputSelect>
                                 </td>
                             </tr>
-
+                            <!-- Is New -->
                             <tr>
                                 <th class="text-muted small">Nuevo</th>
                                 <td>
@@ -153,23 +182,7 @@ else
                                                    @bind-Value="Lead.IsNew" />
                                 </td>
                             </tr>
-
-                            <tr>
-                                <th class="text-muted small">Contactado</th>
-                                <td>
-                                    <InputCheckbox class="form-check-input"
-                                                   @bind-Value="Lead.ContactedBySeller" />
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <th class="text-muted small">Llamada</th>
-                                <td>
-                                    <InputCheckbox class="form-check-input"
-                                                   @bind-Value="Lead.isCalled" />
-                                </td>
-                            </tr>
-
+                            <!-- Createdby -->
                             <tr>
                                 <th class="text-muted small">Creado por</th>
                                 <td class="text-muted">@Lead.CreatedBy</td>
@@ -221,7 +234,8 @@ else
                                 </span>
                             </td>
                         </tr>
-
+                        <tr><th class="text-muted">Sector</th><td>@Lead.Sector?.Name</td></tr>
+                        <tr><th class="text-muted">Entrada</th><td>@Lead.Input?.Name</td></tr>
                         <tr><th class="text-muted">Origen</th><td>@Lead.Origin?.LeadOriginName</td></tr>
                         <tr><th class="text-muted">Tipo</th><td>@Lead.LeadRequest?.RequestName</td></tr>
                         <tr><th class="text-muted">Vendedor</th><td>@Lead.Seller?.SellerName</td></tr>
@@ -248,24 +262,6 @@ else
                             <td>
                                 <span class="badge @(Lead.IsNew ? "bg-success" : "bg-secondary")">
                                     @(Lead.IsNew ? "Sí" : "No")
-                                </span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-muted">Contactado</th>
-                            <td>
-                                <span class="badge @(Lead.ContactedBySeller ? "bg-success" : "bg-secondary")">
-                                    @(Lead.ContactedBySeller ? "Sí" : "No")
-                                </span>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <th class="text-muted">Llamada</th>
-                            <td>
-                                <span class="badge @(Lead.isCalled ? "bg-success" : "bg-secondary")">
-                                    @(Lead.isCalled ? "Sí" : "No")
                                 </span>
                             </td>
                         </tr>
@@ -309,14 +305,6 @@ else
                     <Button class="btn btn-sm btn-primary px-3"
                             @onclick="SendMessage">
                         Notificar al Vendedor
-                    </Button>
-
-                    <Button class="btn btn-sm btn-outline-success px-3">
-                        Contactado
-                    </Button>
-
-                    <Button class="btn btn-sm btn-outline-secondary px-3">
-                        Llamado
                     </Button>
                 }
                 else
@@ -399,15 +387,34 @@ else
     private string? currentUser;
     private bool Editing = false;
 
-    private Dictionary<int, string> Origins = new();
-    private Dictionary<int, string> RequestTypes = new();
-    private Dictionary<int, string> Sellers = new();
+    private List<LeadOrigin> Origins = new();
+    private List<LeadRequest> RequestTypes = new();
+    private List<Seller> Sellers = new();
 
-    private Dictionary<int, string> States = new();
+    private List<LeadSector> sectors = new();
+    private List<LeadInput> Inputs = new();
+    private List<LeadState> States = new();
 
     private string deletebutton = "btn-success";
 
-    private string message = "";
+    List<ToastMessage> messages = new List<ToastMessage>();
+
+    private ToastMessage CreateToastMessage(
+        ToastType toastType,
+        string title,
+        string message,
+        string? helpText = null)
+    {
+        return new ToastMessage
+        {
+            Type = toastType,
+            Title = title,
+            Message = message,
+            HelpText = helpText ?? DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+        };
+    }
+
+
 
 
     protected override async Task OnInitializedAsync()
@@ -415,30 +422,7 @@ else
         db = DbContextFactory.CreateDbContext();
         await LoadUserAsync();
 
-        message = $@"
-📌 Nueva Solicitud Entrante en Recepción
 
-• Nombre: {Lead.ContactName}
-• Empresa: {Lead.CompanyName}
-
-• Origen: {Lead?.Origin.LeadOriginName}
-• Solicitud: {Lead?.LeadRequest.RequestName}
-• Estado: {Lead.LeadState?.Name}
-
-• Negociación https://grupomecsa.bitrix24.es/crm/deal/details/{Lead.DealNumber}/
-
-• Vendedor asignado: {Lead.Seller.SellerName}
-
-🗓 Fecha de creación: {Lead.CreatedAt:dd/MM/yyyy HH:mm}
-👤 Creado por: {currentUser}
-
-Descripción
-{Lead.Description}
-
-
--------
-(Este es un mensaje automático)
-";
 
         await LoadData();
     }
@@ -449,12 +433,10 @@ Descripción
         {
             using var context = DbContextFactory.CreateDbContext();
 
-            context.Leads.Attach(Lead);
-            context.Entry(Lead).State = EntityState.Modified;
-
+            Lead.LeadState = States.FirstOrDefault(s => s.LeadStateId == Lead.LeadStateId);
             Lead.UpdatedAt = DateTime.Now;
             Lead.LastUpdatedBy = currentUser;
-
+            context.Leads.Update(Lead);
             await context.SaveChangesAsync();
 
             Editing = false;
@@ -492,10 +474,12 @@ Descripción
     {
         try
         {
-            Origins = await db.LeadOrigins.ToDictionaryAsync(e => e.LeadOriginId, e => e.LeadOriginName);
-            RequestTypes = await db.LeadsRequest.ToDictionaryAsync(e => e.LeadRequestId, e => e.RequestName);
-            Sellers = await db.Seller.ToDictionaryAsync(e => e.SellerId, e => e.SellerName);
-            States = await db.LeadsState.ToDictionaryAsync(e => e.LeadStateId, e => e.Name);
+            Origins = await db.LeadOrigins.AsNoTracking().OrderBy(o=>o.LeadOriginName).ToListAsync();
+            RequestTypes = await db.LeadsRequest.AsNoTracking().OrderBy(o => o.RequestName).ToListAsync();
+            Sellers = await db.Seller.AsNoTracking().Where(e=>e.IsActive).OrderBy(o => o.SellerName).ToListAsync();
+            States = await db.LeadsState.AsNoTracking().OrderBy(o => o.Order).ToListAsync();
+            sectors = await db.LeadSectors.AsNoTracking().OrderBy(e => e.Name).ToListAsync();
+            Inputs = await db.LeadInput.AsNoTracking().OrderBy(e => e.Name).ToListAsync();
         }
         catch (Exception e)
         {
@@ -542,6 +526,38 @@ Descripción
 
     private async Task SendMessage()
     {
-        await Bitrix24Client.SendMessageToUser(252, message);
+        var message = $@"
+📌 Nueva Solicitud Entrante en Recepción
+
+• Nombre: {Lead.ContactName}
+• Empresa: {Lead.CompanyName}
+
+• Origen: {Lead?.Origin.LeadOriginName}
+• Solicitud: {Lead?.LeadRequest.RequestName}
+• Estado: {Lead.LeadState?.Name}
+
+• Negociación https://grupomecsa.bitrix24.es/crm/deal/details/{Lead.DealNumber}/
+
+• Vendedor asignado: {Lead.Seller.SellerName}
+
+🗓 Fecha de creación: {Lead.CreatedAt:dd/MM/yyyy HH:mm}
+👤 Creado por: {currentUser}
+
+Descripción
+{Lead.Description}
+
+
+-------
+(Este es un mensaje automático)
+";
+        var respo = await Bitrix24Client.SendMessageToUser(Lead.Seller.Bitrix24Id, message);
+        if (respo != 0)
+        {
+            messages.Add(CreateToastMessage(ToastType.Success, "Éxito", "Mensaje enviado al vendedor correctamente."));
+        }
+        else
+        {
+            messages.Add(CreateToastMessage(ToastType.Danger, "Error", "No se pudo enviar el mensaje al vendedor."));
+        }
     }
 }

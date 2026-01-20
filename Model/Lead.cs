@@ -38,11 +38,11 @@ namespace ProjectsMecsaSPA.Model
 
         // Input
         public LeadInput? Input { get; set; }
-        public int LeadInputId { get; set; } = 1;
+        public int LeadInputId { get; set; } 
 
         // Sector
         public LeadSector? Sector { get; set; }
-        public int LeadSectorId { get; set; } = 1;
+        public int LeadSectorId { get; set; } 
         /// Notes
         public ICollection<LeadNotes> Notes { get; set; }
 
