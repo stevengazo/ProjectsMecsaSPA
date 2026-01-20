@@ -15,7 +15,7 @@
                        @bind-value:event="oninput" />
             </div>
 
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" @onclick="ShowLeadComponent">
                 <i class="bi bi-plus-lg me-1"></i>
                 Agregar Lead
             </button>
@@ -157,7 +157,7 @@
     {
         ByCategory.Clear();
 
-        foreach (var sector in sectors)
+        foreach (var sector in sectors.Distinct().ToList())
         {
             var sectorLeads = leads
                 .Where(l => l.LeadSectorId == sector.LeadSectorId)
